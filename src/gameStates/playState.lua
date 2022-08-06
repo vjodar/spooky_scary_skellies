@@ -1,21 +1,24 @@
 local PlayState={}
 
-function PlayState:load()
-    --load PlayState stuff here
-    Player={talkOnCooldown=false}
+function PlayState:load()    
+    World=wf.newWorld()
+    World:addCollisionClass('player')
+
+    Entities:load()
+    Player:load(10,10)
+    Camera.target=Player
+    Camera.cam:zoomTo(3)
 end
 
 function PlayState:update()
-    --update PlayState stuff here    
-    if Player.talkOnCooldown==false then 
-        print("Hello") 
-        local cdPeriod=love.math.random(2)
-        Timer:setOnCooldown(Player,'talkOnCooldown',cdPeriod)
-    end
+    Camera:update()
+    World:update(dt)
+    Entities:update()
 end
 
 function PlayState:draw()
-    --draw PlayState stuff here     
+    World:draw()
+    Entities:draw()
 end
 
 return PlayState

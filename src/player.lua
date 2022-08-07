@@ -74,6 +74,8 @@ function player:move()
         if target.y~=self.x then yVel=(sin(angle)*self.moveSpeed) end
 
         self.animations.current=self.animations.moving
+    else 
+        self.animations.current=self.animations.idle
     end
 
     self.collider:applyForce(xVel,yVel)

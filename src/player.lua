@@ -1,13 +1,18 @@
 local player={}
 
 function player:load(_x,_y)
-    self.collider=self:createCollider(_x,_y)
-    self.x,self.y=self.collider:getPosition()
-    self.xOffset,self.yOffset=10,19
-    
-    self.scaleX=1 --used to flip sprites horizontally
-    self.moveSpeed=2400
+    self.collider=World:newBSGRectangleCollider(_x,_y,12,5,3)    
+    self.collider:setLinearDamping(20) --apply increased 'friction'
+    self.collider:setFixedRotation(true) --collider won't spin/rotate
+    self.collider:setCollisionClass('player')
+    self.collider:setObject(self) --attach collider to this object
+    self.collider:setMass(10) --player is base unit for mass
 
+    self.x,self.y=self.collider:getPosition()
+    self.scaleX=1 --used to flip sprites horizontally
+    self.moveSpeed=24000
+    
+    self.xOffset,self.yOffset=10,19
     self.spriteSheet=love.graphics.newImage('assets/entities/player.png')
     self.grid=anim8.newGrid(20,19,self.spriteSheet:getWidth(),self.spriteSheet:getHeight())
     self.animations={}
@@ -30,16 +35,6 @@ function player:draw()
         self.spriteSheet,self.x,self.y,
         nil,self.scaleX,1,self.xOffset,self.yOffset
     )
-end
-
-function player:createCollider(_x,_y)
-    local c=World:newBSGRectangleCollider(_x,_y,12,5,3)    
-    c:setLinearDamping(20) --apply increased 'friction'
-    c:setFixedRotation(true) --collider won't spin/rotate
-    c:setCollisionClass('player')
-    c:setObject(self) --attach collider to this object
-    c:setMass(1) --player is base unit for mass
-    return c
 end
 
 function player:move()

@@ -48,9 +48,13 @@ function skeletons:new(_skeletonType,_x,_y)
     s.collider:setFixedRotation(true) 
     s.collider:setCollisionClass('skeleton')
     s.collider:setObject(s)
+
     s.x,s.y=s.collider:getPosition()
     s.moveSpeed=def.moveSpeed
-    s.moveTarget={x=s.x,y=s.y}
+    s.moveTarget=s
+    s.moveTargetOffset=0 --how far away from target before being 'reached'
+    s.distanceFromPlayer=0
+    s.distanceFromPlayerThreshold=100
 
     s.xOffset=def.drawData.xOffset
     s.yOffset=def.drawData.yOffset
@@ -61,13 +65,10 @@ function skeletons:new(_skeletonType,_x,_y)
     )
     s.animSpeed={min=0.25,max=3,current=1}
     
+    s.changeState=self.behaviors.changeState
     s.AI=self.behaviors.AI[s.name]
     
-    function s:changeState(_state) 
-        self.state=_state 
-        self.animations.current=self.animations[_state]
-    end
-    function s:update() self.AI[self.state](self) end    
+    function s:update() self.AI[self.state](self) end
     function s:draw()
         self.animations.current:draw(
             self.spriteSheet,self.x,self.y,

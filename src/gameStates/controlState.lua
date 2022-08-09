@@ -7,8 +7,10 @@ function controlState:load()
             dirRight=false,
             dirUp=false,
             dirDown=false,
-            btnA=false,
-            btnB=false,
+            mouse=false,
+            --testing-----------
+            mouse2=false,
+            --testing-----------
         }
     end
 
@@ -18,15 +20,25 @@ function controlState:load()
             dirDown={'s','down'},
             dirLeft={'a','left'},
             dirRight={'d','right'},
-            btnA={'o'},
-            btnB={'p'},
         }
     end
 
+    local function defaultMouseMappings()
+        return {
+            mouse=1,
+            --testing-------------
+            mouse2=2,
+            --testing-------------
+        }
+    end
+    
     self.down=defaultInputs()
     self.pressed=defaultInputs()
     self.released=defaultInputs()
-    self.keyMappings=defaultKeyMappings()
+    self.keyMappings=defaultKeyMappings() 
+    self.mouseMappings=defaultMouseMappings() 
+
+    love.mouse.setCursor(love.mouse.getSystemCursor('hand'))
 end
 
 --Reads input to determine what inputs are down, pressed, and released this frame
@@ -41,6 +53,19 @@ function controlState:update()
             self.pressed[input]=false
         end
     end
+
+    for input,mouseBtn in pairs(self.mouseMappings) do 
+        if love.mouse.isDown(mouseBtn) and not self.released[input] then 
+            self.pressed[input]=not self.down[input]
+            self.down[input]=true 
+        else 
+            self.released[input]=self.down[input]
+            self.down[input]=false
+            self.pressed[input]=false
+        end
+    end
 end
+
+function controlState.getMousePosition() return Camera.cam:mousePosition() end
 
 return controlState

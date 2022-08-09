@@ -4,12 +4,17 @@ function PlayState:load()
     World=wf.newWorld()
     World:addCollisionClass('player')
     World:addCollisionClass('skeleton')
+    World:addCollisionClass('enemy')
+    --testing--------------------------------
+    World:setQueryDebugDrawing(true)
+    --testing--------------------------------
 
     map=love.graphics.newImage('assets/maps/placeholder.png')
 
     Entities:load()
     Player:load(10,10)
     Skeletons:load()
+    Enemies:load()
     Camera.target=Player
     Camera.cam:zoomTo(2)
 end
@@ -18,12 +23,11 @@ function PlayState:update()
     Camera:update()
     World:update(dt)
     Entities:update()
-    if Controls.released.btnB then 
-        Skeletons:new('warrior',0,0)
-        Skeletons:new('archer',15,0)
-        Skeletons:new('mageFire',30,0)
-        Skeletons:new('mageIce',45,0)
-        Skeletons:new('mageElectric',60,0)
+    if Controls.pressed.mouse then
+        Skeletons:new('warrior',Controls.getMousePosition())
+    end
+    if Controls.pressed.mouse2 then 
+        Enemies:new('meleeEnemy',Controls.getMousePosition())
     end
 end
 

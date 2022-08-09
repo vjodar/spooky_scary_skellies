@@ -1,6 +1,7 @@
 local player={}
 
 function player:load(_x,_y)
+    self.name='player'
     self.collider=World:newBSGRectangleCollider(_x,_y,12,5,3)    
     self.collider:setLinearDamping(20) --apply increased 'friction'
     self.collider:setFixedRotation(true) --collider won't spin/rotate
@@ -10,7 +11,7 @@ function player:load(_x,_y)
 
     self.x,self.y=self.collider:getPosition()
     self.scaleX=1 --used to flip sprites horizontally
-    self.moveSpeed=24000
+    self.moveSpeed=18000
     
     self.xOffset,self.yOffset=10,19
     self.spriteSheet=love.graphics.newImage('assets/entities/player.png')

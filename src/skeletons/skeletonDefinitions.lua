@@ -43,7 +43,7 @@ return {
                 duration=0.4
             },
         },
-        moveSpeed=240,         
+        moveSpeed=210,         
     },
     archer={
         name='skeleton_archer',
@@ -89,7 +89,7 @@ return {
                 duration=0.4
             },
         },
-        moveSpeed=240,         
+        moveSpeed=180,         
     },
     mageFire={
         name='skeleton_mage_fire',
@@ -135,7 +135,7 @@ return {
             --     duration=0.4
             -- },
         },
-        moveSpeed=240,         
+        moveSpeed=180,         
     },
     mageIce={
         name='skeleton_mage_ice',
@@ -181,7 +181,7 @@ return {
             --     duration=0.4
             -- },
         },
-        moveSpeed=240,         
+        moveSpeed=180,         
     },
     mageElectric={
         name='skeleton_mage_electric',
@@ -227,6 +227,6 @@ return {
             --     duration=0.4
             -- },
         },
-        moveSpeed=240,         
+        moveSpeed=180,         
     },
 }

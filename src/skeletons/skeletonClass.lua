@@ -1,6 +1,6 @@
-local skeletons={}
+local skeletonClass={}
 
-function skeletons:load()
+function skeletonClass:load()
     self.spriteSheets={
         warrior=love.graphics.newImage('assets/entities/skeleton_warrior.png'),
         archer=love.graphics.newImage('assets/entities/skeleton_archer.png'),
@@ -23,23 +23,20 @@ function skeletons:load()
     function self:parseAnimations(_skeleton,_grid,_animDefs)
         local anims={}  
         for anim,def in pairs(_animDefs) do
-            local onLoopFn=function() end 
-            if def.onLoop then
-                onLoopFn=self.behaviors.onLoopFunctions[def.onLoop](_skeleton)
-            end 
             anims[anim]=anim8.newAnimation(
-                _grid(def.frames,def.row),def.duration,onLoopFn
+                _grid(def.frames,def.row),def.duration
             ) 
         end
         return anims
     end
 end
 
-function skeletons:new(_skeletonType,_x,_y)
+function skeletonClass:new(_skeletonType,_x,_y)
     local def=self.skeletonDefinitions[_skeletonType]
 
-    local s={}
-    s.name=def.name
+    local s={name=def.name}
+    
+    --Collider data
     s.collider=World:newBSGRectangleCollider(
         _x,_y,def.collider.width,def.collider.height,def.collider.corner
     )
@@ -49,22 +46,32 @@ function skeletons:new(_skeletonType,_x,_y)
     s.collider:setCollisionClass('skeleton')
     s.collider:setObject(s)
 
+    --General data
     s.x,s.y=s.collider:getPosition()
     s.moveSpeed=def.moveSpeed
+    s.attackRange=def.attackRange
     s.moveTarget=s
-    s.moveTargetOffset=0 --how far away from target before being 'reached'
+    s.moveTargetOffset=0
     s.distanceFromPlayer=0
-    s.distanceFromPlayerThreshold=100
+    s.returnToPlayerThreshold=100
+    s.queryAttackTargetRate=1 --will target enemies every 1s
+    s.queryAttackTargetReady=true 
 
+    --Draw data
     s.xOffset=def.drawData.xOffset
     s.yOffset=def.drawData.yOffset
     s.scaleX=1
-    s.spriteSheet=self.spriteSheets[def.drawData.spriteSheet]
+    s.spriteSheet=self.spriteSheets[def.name]
     s.animations=self:parseAnimations(
-        s,self.grids[def.drawData.grid],def.animations
+        s,self.grids[def.name],def.animations
     )
     s.animSpeed={min=0.25,max=3,current=1}
     
+    --Actions/AI
+    s.onLoopFunctions={}
+    for i,fn in pairs(self.behaviors.onLoopFunctions) do
+        s.onLoopFunctions[i]=fn(s)
+    end
     s.changeState=self.behaviors.changeState
     s.AI=self.behaviors.AI[s.name]
     
@@ -81,4 +88,4 @@ function skeletons:new(_skeletonType,_x,_y)
     return s
 end
 
-return skeletons
+return skeletonClass

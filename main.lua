@@ -8,8 +8,8 @@ function love.load()
     Camera=require 'src/camera' --automatically initialized
     Entities=require 'src/entities'
     Player=require 'src/player'
-    Skeletons=require 'src/skeletons/skeletons'
-    Enemies=require 'src/enemies/enemies'
+    Skeletons=require 'src/skeletons/skeletonClass'
+    Enemies=require 'src/enemies/enemyClass'
 
     --GameStates
     Controls=require 'src/gameStates/controlState'

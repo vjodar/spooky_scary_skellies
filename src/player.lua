@@ -12,6 +12,10 @@ function player:load(_x,_y)
     self.x,self.y=self.collider:getPosition()
     self.scaleX=1 --used to flip sprites horizontally
     self.moveSpeed=18000
+    self.queryForEnemiesRate=1 --will query for enemies every 1s
+    self.queryForEnemiesReady=true
+    self.nearbyEnemies={}
+    self.aggroRange={w=600,h=450}
     
     self.xOffset,self.yOffset=10,19
     self.spriteSheet=love.graphics.newImage('assets/entities/player.png')
@@ -27,8 +31,14 @@ end
 
 function player:update()
     self.animations.current:update(dt*self.animSpeed.current)
-    self:move()
     self.x,self.y=self.collider:getPosition()
+
+    if self.queryForEnemiesReady then 
+        Timer:setOnCooldown(self,'queryForEnemiesReady',self.queryForEnemiesRate)
+        self.nearbyEnemies=self:queryForEnemies()
+    end
+
+    self:move()
 end
 
 function player:draw()
@@ -75,6 +85,23 @@ function player:move()
     end
 
     self.collider:applyForce(xVel,yVel)
+end
+
+--return a table of all enemies onscreen
+function player:queryForEnemies() 
+    local queryData={
+        x=self.x-(self.aggroRange.w*0.5),
+        y=self.y-(self.aggroRange.h*0.5),
+        w=self.aggroRange.w,
+        h=self.aggroRange.h,
+        colliderNames={'enemy'}
+    }    
+    local targetColliders=World:queryRectangleArea(
+        queryData.x,queryData.y,queryData.w,queryData.h,queryData.colliderNames
+    )
+    local targets={}
+    for _,c in pairs(targetColliders) do table.insert(targets,c:getObject()) end 
+    return targets
 end
 
 return player

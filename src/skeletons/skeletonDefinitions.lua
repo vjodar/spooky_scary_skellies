@@ -1,6 +1,6 @@
 return {
     warrior={
-        name='skeleton_warrior',
+        name='warrior',
         collider={
             width=12,
             height=5,
@@ -11,21 +11,17 @@ return {
         drawData={
             xOffset=5,
             yOffset=17,
-            spriteSheet='warrior',
-            grid='warrior',
         },
         animations={
             raise={
                 frames='1-7',
                 row=1,
                 duration=0.1,
-                onLoop='changeToIdle'
             },
             lower={
                 frames='7-1',
                 row=1,
                 duration=0.1,
-                onLoop='changeToRaise'
             },
             idle={
                 frames='1-4',
@@ -43,10 +39,11 @@ return {
                 duration=0.4
             },
         },
-        moveSpeed=210,         
+        moveSpeed=210,
+        attackRange=30,  
     },
     archer={
-        name='skeleton_archer',
+        name='archer',
         collider={
             width=12,
             height=5,
@@ -57,21 +54,17 @@ return {
         drawData={
             xOffset=21,
             yOffset=22,
-            spriteSheet='archer',
-            grid='archer',
         },
         animations={
             raise={
                 frames='1-7',
                 row=1,
                 duration=0.1,
-                onLoop='changeToIdle'
             },
             lower={
                 frames='7-1',
                 row=1,
                 duration=0.1,
-                onLoop='changeToRaise'
             },
             idle={
                 frames='1-4',
@@ -89,10 +82,11 @@ return {
                 duration=0.4
             },
         },
-        moveSpeed=180,         
+        moveSpeed=180,     
+        attackRange=90,    
     },
     mageFire={
-        name='skeleton_mage_fire',
+        name='mageFire',
         collider={
             width=12,
             height=5,
@@ -103,21 +97,17 @@ return {
         drawData={
             xOffset=12,
             yOffset=24,
-            spriteSheet='mageFire',
-            grid='mage',
         },
         animations={
             raise={
                 frames='1-7',
                 row=1,
                 duration=0.1,
-                onLoop='changeToIdle'
             },
             lower={
                 frames='7-1',
                 row=1,
                 duration=0.1,
-                onLoop='changeToRaise'
             },
             idle={
                 frames='1-4',
@@ -135,10 +125,11 @@ return {
             --     duration=0.4
             -- },
         },
-        moveSpeed=180,         
+        moveSpeed=180,  
+        attackRange=60,       
     },
     mageIce={
-        name='skeleton_mage_ice',
+        name='mageIce',
         collider={
             width=12,
             height=5,
@@ -149,21 +140,17 @@ return {
         drawData={
             xOffset=12,
             yOffset=24,
-            spriteSheet='mageIce',
-            grid='mage',
         },
         animations={
             raise={
                 frames='1-7',
                 row=1,
                 duration=0.1,
-                onLoop='changeToIdle'
             },
             lower={
                 frames='7-1',
                 row=1,
                 duration=0.1,
-                onLoop='changeToRaise'
             },
             idle={
                 frames='1-4',
@@ -181,10 +168,11 @@ return {
             --     duration=0.4
             -- },
         },
-        moveSpeed=180,         
+        moveSpeed=180,    
+        attackRange=60,     
     },
     mageElectric={
-        name='skeleton_mage_electric',
+        name='mageElectric',
         collider={
             width=12,
             height=5,
@@ -195,21 +183,17 @@ return {
         drawData={
             xOffset=12,
             yOffset=24,
-            spriteSheet='mageElectric',
-            grid='mage',
         },
         animations={
             raise={
                 frames='1-7',
                 row=1,
                 duration=0.1,
-                onLoop='changeToIdle'
             },
             lower={
                 frames='7-1',
                 row=1,
                 duration=0.1,
-                onLoop='changeToRaise'
             },
             idle={
                 frames='1-4',
@@ -227,6 +211,7 @@ return {
             --     duration=0.4
             -- },
         },
-        moveSpeed=180,         
+        moveSpeed=180,    
+        attackRange=60,     
     },
 }

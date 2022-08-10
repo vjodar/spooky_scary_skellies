@@ -1,13 +1,13 @@
-local enemies={}
+local enemyClass={}
 
-function enemies:load()
+function enemyClass:load()
     self.spriteSheets={
-        meleeEnemy=love.graphics.newImage('assets/entities/skeleton_warrior.png'),
+        slime=love.graphics.newImage('assets/entities/slime.png'),
     }
     local function getWidth(_type) return self.spriteSheets[_type]:getWidth() end 
     local function getHeight(_type) return self.spriteSheets[_type]:getHeight() end 
     self.grids={
-        meleeEnemy=anim8.newGrid(10,17,getWidth('meleeEnemy'),getHeight('meleeEnemy')),
+        slime=anim8.newGrid(16,14,getWidth('slime'),getHeight('slime')),
     }
 
     self.enemyDefinitions=require 'src/enemies/enemyDefinitions'
@@ -29,12 +29,12 @@ function enemies:load()
     end
 end
 
-function enemies:new(_enemyType,_x,_y)
+function enemyClass:new(_enemyType,_x,_y)
     local def=self.enemyDefinitions[_enemyType]
 
-    local e={}
-    --Collider data (and name)
-    e.name=def.name
+    local e={name=def.name}
+
+    --Collider data
     e.collider=World:newBSGRectangleCollider(
         _x,_y,def.collider.width,def.collider.height,def.collider.corner
     )
@@ -48,23 +48,27 @@ function enemies:new(_enemyType,_x,_y)
     e.x,e.y=e.collider:getPosition()
     e.moveSpeed=def.moveSpeed
     e.moveTarget=e
-    e.moveTargetOffset=0 --how far away from target before being 'reached'
+    e.attackRange=def.attackRange 
     e.aggroRange={w=400,h=300}
-    e.queryForAttackTargetsRate=1 --check for targets every 1s
-    e.queryForAttackTargetsTimer=0
     e.nearbyAttackTargets={}
+    e.queryAttackTargetRate=1 --check for targets every 1s
+    e.queryAttackTargetReady=true
 
     --Draw data
     e.xOffset=def.drawData.xOffset
     e.yOffset=def.drawData.yOffset
     e.scaleX=1
-    e.spriteSheet=self.spriteSheets[def.drawData.spriteSheet]
+    e.spriteSheet=self.spriteSheets[def.name]
     e.animations=self:parseAnimations(
-        e,self.grids[def.drawData.grid],def.animations
+        e,self.grids[def.name],def.animations
     )
     e.animSpeed={min=0.25,max=3,current=1}
     
     --Actions/AI
+    e.onLoopFunctions={}
+    for i,fn in pairs(self.behaviors.onLoopFunctions) do 
+        e.onLoopFunctions[i]=fn(e)
+    end
     e.changeState=self.behaviors.changeState
     e.AI=self.behaviors.AI[e.name]    
     function e:update() self.AI[self.state](self) end
@@ -80,4 +84,4 @@ function enemies:new(_enemyType,_x,_y)
     return e
 end
 
-return enemies
+return enemyClass

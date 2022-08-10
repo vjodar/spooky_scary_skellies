@@ -27,7 +27,7 @@ function PlayState:update()
         Skeletons:new('warrior',Controls.getMousePosition())
     end
     if Controls.pressed.mouse2 then 
-        Enemies:new('meleeEnemy',Controls.getMousePosition())
+        Enemies:new('slime',Controls.getMousePosition())
     end
 end
 

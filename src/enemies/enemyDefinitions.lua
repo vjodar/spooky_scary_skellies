@@ -1,20 +1,23 @@
 return {
-    meleeEnemy={
-        name='melee_enemy',
+    slime={
+        name='slime',
         collider={
-            width=12,
-            height=5,
+            width=10,
+            height=4,
             corner=3,
             linearDamping=20,
             mass=0.1,
         },
         drawData={
-            xOffset=5,
-            yOffset=17,
-            spriteSheet='meleeEnemy',
-            grid='meleeEnemy',
+            xOffset=8,
+            yOffset=14,
         },
         animations={
+            wake={
+                frames='1-4',
+                row=1,
+                duration=0.1,
+            },
             idle={
                 frames='1-4',
                 row=2,
@@ -26,11 +29,12 @@ return {
                 duration=0.1,
             },
             attack={
-                frames=1,
+                frames='1-7',
                 row=4,
-                duration=0.4
+                duration=0.1
             },
         },
-        moveSpeed=210,
+        moveSpeed=100,
+        attackRange=30,
     },
 }

@@ -10,6 +10,9 @@ behaviors.onLoopFunctions={
             _s:changeState('raise')
         end
     end,
+    changeToMove=function(_s)
+        return function() _s:changeState('move') end
+    end,
 }
 
 behaviors.updatePosition=function(_s)
@@ -53,6 +56,11 @@ behaviors.getNearestAttackTarget=function(_s)
     return closest.t
 end
 
+behaviors.onDamagingFrames=function(_e)
+    return _e.animations.current.position >= _e.damagingFrames[1]
+        and _e.animations.current.position <= _e.damagingFrames[2]
+end
+
 -------------------------------------------------------------------------------
 
 behaviors.raise=function(_s)
@@ -82,11 +90,13 @@ behaviors.idle=function(_s)
     end
 
     --find and target the nearest enemy
-    if _s.queryAttackTargetReady then 
-        Timer:setOnCooldown(_s,'queryAttackTargetReady',_s.queryAttackTargetRate)
+    if _s.canQueryAttackTarget then 
+        Timer:setOnCooldown(_s,'canQueryAttackTarget',_s.queryAttackTargetRate)
         _s.moveTarget=behaviors.getNearestAttackTarget(_s)
-        _s.moveTargetOffset=_s.attackRange
-        _s:changeState('move')
+        if _s.moveTarget~=_s then 
+            _s.moveTargetOffset=_s.attackRange
+            _s:changeState('move') 
+        end
     end
 end
 
@@ -100,26 +110,46 @@ behaviors.move=function(_s)
         return 
     end 
 
+    if _s.moveTarget.x>_s.x then _s.scaleX=1 else _s.scaleX=-1 end 
+    _s.angle=atan2((_s.moveTarget.y-_s.y),(_s.moveTarget.x-_s.x))
+
     local xVel,yVel=0,0
     local reachedTarget=(
         (abs(_s.moveTarget.x-_s.x)^2+abs(_s.moveTarget.y-_s.y)^2)^0.5
     )<_s.moveTargetOffset
 
     if reachedTarget then 
-        _s:changeState('idle') 
-        behaviors.resetMoveTarget(_s)
-        return 
+        if _s.moveTarget==Player or _s.moveTarget==_s then 
+            _s:changeState('idle') 
+            behaviors.resetMoveTarget(_s)
+            return 
+        else --reached attack target
+            if _s.canAttack then 
+                _s:changeState('attack')
+                return
+            else 
+                _s:changeState('idle')
+                return
+            end
+        end
     end
 
-    local angle=atan2((_s.moveTarget.y-_s.y),(_s.moveTarget.x-_s.x))
-    xVel=cos(angle)*_s.moveSpeed
-    yVel=sin(angle)*_s.moveSpeed
-    if _s.moveTarget.x>_s.x then _s.scaleX=1 else _s.scaleX=-1 end 
+    xVel=cos(_s.angle)*_s.moveSpeed
+    yVel=sin(_s.angle)*_s.moveSpeed
     _s.collider:applyForce(xVel,yVel)
 end
 
-behaviors.attackMelee=function(_s)
+behaviors.attackLunge=function(_s)
+    behaviors.updatePosition(_s)
+    behaviors.updateAnimation(_s)
+    _s.animations.attack.onLoop=_s.onLoopFunctions.changeToMove
 
+    if _s.canAttack and behaviors.onDamagingFrames(_s) then
+        local fx=cos(_s.angle)*_s.moveSpeed*40
+        local fy=sin(_s.angle)*_s.moveSpeed*40
+        _s.collider:applyForce(fx,fy)
+        Timer:setOnCooldown(_s,'canAttack',_s.attackSpeed)
+    end
 end
 
 behaviors.attackRange=function(_s)
@@ -129,35 +159,35 @@ end
 -------------------------------------------------------------------------------
 
 behaviors.AI={
-    ['warrior']={
+    ['skeletonWarrior']={
         raise=behaviors.raise,
         lower=behaviors.lower,
         idle=behaviors.idle,
         move=behaviors.move,
-        attack=behaviors.attackMelee,
+        attack=behaviors.attackLunge,
     },
-    ['archer']={
-        raise=behaviors.raise,
-        lower=behaviors.lower,
-        idle=behaviors.idle,
-        move=behaviors.move,
-        attack=behaviors.attackRange,
-    },
-    ['mageFire']={
+    ['skeletonArcher']={
         raise=behaviors.raise,
         lower=behaviors.lower,
         idle=behaviors.idle,
         move=behaviors.move,
         attack=behaviors.attackRange,
     },
-    ['mageIce']={
+    ['skeletonMageFire']={
         raise=behaviors.raise,
         lower=behaviors.lower,
         idle=behaviors.idle,
         move=behaviors.move,
         attack=behaviors.attackRange,
     },
-    ['mageElectric']={
+    ['skeletonMageIce']={
+        raise=behaviors.raise,
+        lower=behaviors.lower,
+        idle=behaviors.idle,
+        move=behaviors.move,
+        attack=behaviors.attackRange,
+    },
+    ['skeletonMageElectric']={
         raise=behaviors.raise,
         lower=behaviors.lower,
         idle=behaviors.idle,

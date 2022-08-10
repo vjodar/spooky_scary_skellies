@@ -1,16 +1,21 @@
 return {
-    warrior={
-        name='warrior',
+    skeletonWarrior={
+        name='skeletonWarrior',
         collider={
             width=12,
             height=5,
             corner=3,
-            linearDamping=20,
-            mass=0.1,
+            modifiers={
+                setLinearDamping=10,
+                setMass=0.1,
+                setBullet=true,
+            },
         },
         drawData={
             xOffset=5,
             yOffset=17,
+            frameWidth=10,
+            frameHeight=17,
         },
         animations={
             raise={
@@ -36,24 +41,30 @@ return {
             attack={
                 frames=1,
                 row=4,
-                duration=0.4
+                duration=0.4,
+                damagingFrames={1,1}
             },
         },
-        moveSpeed=210,
+        moveSpeed=100,
         attackRange=30,  
+        attackSpeed=1,
     },
-    archer={
-        name='archer',
+    skeletonArcher={
+        name='skeletonArcher',
         collider={
             width=12,
             height=5,
             corner=3,
-            linearDamping=20,
-            mass=0.1,
+            modifiers={
+                setLinearDamping=10,
+                setMass=0.1,
+            },
         },
         drawData={
             xOffset=21,
             yOffset=22,
+            frameWidth=42,
+            frameHeight=22,
         },
         animations={
             raise={
@@ -77,26 +88,31 @@ return {
                 duration=0.1,
             },
             attack={
-                frames=1,
-                row=4,
-                duration=0.4
+                frames='1-4',
+                row=3,
+                duration=0.1,
             },
         },
-        moveSpeed=180,     
-        attackRange=90,    
+        moveSpeed=80,     
+        attackRange=90,  
+        attackSpeed=1, 
     },
-    mageFire={
-        name='mageFire',
+    skeletonMageFire={
+        name='skeletonMageFire',
         collider={
             width=12,
             height=5,
             corner=3,
-            linearDamping=20,
-            mass=0.1,
+            modifiers={
+                setLinearDamping=10,
+                setMass=0.1,
+            },
         },
         drawData={
             xOffset=12,
             yOffset=24,
+            frameWidth=24,
+            frameHeight=24,
         },
         animations={
             raise={
@@ -119,27 +135,32 @@ return {
                 row=3,
                 duration=0.1,
             },
-            -- attack={
-            --     frames=1,
-            --     row=4,
-            --     duration=0.4
-            -- },
+            attack={
+                frames='1-4',
+                row=3,
+                duration=0.1,
+            },
         },
-        moveSpeed=180,  
-        attackRange=60,       
+        moveSpeed=80,  
+        attackRange=60,  
+        attackSpeed=1,     
     },
-    mageIce={
-        name='mageIce',
+    skeletonMageIce={
+        name='skeletonMageIce',
         collider={
             width=12,
             height=5,
             corner=3,
-            linearDamping=20,
-            mass=0.1,
+            modifiers={
+                setLinearDamping=10,
+                setMass=0.1,
+            },
         },
         drawData={
             xOffset=12,
             yOffset=24,
+            frameWidth=24,
+            frameHeight=24,
         },
         animations={
             raise={
@@ -162,27 +183,32 @@ return {
                 row=3,
                 duration=0.1,
             },
-            -- attack={
-            --     frames=1,
-            --     row=4,
-            --     duration=0.4
-            -- },
+            attack={
+                frames='1-4',
+                row=3,
+                duration=0.1,
+            },
         },
-        moveSpeed=180,    
+        moveSpeed=80,    
         attackRange=60,     
+        attackSpeed=1,
     },
-    mageElectric={
-        name='mageElectric',
+    skeletonMageElectric={
+        name='skeletonMageElectric',
         collider={
             width=12,
             height=5,
             corner=3,
-            linearDamping=20,
-            mass=0.1,
+            modifiers={
+                setLinearDamping=10,
+                setMass=0.1,
+            },
         },
         drawData={
             xOffset=12,
             yOffset=24,
+            frameWidth=24,
+            frameHeight=24,
         },
         animations={
             raise={
@@ -205,13 +231,14 @@ return {
                 row=3,
                 duration=0.1,
             },
-            -- attack={
-            --     frames=1,
-            --     row=4,
-            --     duration=0.4
-            -- },
+            attack={
+                frames='1-4',
+                row=3,
+                duration=0.1,
+            },
         },
-        moveSpeed=180,    
+        moveSpeed=80,    
         attackRange=60,     
+        attackSpeed=1,
     },
 }

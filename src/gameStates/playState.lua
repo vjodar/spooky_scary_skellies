@@ -24,7 +24,11 @@ function PlayState:update()
     World:update(dt)
     Entities:update()
     if Controls.pressed.mouse then
-        Skeletons:new('warrior',Controls.getMousePosition())
+        Skeletons:new('skeletonWarrior',Controls.getMousePosition())
+        -- Skeletons:new('skeletonArcher',Controls.getMousePosition())
+        -- Skeletons:new('skeletonMageFire',Controls.getMousePosition())
+        -- Skeletons:new('skeletonMageIce',Controls.getMousePosition())
+        -- Skeletons:new('skeletonMageElectric',Controls.getMousePosition())
     end
     if Controls.pressed.mouse2 then 
         Enemies:new('slime',Controls.getMousePosition())
@@ -33,7 +37,7 @@ end
 
 function PlayState:draw()
     love.graphics.draw(map,-40,-50)
-    World:draw()
+    -- World:draw()
     Entities:draw()
 end
 

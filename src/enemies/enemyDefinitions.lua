@@ -5,12 +5,17 @@ return {
             width=10,
             height=4,
             corner=3,
-            linearDamping=20,
-            mass=0.1,
+            modifiers={
+                setLinearDamping=10,
+                setMass=0.1,
+                setBullet=true,
+            },
         },
         drawData={
             xOffset=8,
             yOffset=14,
+            frameWidth=16,
+            frameHeight=14,
         },
         animations={
             wake={
@@ -29,12 +34,14 @@ return {
                 duration=0.1,
             },
             attack={
-                frames='1-7',
+                frames='1-8',
                 row=4,
-                duration=0.1
+                duration=0.1,
+                damagingFrames={3,8}
             },
         },
-        moveSpeed=100,
-        attackRange=30,
+        moveSpeed=50,
+        attackRange=40,
+        attackSpeed=1.5,
     },
 }

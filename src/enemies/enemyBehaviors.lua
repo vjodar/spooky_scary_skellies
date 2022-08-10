@@ -4,6 +4,9 @@ behaviors.onLoopFunctions={
     changeToIdle=function(_e)
         return function() _e:changeState('idle')  end
     end,
+    changeToMove=function(_e)
+        return function() _e:changeState('move') end 
+    end,
 }
 
 behaviors.updatePosition=function(_e)
@@ -59,16 +62,21 @@ behaviors.getNearestAttackTarget=function(_e)
     return closest.t
 end
 
+behaviors.onDamagingFrames=function(_e)
+    return _e.animations.current.position >= _e.damagingFrames[1]
+        and _e.animations.current.position <= _e.damagingFrames[2]
+end
+
 -------------------------------------------------------------------------------
 
 behaviors.idle=function(_e)
     behaviors.updatePosition(_e)
     behaviors.updateAnimation(_e)
     
-    if _e.queryAttackTargetReady then 
-        Timer:setOnCooldown(_e,'queryAttackTargetReady',_e.queryAttackTargetRate)
+    if _e.canQueryAttackTarget then 
+        Timer:setOnCooldown(_e,'canQueryAttackTarget',_e.queryAttackTargetRate)
         _e.moveTarget=behaviors.getNearestAttackTarget(_e)
-        _e:changeState('move')
+        if _e.moveTarget~=_e then _e:changeState('move') end
     end
 end
 
@@ -82,6 +90,9 @@ behaviors.move=function(_e)
         _e.moveTarget=_e 
         return 
     end 
+
+    _e.angle=atan2((_e.moveTarget.y-_e.y),(_e.moveTarget.x-_e.x))
+    if _e.moveTarget.x>_e.x then _e.scaleX=1 else _e.scaleX=-1 end --face target
     
     local xVel,yVel=0,0
     local reachedAttackRange=(
@@ -89,22 +100,33 @@ behaviors.move=function(_e)
     )<_e.attackRange
     
     if reachedAttackRange then 
-        _e:changeState('idle') 
-        _e.moveTarget=_e --clear moveTarget
-        return 
+        if _e.canAttack then 
+            _e:changeState('attack')
+            return 
+        else --attack still on cooldown 
+            _e:changeState('idle')
+            return 
+        end
     end
 
     --TODO: query for closer attack targets
     
-    local angle=atan2((_e.moveTarget.y-_e.y),(_e.moveTarget.x-_e.x))
-    xVel=cos(angle)*_e.moveSpeed
-    yVel=sin(angle)*_e.moveSpeed
-    if _e.moveTarget.x>_e.x then _e.scaleX=1 else _e.scaleX=-1 end 
+    xVel=cos(_e.angle)*_e.moveSpeed
+    yVel=sin(_e.angle)*_e.moveSpeed
     _e.collider:applyForce(xVel,yVel)
 end
 
-behaviors.attackMelee=function(_e)
+behaviors.attackLunge=function(_e)
+    behaviors.updatePosition(_e)
+    behaviors.updateAnimation(_e)
+    _e.animations.attack.onLoop=_e.onLoopFunctions.changeToMove
 
+    if _e.canAttack and behaviors.onDamagingFrames(_e) then
+        local fx=cos(_e.angle)*_e.moveSpeed*40
+        local fy=sin(_e.angle)*_e.moveSpeed*40
+        _e.collider:applyForce(fx,fy)
+        Timer:setOnCooldown(_e,'canAttack',_e.attackSpeed)
+    end
 end
 
 behaviors.attackRange=function(_e)
@@ -117,7 +139,7 @@ behaviors.AI={
     ['slime']={
         idle=behaviors.idle,
         move=behaviors.move,
-        attack=behaviors.attackMelee,
+        attack=behaviors.attackLunge,
     },
 }
 

@@ -15,69 +15,105 @@ behaviors.onLoopFunctions={
     end,
 }
 
-behaviors.updatePosition=function(_s)
-    _s.x,_s.y=_s.collider:getPosition()
-end
+--Methods--------------------------------------------------------------------==
 
-behaviors.updateAnimation=function(_s)
-    _s.animations.current:update(dt*_s.animSpeed.current)
-end
+behaviors.methods={
+    update=function(_s) return _s.AI[_s.state](_s) end,
+    draw=function(_s)
+        _s.animations.current:draw(
+            _s.spriteSheet,_s.x,_s.y,
+            nil,_s.scaleX,1,_s.xOffset,_s.yOffset
+        )
+    end,
 
-behaviors.changeState=function(_s,_newState)
-    _s.state=_newState 
-    if _s.animations[_newState] then 
-        _s.animations.current=_s.animations[_newState]
-    end
-end
+    updatePosition=function(_s)
+        _s.x,_s.y=_s.collider:getPosition()
+    end,
 
-behaviors.resetMoveTarget=function(_s)
-    _s.moveTargetOffset=0
-    _s.moveTarget=_s 
-end
+    updateAnimation=function(_s)
+        _s.animations.current:update(dt*_s.animSpeed.current)
+    end,
 
---Gets the closest attack target within LOS from the Player's nearby enemies table
-behaviors.getNearestAttackTarget=function(_s)
-    local nearbyEnemies=Player.nearbyEnemies
-    if #nearbyEnemies==0 then return _s end --nothing nearby, reset moveTarget
+    takeDamage=function(_s,_source)
+        local hp=_s.health.current 
+        local damage=_source.attackDamage or 0 
+        local knockback=_source.knockback or 0
+        local angle=atan2((_source.y-_s.y),(_source.x-_s.x))+pi
+        
+        hp=max(0,hp-damage)
+        _s.health.current=hp
 
-    --filter out any targets blocked from LOS
-    local LOSblockers={'ALL',{except='enemy'}}
-    for i,target in pairs(nearbyEnemies) do 
-        if #World:queryLine(_s.x,_s.y,target.x,target.y,LOSblockers)>0 then 
-            table.remove(nearbyEnemies,i)
+        local ix,iy=cos(angle)*knockback,sin(angle)*knockback
+        _s.collider:applyLinearImpulse(ix,iy)
+
+        if _s.health.current==0 then _s:die() end
+    end,
+
+    dealDamage=function(_s,_target)
+        _target:takeDamage(_s) 
+    end,
+
+    die=function(_s)
+        _s.collider:destroy()
+        _s:changeState('dead')
+    end,
+
+    changeState=function(_s,_newState)
+        _s.state=_newState 
+        if _s.animations[_newState] then 
+            _s.animations.current=_s.animations[_newState]
         end
-    end
-    
-    local closest=nil --find and return the closest target
-    for _,target in pairs(nearbyEnemies) do 
-        local dist=((abs(_s.x-target.x))^2+(abs(_s.y-target.y))^2)^0.5
-        if closest==nil or closest.d>dist then closest={t=target,d=dist} end
-    end
-    return closest.t
-end
+    end,
 
-behaviors.onDamagingFrames=function(_e)
-    return _e.animations.current.position >= _e.damagingFrames[1]
-        and _e.animations.current.position <= _e.damagingFrames[2]
-end
+    resetMoveTarget=function(_s)
+        _s.moveTargetOffset=0
+        _s.moveTarget=_s 
+    end,
 
--------------------------------------------------------------------------------
+    --Gets the closest attack target within LOS from the Player's nearby enemies table
+    getNearestAttackTarget=function(_s)
+        local nearbyEnemies=Player.nearbyEnemies
+        if #nearbyEnemies==0 then return _s end --nothing nearby, reset moveTarget
+
+        --filter out any targets blocked from LOS
+        local LOSblockers={'ALL',{except='enemy'}}
+        for i,target in pairs(nearbyEnemies) do 
+            if #World:queryLine(_s.x,_s.y,target.x,target.y,LOSblockers)>0 then 
+                table.remove(nearbyEnemies,i)
+            end
+        end
+        
+        local closest=nil --find and return the closest target
+        for _,target in pairs(nearbyEnemies) do 
+            local dist=((abs(_s.x-target.x))^2+(abs(_s.y-target.y))^2)^0.5
+            if closest==nil or closest.d>dist then closest={t=target,d=dist} end
+        end
+        return closest.t
+    end,
+
+    onDamagingFrames=function(_e)
+        return _e.animations.current.position >= _e.damagingFrames[1]
+            and _e.animations.current.position <= _e.damagingFrames[2]
+    end,
+}
+
+--States-----------------------------------------------------------------------
 
 behaviors.raise=function(_s)
-    behaviors.updatePosition(_s)
-    behaviors.updateAnimation(_s)
+    _s:updatePosition()
+    _s:updateAnimation()
     _s.animations.raise.onLoop=_s.onLoopFunctions.changeToIdle
 end
 
 behaviors.lower=function(_s)
-    behaviors.updatePosition(_s)
-    behaviors.updateAnimation(_s)
+    _s:updatePosition()
+    _s:updateAnimation()
     _s.animations.lower.onLoop=_s.onLoopFunctions.changeToRaise
 end
 
 behaviors.idle=function(_s)
-    behaviors.updatePosition(_s)
-    behaviors.updateAnimation(_s)
+    _s:updatePosition()
+    _s:updateAnimation()
 
     --update distance from Player
     _s.distanceFromPlayer=(abs(Player.x-_s.x)^2+abs(Player.y-_s.y)^2)^0.5
@@ -92,7 +128,7 @@ behaviors.idle=function(_s)
     --find and target the nearest enemy
     if _s.canQueryAttackTarget then 
         Timer:setOnCooldown(_s,'canQueryAttackTarget',_s.queryAttackTargetRate)
-        _s.moveTarget=behaviors.getNearestAttackTarget(_s)
+        _s.moveTarget=_s:getNearestAttackTarget()
         if _s.moveTarget~=_s then 
             _s.moveTargetOffset=_s.attackRange
             _s:changeState('move') 
@@ -101,12 +137,13 @@ behaviors.idle=function(_s)
 end
 
 behaviors.move=function(_s)
-    behaviors.updatePosition(_s)
-    behaviors.updateAnimation(_s)
+    _s:updatePosition()
+    _s:updateAnimation()
 
-    if _s.moveTarget.state=='dead' then --if target has died, return to idle
+    --if moveTarget has died or has been cleared, return to idle
+    if _s.moveTarget.state=='dead' or _s.moveTarget==_s then
         _s:changeState('idle')
-        behaviors.resetMoveTarget(_s)
+        _s:resetMoveTarget()
         return 
     end 
 
@@ -119,19 +156,12 @@ behaviors.move=function(_s)
     )<_s.moveTargetOffset
 
     if reachedTarget then 
-        if _s.moveTarget==Player or _s.moveTarget==_s then 
-            _s:changeState('idle') 
-            behaviors.resetMoveTarget(_s)
-            return 
-        else --reached attack target
-            if _s.canAttack then 
-                _s:changeState('attack')
-                return
-            else 
-                _s:changeState('idle')
-                return
-            end
+        if _s.moveTarget~=Player and _s.canAttack  then 
+            _s:changeState('attack')
+            return
         end
+        _s:changeState('idle')
+        return
     end
 
     xVel=cos(_s.angle)*_s.moveSpeed
@@ -140,23 +170,38 @@ behaviors.move=function(_s)
 end
 
 behaviors.attackLunge=function(_s)
-    behaviors.updatePosition(_s)
-    behaviors.updateAnimation(_s)
+    _s:updatePosition()
+    _s:updateAnimation()
     _s.animations.attack.onLoop=_s.onLoopFunctions.changeToMove
 
-    if _s.canAttack and behaviors.onDamagingFrames(_s) then
-        local fx=cos(_s.angle)*_s.moveSpeed*40
-        local fy=sin(_s.angle)*_s.moveSpeed*40
-        _s.collider:applyForce(fx,fy)
-        Timer:setOnCooldown(_s,'canAttack',_s.attackSpeed)
+    if _s:onDamagingFrames() then
+        if _s.canAttack then 
+            local ix=cos(_s.angle)*_s.lungeSpeed
+            local iy=sin(_s.angle)*_s.lungeSpeed
+            _s.collider:applyLinearImpulse(ix,iy)
+            Timer:setOnCooldown(_s,'canAttack',_s.attackSpeed)
+        end
+
+        if _s.collider:enter('enemy') then 
+            local data=_s.collider:getEnterCollisionData('enemy')
+            local enemy=data.collider:getObject()
+            if enemy~=nil then _s:dealDamage(enemy) end
+        end
     end
 end
 
-behaviors.attackRange=function(_s)
+behaviors.attackRanged=function(_s)
+    _s:updatePosition()
+    _s:updateAnimation()
+    _s.animations.attack.onLoop=_s.onLoopFunctions.changeToMove
 
 end
 
--------------------------------------------------------------------------------
+behaviors.dead=function(_s)
+    return false
+end
+
+--AI---------------------------------------------------------------------------
 
 behaviors.AI={
     ['skeletonWarrior']={
@@ -165,34 +210,39 @@ behaviors.AI={
         idle=behaviors.idle,
         move=behaviors.move,
         attack=behaviors.attackLunge,
+        dead=behaviors.dead,
     },
     ['skeletonArcher']={
         raise=behaviors.raise,
         lower=behaviors.lower,
         idle=behaviors.idle,
         move=behaviors.move,
-        attack=behaviors.attackRange,
+        attack=behaviors.attackRanged,
+        dead=behaviors.dead,
     },
     ['skeletonMageFire']={
         raise=behaviors.raise,
         lower=behaviors.lower,
         idle=behaviors.idle,
         move=behaviors.move,
-        attack=behaviors.attackRange,
+        attack=behaviors.attackRanged,
+        dead=behaviors.dead,
     },
     ['skeletonMageIce']={
         raise=behaviors.raise,
         lower=behaviors.lower,
         idle=behaviors.idle,
         move=behaviors.move,
-        attack=behaviors.attackRange,
+        attack=behaviors.attackRanged,
+        dead=behaviors.dead,
     },
     ['skeletonMageElectric']={
         raise=behaviors.raise,
         lower=behaviors.lower,
         idle=behaviors.idle,
         move=behaviors.move,
-        attack=behaviors.attackRange,
+        attack=behaviors.attackRanged,
+        dead=behaviors.dead,
     },
 }
 

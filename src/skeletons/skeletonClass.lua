@@ -46,9 +46,13 @@ function skeletonClass:new(_skeletonType,_x,_y)
 
     --General data
     s.x,s.y=s.collider:getPosition()
+    s.health={current=def.health,max=def.health}
     s.moveSpeed=def.moveSpeed
     s.attackRange=def.attackRange
     s.attackSpeed=def.attackSpeed
+    s.attackDamage=def.attackDamage
+    s.knockback=def.knockback
+    s.lungeSpeed=def.lungeSpeed or 0    
     s.canAttack=true
     s.moveTarget=s
     s.angle=0
@@ -74,16 +78,9 @@ function skeletonClass:new(_skeletonType,_x,_y)
     for i,fn in pairs(self.behaviors.onLoopFunctions) do
         s.onLoopFunctions[i]=fn(s)
     end
-    s.changeState=self.behaviors.changeState
+    s.methods={} --includes update and draw functions
+    for i,method in pairs(self.behaviors.methods) do s[i]=method end 
     s.AI=self.behaviors.AI[s.name]
-    
-    function s:update() self.AI[self.state](self) end
-    function s:draw()
-        self.animations.current:draw(
-            self.spriteSheet,self.x,self.y,
-            nil,self.scaleX,1,self.xOffset,self.yOffset
-        )
-    end
 
     s:changeState('raise')
     table.insert(Entities.table,s)

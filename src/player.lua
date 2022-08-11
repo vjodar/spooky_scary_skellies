@@ -1,7 +1,6 @@
-local player={}
+local player={name='player'}
 
 function player:load(_x,_y)
-    self.name='player'
     self.collider=World:newBSGRectangleCollider(_x,_y,12,5,3)    
     self.collider:setLinearDamping(20) --apply increased 'friction'
     self.collider:setFixedRotation(true) --collider won't spin/rotate
@@ -10,9 +9,10 @@ function player:load(_x,_y)
     self.collider:setMass(10) --player is base unit for mass
 
     self.x,self.y=self.collider:getPosition()
+    self.health={current=100,max=100}
     self.scaleX=1 --used to flip sprites horizontally
     self.moveSpeed=18000
-    self.queryForEnemiesRate=1 --will query for enemies every 1s
+    self.queryForEnemiesRate=0.5 --will query for enemies every 0.5s
     self.queryForEnemiesReady=true
     self.nearbyEnemies={}
     self.aggroRange={w=600,h=450}
@@ -102,6 +102,13 @@ function player:queryForEnemies()
     local targets={}
     for _,c in pairs(targetColliders) do table.insert(targets,c:getObject()) end 
     return targets
+end
+
+function player:takeDamage(_args)
+    local damage=_args.damage or 1
+    local hp=self.health.current
+    hp=max(0,hp-damage)
+    self.health.current=hp
 end
 
 return player

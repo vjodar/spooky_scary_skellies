@@ -22,8 +22,9 @@ function love.load()
     gameStates={} --state stack
 
     --common math functions
-    abs,floor,ceil,rnd=math.abs,math.floor,math.ceil,love.math.random
-    cos,sin,atan2=math.cos,math.sin,math.atan2
+    abs,floor,ceil,rnd=math.abs,math.floor,math.ceil
+    min,max,rnd=math.min,math.max,love.math.random
+    pi,cos,sin,atan2=math.pi,math.cos,math.sin,math.atan2
 
     love.graphics.setDefaultFilter('nearest','nearest') --set pixelated look
     love.graphics.setBackgroundColor(paletteBlack) --set background color

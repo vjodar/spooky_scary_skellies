@@ -41,7 +41,11 @@ return {
             },
         },
         moveSpeed=50,
-        attackRange=40,
+        attackRange=40,        
         attackSpeed=1.5,
+        attackDamage=1,
+        lungeSpeed=40,
+        knockback=10,
+        health=3
     },
 }

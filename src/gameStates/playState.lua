@@ -16,7 +16,7 @@ function PlayState:load()
     Skeletons:load()
     Enemies:load()
     Camera.target=Player
-    Camera.cam:zoomTo(2)
+    Camera.cam:zoomTo(3)
 end
 
 function PlayState:update()

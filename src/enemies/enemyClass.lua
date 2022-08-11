@@ -46,10 +46,14 @@ function enemyClass:new(_enemyType,_x,_y)
 
     --General data
     e.x,e.y=e.collider:getPosition()
+    e.health={current=def.health,max=def.health}
     e.moveSpeed=def.moveSpeed
     e.moveTarget=e
     e.angle=0
     e.attackRange=def.attackRange
+    e.attackDamage=def.attackDamage
+    e.lungeSpeed=def.lungeSpeed or 0
+    e.knockback=def.knockback
     e.attackSpeed=def.attackSpeed 
     e.canAttack=true --attack not on cooldown
     e.aggroRange={w=400,h=300}
@@ -73,15 +77,9 @@ function enemyClass:new(_enemyType,_x,_y)
     for i,fn in pairs(self.behaviors.onLoopFunctions) do 
         e.onLoopFunctions[i]=fn(e)
     end
-    e.changeState=self.behaviors.changeState
-    e.AI=self.behaviors.AI[e.name]    
-    function e:update() self.AI[self.state](self) end
-    function e:draw()
-        self.animations.current:draw(
-            self.spriteSheet,self.x,self.y,
-            nil,self.scaleX,1,self.xOffset,self.yOffset
-        )
-    end
+    e.methods={} --includes update/draw functions
+    for i,method in pairs(self.behaviors.methods) do e[i]=method end
+    e.AI=self.behaviors.AI[e.name]
 
     e:changeState('idle')
     table.insert(Entities.table,e)

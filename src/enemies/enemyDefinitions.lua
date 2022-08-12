@@ -1,6 +1,13 @@
 return {
     slime={
         name='slime',
+        moveSpeed=50,
+        attackRange=40,        
+        attackSpeed=1.5,
+        attackDamage=1,
+        lungeSpeed=40,
+        knockback=10,
+        health=3,
         collider={
             width=10,
             height=4,
@@ -40,12 +47,5 @@ return {
                 damagingFrames={3,8}
             },
         },
-        moveSpeed=50,
-        attackRange=40,        
-        attackSpeed=1.5,
-        attackDamage=1,
-        lungeSpeed=40,
-        knockback=10,
-        health=3
     },
 }

@@ -10,6 +10,7 @@ function love.load()
     Player=require 'src/player'
     Skeletons=require 'src/skeletons/skeletonClass'
     Enemies=require 'src/enemies/enemyClass'
+    Projectiles=require 'src/projectiles'
 
     --GameStates
     Controls=require 'src/gameStates/controlState'

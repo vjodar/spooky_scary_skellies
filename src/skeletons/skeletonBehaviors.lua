@@ -195,6 +195,17 @@ behaviors.attackRanged=function(_s)
     _s:updateAnimation()
     _s.animations.attack.onLoop=_s.onLoopFunctions.changeToMove
 
+    if _s.canAttack and _s:onDamagingFrames() then
+        local target=_s:getNearestAttackTarget()
+        local angleToTarget=atan2( --calculate angle from ARROW to target
+            (_s.moveTarget.y-_s.y),(_s.moveTarget.x-(_s.x+14*_s.scaleX))
+        )
+        Projectiles:new({
+            x=_s.x+14*_s.scaleX,y=_s.y,name='arrow',attackDamage=_s.attackDamage,
+            knockback=_s.knockback,angle=angleToTarget
+        })
+        Timer:setOnCooldown(_s,'canAttack',_s.attackSpeed)
+    end
 end
 
 behaviors.dead=function(_s)

@@ -31,7 +31,7 @@ behaviors.methods={
     end,
 
     takeDamage=function(_e,_source)
-        local hp=_e.health.current 
+        local hp=_e.health.current
         local damage=_source.attackDamage or 0
         local knockback=_source.knockback or 0
         local angle=atan2((_source.y-_e.y),(_source.x-_e.x))+pi

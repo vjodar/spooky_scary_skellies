@@ -181,6 +181,19 @@ behaviors.skeleton={ --skeleton specific states
             self.moveTarget=Player
             self.moveTargetOffset=rnd(10,50) --will stop 10-50px from player
             self:changeState('move')
+            return 
+        end
+
+        --if target is a living enemy and skeleton can attack or is out of 
+        --range, move toward the target in order to attack.
+        if self.moveTarget~=Player 
+        and self.moveTarget~=self 
+        and self.moveTarget.state~='dead'
+        then 
+            if self.canAttack 
+            or getDistance(self,self.moveTarget)>self.attackRange 
+            then self:changeState('move') end 
+            return --return to wait until attack is ready or target dies          
         end
     
         --find and target the nearest enemy
@@ -190,6 +203,7 @@ behaviors.skeleton={ --skeleton specific states
             if self.moveTarget~=self then 
                 self.moveTargetOffset=self.attackRange
                 self:changeState('move') 
+                return 
             end
         end
     end,
@@ -209,15 +223,23 @@ behaviors.skeleton={ --skeleton specific states
         self.angle=getAngle(self,self.moveTarget)
     
         if getDistance(self,self.moveTarget)<self.moveTargetOffset then 
-            if self.moveTarget~=Player and self.canAttack then 
-                self:changeState('attack')
+            if self.moveTarget==Player then 
+                self:resetMoveTarget()
+                self:changeState('idle')
                 return
             end
-            self:changeState('idle')
-            return
+            
+            if self.canAttack then
+                self:changeState('attack')
+                return 
+            else 
+                self:changeState('idle') 
+                return  
+            end
         end
-    
-        local xVel,yVel=cos(self.angle)*self.moveSpeed,sin(self.angle)*self.moveSpeed
+
+        local xVel=cos(self.angle)*self.moveSpeed
+        local yVel=sin(self.angle)*self.moveSpeed
         self.collider:applyForce(xVel,yVel)
     end,
     
@@ -247,7 +269,17 @@ behaviors.enemy={ --enemy specific states
     idle=function(self) 
         self:updatePosition()
         self:updateAnimation()
+
+        --if target is a living skeleton and enemy can attack or is out of 
+        --range, move toward the target in order to attack.
+        if self.moveTarget~=self and self.moveTarget.state~='dead' then 
+            if self.canAttack 
+            or getDistance(self,self.moveTarget)>self.attackRange 
+            then self:changeState('move') end 
+            return --return to wait until attack is ready or target dies          
+        end
         
+        --find and target the nearest skeleton/player
         if self.canQueryAttackTarget then 
             Timer:setOnCooldown(self,'canQueryAttackTarget',self.queryAttackTargetRate)
             self.moveTarget=self:getNearestEnemyAttackTarget()
@@ -273,10 +305,10 @@ behaviors.enemy={ --enemy specific states
             if self.canAttack then 
                 self:changeState('attack')
                 return 
-            end 
-            --attack still on cooldown
-            self:changeState('idle')
-            return 
+            else 
+                self:changeState('idle')
+                return
+            end  
         end
     
         --TODO: query for closer attack targets
@@ -294,7 +326,7 @@ behaviors.enemy={ --enemy specific states
             if self.canAttack then 
                 local ix=cos(self.angle)*self.lungeSpeed
                 local iy=sin(self.angle)*self.lungeSpeed
-                self.collider:applyLinearImpulse(ix,iy)        
+                self.collider:applyLinearImpulse(ix,iy)  
                 Timer:setOnCooldown(self,'canAttack',self.attackSpeed)
             end        
     
@@ -306,7 +338,7 @@ behaviors.enemy={ --enemy specific states
     
             if self.collider:enter('player') then 
                 --TODO: damage the player
-                print("hit the player")
+                -- print("hit the player")
             end
         end
     end,

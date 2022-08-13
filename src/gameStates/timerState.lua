@@ -44,8 +44,8 @@ end
 --Set a cooldown timer 
 function TimerState:setOnCooldown(_obj,_cdFlag,_cdPeriod)
     _obj[_cdFlag]=false
-    local setOffCooldown=function() _obj[_cdFlag]=true end
-    self:after(_cdPeriod,setOffCooldown)
+    local releaseCooldown=function() _obj[_cdFlag]=true end
+    self:after(_cdPeriod,releaseCooldown)
 end
 
 return TimerState

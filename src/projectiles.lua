@@ -20,28 +20,34 @@ end
 function projectiles:load()
     self.definitions=self.definitions()
     self.updateFunctions={
-        arrow=function(_p)
-            _p.x,_p.y=_p.collider:getPosition()
-            _p.collider:applyForce(
-                cos(_p.angle)*_p.moveSpeed,sin(_p.angle)*_p.moveSpeed
+        arrow=function(self)
+            self.remainingTravelDistance=self.remainingTravelDistance-dt 
+            if self.remainingTravelDistance<0 then 
+                self.collider:destroy()
+                return false
+            end
+
+            self.x,self.y=self.collider:getPosition()
+            self.collider:applyForce(
+                cos(self.angle)*self.moveSpeed,sin(self.angle)*self.moveSpeed
             )
 
-            if _p.collider:enter('enemy') then
-                local data=_p.collider:getEnterCollisionData('enemy')    
+            if self.collider:enter('enemy') then
+                local data=self.collider:getEnterCollisionData('enemy')    
                 local enemy=data.collider:getObject()
                 if enemy~=nil then
-                    enemy:takeDamage(_p)
-                    _p.collider:destroy()
+                    enemy:takeDamage(self)
+                    self.collider:destroy()
                     return false
                 end
             end 
         end,
     }
     self.drawFunctions={
-        arrow=function(_p)
+        arrow=function(self)
             love.graphics.draw(
-                _p.sprite,_p.x+_p.offset.x,_p.y+_p.offset.y,
-                _p.angle,1,1,_p.origin.x,_p.origin.y
+                self.sprite,self.x+self.offset.x,self.y+self.offset.y,
+                self.angle,1,1,self.origin.x,self.origin.y
             )
         end,
     }
@@ -75,6 +81,7 @@ function projectiles:new(_args)
     p.knockback=_args.knockback
     p.angle=_args.angle
     p.moveSpeed=def.moveSpeed
+    p.remainingTravelDistance=p.moveSpeed/50
 
     --Draw data
     p.sprite=self.sprites[def.name]

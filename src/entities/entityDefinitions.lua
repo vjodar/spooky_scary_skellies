@@ -12,6 +12,7 @@ return {
             width=12,
             height=5,
             corner=3,
+            class='skeleton',
             modifiers={
                 setLinearDamping=10,
                 setMass=0.1,
@@ -65,6 +66,7 @@ return {
             width=12,
             height=5,
             corner=3,
+            class='skeleton',
             modifiers={
                 setLinearDamping=10,
                 setMass=0.1,
@@ -117,6 +119,7 @@ return {
             width=12,
             height=5,
             corner=3,
+            class='skeleton',
             modifiers={
                 setLinearDamping=10,
                 setMass=0.1,
@@ -168,6 +171,7 @@ return {
             width=12,
             height=5,
             corner=3,
+            class='skeleton',
             modifiers={
                 setLinearDamping=10,
                 setMass=0.1,
@@ -219,6 +223,7 @@ return {
             width=12,
             height=5,
             corner=3,
+            class='skeleton',
             modifiers={
                 setLinearDamping=10,
                 setMass=0.1,
@@ -255,6 +260,56 @@ return {
                 frames='1-4',
                 row=3,
                 duration=0.1,
+            },
+        },
+    },
+    slime={
+        name='slime',
+        moveSpeed=50,
+        attackRange=40,        
+        attackSpeed=1.5,
+        attackDamage=1,
+        lungeSpeed=40,
+        knockback=10,
+        health=3,
+        collider={
+            width=10,
+            height=4,
+            corner=3,
+            class='enemy',
+            modifiers={
+                setLinearDamping=10,
+                setMass=0.1,
+                setBullet=true,
+            },
+        },
+        drawData={
+            xOffset=8,
+            yOffset=14,
+            frameWidth=16,
+            frameHeight=14,
+        },
+        animations={
+            wake={
+                frames='1-4',
+                row=1,
+                duration=0.1,
+            },
+            idle={
+                frames='1-4',
+                row=2,
+                duration=0.1,
+            },
+            move={
+                frames='1-4',
+                row=3,
+                duration=0.1,
+            },
+            attack={
+                frames='1-8',
+                row=4,
+                duration=0.1,
+                damagingFrames={3,8}
             },
         },
     },

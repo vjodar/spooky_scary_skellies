@@ -87,7 +87,7 @@ function projectiles:new(_args)
 
     p.collider:setLinearVelocity(cos(p.angle)*p.moveSpeed,sin(p.angle)*p.moveSpeed)
     
-    table.insert(Entities.table,p)
+    table.insert(Objects.table,p)
     return p
 end
 

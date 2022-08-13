@@ -8,14 +8,16 @@ function PlayState:load()
     World:addCollisionClass('projectile',
        {ignores={'projectile','player','skeleton','enemy'}}
     )
+    World:addCollisionClass('solid')
     --testing--------------------------------
     World:setQueryDebugDrawing(true)
     --testing--------------------------------
 
     map=love.graphics.newImage('assets/maps/placeholder.png')
 
-    Entities:load()
+    Objects:load()
     Player:load(10,10)
+    Entities:load()
     Skeletons:load()
     Enemies:load()
     Projectiles:load()
@@ -27,24 +29,22 @@ end
 function PlayState:update()
     Camera:update()
     World:update(dt)
-    Entities:update()
+    Objects:update()
     if Controls.pressed.mouse then
         -- Projectiles:new({x=0,y=0,name='arrow',damage=1,knockback=1,angle=0})
-        -- Skeletons:new('skeletonWarrior',Controls.getMousePosition())
-        Skeletons:new('skeletonArcher',Controls.getMousePosition())
-        -- Skeletons:new('skeletonMageFire',Controls.getMousePosition())
-        -- Skeletons:new('skeletonMageIce',Controls.getMousePosition())
-        -- Skeletons:new('skeletonMageElectric',Controls.getMousePosition())
+        -- Entities:new('skeletonWarrior',Controls.getMousePosition())
+        Entities:new('skeletonArcher',Controls.getMousePosition())
     end
     if Controls.pressed.mouse2 then 
-        Enemies:new('slime',Controls.getMousePosition())
+        -- Enemies:new('slime',Controls.getMousePosition())
+        Entities:new('slime',Controls.getMousePosition())
     end
 end
 
 function PlayState:draw()
     love.graphics.draw(map,-40,-50)
     -- World:draw()
-    Entities:draw()
+    Objects:draw()
 end
 
 return PlayState

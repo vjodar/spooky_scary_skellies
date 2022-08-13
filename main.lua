@@ -6,8 +6,9 @@ function love.load()
 
     --Modules
     Camera=require 'src/camera' --automatically initialized
-    Entities=require 'src/entities'
+    Objects=require 'src/objects'
     Player=require 'src/player'
+    Entities=require 'src/entities/entityClass'
     Skeletons=require 'src/skeletons/skeletonClass'
     Enemies=require 'src/enemies/enemyClass'
     Projectiles=require 'src/projectiles'
@@ -26,6 +27,8 @@ function love.load()
     abs,floor,ceil,rnd=math.abs,math.floor,math.ceil
     min,max,rnd=math.min,math.max,love.math.random
     pi,cos,sin,atan2=math.pi,math.cos,math.sin,math.atan2
+    getAngle=function(s,t) return atan2((t.y-s.y),(t.x-s.x)) end
+    getDistance=function(a,b) return ((abs(b.x-a.x))^2+(abs(b.y-a.y))^2)^0.5 end
 
     love.graphics.setDefaultFilter('nearest','nearest') --set pixelated look
     love.graphics.setBackgroundColor(paletteBlack) --set background color

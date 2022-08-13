@@ -26,7 +26,7 @@ function player:load(_x,_y)
     self.animations.current=self.animations.idle
     self.animSpeed={min=0.25,max=3,current=1}
 
-    table.insert(Entities.table,self)
+    table.insert(Objects.table,self)
 end
 
 function player:update()

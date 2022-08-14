@@ -74,6 +74,10 @@ behaviors.methods={
         return self.animations.current.position >= self.damagingFrames[1]
             and self.animations.current.position <= self.damagingFrames[2]
     end,
+
+    onFiringFrame=function(self)
+        return self.animations.current.position==self.firingFrame
+    end,
     
     --Gets the closest attack target within LOS from the Player's nearbyEnemies table
     getNearestSkeletonAttackTarget=function(self)
@@ -158,13 +162,20 @@ behaviors.common={ --states common to both skeletons and enemies
         self:updateAnimation()
         self.animations.attack.onLoop=self.onLoops.changeToMove
 
-        if self.canAttack and self:onDamagingFrames() then
-            local arrow={x=self.x+14*self.scaleX,y=self.y}
-            local angleToTarget=getAngle(arrow,self.moveTarget)
-            Projectiles:new({
-                x=arrow.x,y=arrow.y,name='arrow',attackDamage=self.attackDamage,
-                knockback=self.knockback,angle=angleToTarget
-            })
+        if self.canAttack and self:onFiringFrame() then
+            local projectile={
+                name=self.projectile.name,
+                x=self.x+self.projectile.xOffset*self.scaleX,
+                y=self.y,yOffset=self.projectile.yOffset
+            }
+            local angleToTarget=getAngle(projectile,self.moveTarget)
+            for i=1,self.projectilesPerShot do
+                Projectiles:new({
+                    x=projectile.x,y=projectile.y,name=projectile.name,
+                    attackDamage=self.attackDamage,knockback=self.knockback,
+                    angle=angleToTarget,yOffset=projectile.yOffset
+                })
+            end
             Timer:setOnCooldown(self,'canAttack',self.attackSpeed)
         end
     end,
@@ -218,6 +229,13 @@ behaviors.skeleton={ --skeleton specific states
             self:resetMoveTarget()
             return 
         end 
+    
+        --continue looking for closer targets unless moveing toward player
+        if self.canQueryAttackTarget and self.moveTarget~=Player then 
+            Timer:setOnCooldown(self,'canQueryAttackTarget',self.queryAttackTargetRate)
+            self.moveTarget=self:getNearestSkeletonAttackTarget()
+            if self.moveTarget==self then self:changeState('idle') return end
+        end
     
         if self.moveTarget.x>self.x then self.scaleX=1 else self.scaleX=-1 end 
         self.angle=getAngle(self,self.moveTarget)
@@ -298,6 +316,13 @@ behaviors.enemy={ --enemy specific states
             return 
         end 
     
+        --continue looking for closer targets
+        if self.canQueryAttackTarget then 
+            Timer:setOnCooldown(self,'canQueryAttackTarget',self.queryAttackTargetRate)
+            self.moveTarget=self:getNearestEnemyAttackTarget()
+            if self.moveTarget==self then self:changeState('idle') return end
+        end
+    
         self.angle=getAngle(self,self.moveTarget)
         if self.moveTarget.x>self.x then self.scaleX=1 else self.scaleX=-1 end --face target
         
@@ -310,8 +335,6 @@ behaviors.enemy={ --enemy specific states
                 return
             end  
         end
-    
-        --TODO: query for closer attack targets
         
         local xVel,yVel=cos(self.angle)*self.moveSpeed,sin(self.angle)*self.moveSpeed
         self.collider:applyForce(xVel,yVel)
@@ -363,9 +386,30 @@ behaviors.AI={
         attack=behaviors.common.shoot,
         dead=behaviors.common.dead,
     },
-    ['skeletonMageFire']={},
-    ['skeletonMageIce']={},
-    ['skeletonMageElectric']={},
+    ['skeletonMageFire']={
+        raise=behaviors.common.raise,
+        lower=behaviors.common.lower,
+        idle=behaviors.skeleton.idle,
+        move=behaviors.skeleton.move,
+        attack=behaviors.common.shoot,
+        dead=behaviors.common.dead,
+    },
+    ['skeletonMageIce']={
+        raise=behaviors.common.raise,
+        lower=behaviors.common.lower,
+        idle=behaviors.skeleton.idle,
+        move=behaviors.skeleton.move,
+        attack=behaviors.common.shoot,
+        dead=behaviors.common.dead,
+    },
+    ['skeletonMageElectric']={
+        raise=behaviors.common.raise,
+        lower=behaviors.common.lower,
+        idle=behaviors.skeleton.idle,
+        move=behaviors.skeleton.move,
+        attack=behaviors.common.shoot,
+        dead=behaviors.common.dead,
+    },
     ['slime']={
         idle=behaviors.enemy.idle,
         move=behaviors.enemy.move,

@@ -51,7 +51,9 @@ function entityClass:new(_entity,_x,_y)
     e.attackSpeed=def.attackSpeed
     e.attackDamage=def.attackDamage
     e.knockback=def.knockback
-    e.lungeSpeed=def.lungeSpeed or 0    
+    e.lungeSpeed=def.lungeSpeed or nil
+    e.projectile=def.projectile or nil
+    e.projectilesPerShot=def.projectilesPerShot or 1
     e.canAttack=true
     e.moveTarget=e
     e.angle=0
@@ -60,7 +62,7 @@ function entityClass:new(_entity,_x,_y)
     e.returnToPlayerThreshold=150
     e.aggroRange={w=400,h=300}
     e.nearbyAttackTargets={}
-    e.queryAttackTargetRate=1 --will query for target every 1s
+    e.queryAttackTargetRate=1
     e.canQueryAttackTarget=true 
 
     --Draw data
@@ -70,7 +72,8 @@ function entityClass:new(_entity,_x,_y)
     e.spriteSheet=self.spriteSheets[def.name]
     e.animations=self:parseAnimations(self.grids[def.name],def.animations)
     e.animSpeed={min=0.25,max=3,current=1}
-    e.damagingFrames=def.animations.attack.damagingFrames or 0 --points to table - do not modify!
+    e.damagingFrames=def.animations.attack.damagingFrames or nil 
+    e.firingFrame=def.animations.attack.firingFrame or nil
     
     --Actions/AI
     e.onLoops={}
@@ -79,7 +82,8 @@ function entityClass:new(_entity,_x,_y)
     for i,method in pairs(self.behaviors.methods) do e[i]=method end 
     e.AI=self.behaviors.AI[e.name]
 
-    e:changeState('idle')
+    local startState=def.startState or 'idle'
+    e:changeState(startState)
     table.insert(Objects.table,e)
     return e
 end

@@ -20,6 +20,7 @@ behaviors.onLoops={
 behaviors.methods={
     update=function(self) return self.AI[self.state](self) end,
     draw=function(self)
+        self.shadow:draw(self.x,self.y)
         self.animations.current:draw(
             self.spriteSheet,self.x,self.y,
             nil,self.scaleX,1,self.xOffset,self.yOffset
@@ -190,7 +191,7 @@ behaviors.skeleton={ --skeleton specific states
         --if skeleton is too far from player, move to player
         if self.distanceFromPlayer>self.returnToPlayerThreshold then
             self.moveTarget=Player
-            self.moveTargetOffset=rnd(10,50) --will stop 10-50px from player
+            self.moveTargetOffset=self.returnToPlayerThreshold*0.4
             self:changeState('move')
             return 
         end

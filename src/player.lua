@@ -1,7 +1,7 @@
 local player={name='player'}
 
 function player:load(_x,_y)
-    self.collider=World:newBSGRectangleCollider(_x,_y,12,5,3)    
+    self.collider=World:newBSGRectangleCollider(_x,_y,11,5,3)    
     self.collider:setLinearDamping(20) --apply increased 'friction'
     self.collider:setFixedRotation(true) --collider won't spin/rotate
     self.collider:setCollisionClass('player')
@@ -26,6 +26,8 @@ function player:load(_x,_y)
     self.animations.current=self.animations.idle
     self.animSpeed={min=0.25,max=3,current=1}
 
+    self.shadow=Shadows:new('player')
+
     table.insert(Objects.table,self)
 end
 
@@ -42,6 +44,7 @@ function player:update()
 end
 
 function player:draw()
+    self.shadow:draw(self.x,self.y)
     self.animations.current:draw(
         self.spriteSheet,self.x,self.y,
         nil,self.scaleX,1,self.xOffset,self.yOffset
@@ -104,8 +107,8 @@ function player:queryForEnemies()
     return targets
 end
 
-function player:takeDamage(_args)
-    local damage=_args.damage or 1
+function player:takeDamage(args)
+    local damage=args.damage or 1
     local hp=self.health.current
     hp=max(0,hp-damage)
     self.health.current=hp

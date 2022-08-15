@@ -11,9 +11,9 @@ function TimerState:update()
     end
 end
 
---Delays a function call by _t seconds
-function TimerState:after(_t,_fn)
-    local timer={t=_t,fn=_fn}
+--Delays a function call by t seconds
+function TimerState:after(t,fn)
+    local timer={t=t,fn=fn}
     function timer:update()
         self.t=self.t-dt --decrement time
         --call fn() when time is up, return false to discard timer
@@ -22,15 +22,15 @@ function TimerState:after(_t,_fn)
     table.insert(self.timers,timer)
 end
 
---Tweens the property (number) of an object to an endValue over _time seconds.
-function TimerState:tween(_obj,_prop,_endVal,_time)
-    local _delta=(_endVal-_obj[_prop])/_time
+--Tweens the property (number) of an object to an endValue over time seconds.
+function TimerState:tween(obj,prop,endVal,time)
+    local delta=(endVal-obj[prop])/time
     local timer={
-        t=_time,
-        obj=_obj,
-        prop=_prop,
-        endVal=_endVal,
-        delta=_delta,
+        t=time,
+        obj=obj,
+        prop=prop,
+        endVal=endVal,
+        delta=delta,
     }
     function timer:update()
         self.t=self.t-dt --decrement timer
@@ -42,10 +42,10 @@ function TimerState:tween(_obj,_prop,_endVal,_time)
 end
 
 --Set a cooldown timer 
-function TimerState:setOnCooldown(_obj,_cdFlag,_cdPeriod)
-    _obj[_cdFlag]=false
-    local releaseCooldown=function() _obj[_cdFlag]=true end
-    self:after(_cdPeriod,releaseCooldown)
+function TimerState:setOnCooldown(obj,cdFlag,cdPeriod)
+    obj[cdFlag]=false
+    local releaseCooldown=function() obj[cdFlag]=true end
+    self:after(cdPeriod,releaseCooldown)
 end
 
 return TimerState

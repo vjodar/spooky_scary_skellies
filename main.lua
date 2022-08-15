@@ -7,6 +7,7 @@ function love.load()
     --Modules
     Camera=require 'src/camera' --automatically initialized
     Objects=require 'src/objects'
+    Shadows=require 'src/shadows'
     Player=require 'src/player'
     Entities=require 'src/entities/entityClass'
     Projectiles=require 'src/projectiles'

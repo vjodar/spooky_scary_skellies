@@ -6,36 +6,32 @@ projectiles.definitions=function()
             name='arrow',
             moveSpeed=300,
             collider={
-                width=3,
-                height=3,
-                corner=1,
+                width=1,
+                height=1,
             },
         },
         flame={
             name='flame',
             moveSpeed=200,
             collider={
-                width=3,
-                height=3,
-                corner=1,
+                width=1,
+                height=1,
             },
         },
         icicle={
             name='icicle',
             moveSpeed=160,
             collider={
-                width=3,
-                height=3,
-                corner=1,
+                width=1,
+                height=1,
             },
         },
         spark={
             name='spark',
             moveSpeed=150,
             collider={
-                width=3,
-                height=3,
-                corner=1,
+                width=1,
+                height=1,
             },
         },
     }
@@ -80,7 +76,7 @@ function projectiles:load()
         end
 
         if self.changeDirectionTime==nil then 
-            self.changeDirectionTime=0.1
+            self.changeDirectionTime=rnd()*0.5
             self.angles={}            
             for i=1,20 do -- (-0.2pi,0.2pi) spread from current angle
                 table.insert(self.angles,-(i*0.01*math.pi))
@@ -90,7 +86,7 @@ function projectiles:load()
         else
             self.changeDirectionTime=self.changeDirectionTime-dt 
             if self.changeDirectionTime<0 then 
-                self.changeDirectionTime=0.1
+                self.changeDirectionTime=rnd()*0.5
                 self.angle=self.angle+(self.angles[rnd(#self.angles)])
             end
         end
@@ -112,6 +108,7 @@ function projectiles:load()
     end
 
     self.drawFunction=function(self)
+        self.shadow:draw(self.x,self.y,self.angle)
         love.graphics.draw(
             self.sprite,self.x,self.y+self.yOffset,
             self.angle,1,1,self.origin.x,self.origin.y
@@ -125,14 +122,13 @@ function projectiles:load()
     end
 end
 
-function projectiles:new(_args)
-    local def=self.definitions[_args.name]    
-    local p={name=_args.name}
+function projectiles:new(args)
+    local def=self.definitions[args.name]    
+    local p={name=args.name}
 
     --Collider 
-    p.collider=World:newBSGRectangleCollider(
-        _args.x,_args.y,def.collider.width,
-        def.collider.height,def.collider.corner
+    p.collider=World:newRectangleCollider(
+        args.x,args.y,def.collider.width,def.collider.height
     )
     p.collider:setBullet(true)
     p.collider:setCollisionClass('projectile')
@@ -141,16 +137,17 @@ function projectiles:new(_args)
 
     --General data
     p.x,p.y=p.collider:getPosition()
-    p.attackDamage=_args.attackDamage
-    p.knockback=_args.knockback
-    p.angle=_args.angle
+    p.attackDamage=args.attackDamage
+    p.knockback=args.knockback
+    p.angle=args.angle
     p.moveSpeed=def.moveSpeed
-    p.remainingTravelTime=(200/def.moveSpeed)*2 --1s per 100 movespeed
+    p.remainingTravelTime=(200/def.moveSpeed)*2 --1sec per 100units/sec
 
     --Draw data
     p.sprite=self.sprites[def.name]
-    p.yOffset=_args.yOffset
+    p.yOffset=args.yOffset
     p.origin={x=p.sprite:getWidth()*0.5,y=p.sprite:getHeight()*0.5}
+    p.shadow=Shadows:new(def.name)
 
     --Methods (update and draw)
     p.update=self.updateFunctions[p.name]

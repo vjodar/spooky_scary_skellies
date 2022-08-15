@@ -28,9 +28,9 @@ function objects:draw()
     for _,obj in pairs(self.inDrawDistanceTable) do obj:draw() end 
 end
 
-function objects:removeEntity(_obj)
+function objects:removeEntity(obj1)
     for i,obj2 in pairs(self.table) do 
-        if obj2==_obj then table.remove(self.table,i) end
+        if obj2==obj1 then table.remove(self.table,i) end
     end
 end
 

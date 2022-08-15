@@ -17,24 +17,24 @@ function entityClass:load()
     end
 
     --Creates a table of animations given a grid and animation defs
-    function self:parseAnimations(_grid,_animDefs)
+    function self:parseAnimations(grid,animDefs)
         local anims={}  
-        for anim,def in pairs(_animDefs) do
+        for anim,def in pairs(animDefs) do
             anims[anim]=anim8.newAnimation(
-                _grid(def.frames,def.row),def.duration
+                grid(def.frames,def.row),def.duration
             ) 
         end
         return anims
     end
 end
 
-function entityClass:new(_entity,_x,_y)
-    local def=self.definitions[_entity]
+function entityClass:new(entity,x,y)
+    local def=self.definitions[entity]
     local e={name=def.name}
     
     --Collider data
     e.collider=World:newBSGRectangleCollider(
-        _x,_y,def.collider.width,def.collider.height,def.collider.corner
+        x,y,def.collider.width,def.collider.height,def.collider.corner
     )
     for fn,val in pairs(def.collider.modifiers) do
         e.collider[fn](e.collider,val)
@@ -69,11 +69,13 @@ function entityClass:new(_entity,_x,_y)
     e.xOffset=def.drawData.xOffset
     e.yOffset=def.drawData.yOffset
     e.scaleX=1
-    e.spriteSheet=self.spriteSheets[def.name]
-    e.animations=self:parseAnimations(self.grids[def.name],def.animations)
+    e.spriteSheet=self.spriteSheets[e.name]
+    e.animations=self:parseAnimations(self.grids[e.name],def.animations)
     e.animSpeed={min=0.25,max=3,current=1}
     e.damagingFrames=def.animations.attack.damagingFrames or nil 
     e.firingFrame=def.animations.attack.firingFrame or nil
+
+    e.shadow=Shadows:new(e.name)
     
     --Actions/AI
     e.onLoops={}

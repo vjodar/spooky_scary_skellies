@@ -7,12 +7,12 @@ return {
         attackDamage=1,
         knockback=20,
         lungeSpeed=50,
-        health=4,
+        health=6,
         startState='raise',
         collider={
-            width=12,
-            height=5,
-            corner=3,
+            width=10,
+            height=4,
+            corner=2,
             class='skeleton',
             modifiers={
                 setLinearDamping=10,
@@ -66,9 +66,9 @@ return {
         health=3,
         startState='raise',
         collider={
-            width=12,
-            height=5,
-            corner=3,
+            width=10,
+            height=4,
+            corner=2,
             class='skeleton',
             modifiers={
                 setLinearDamping=10,
@@ -121,9 +121,9 @@ return {
         health=3,
         startState='raise',
         collider={
-            width=12,
-            height=5,
-            corner=3,
+            width=10,
+            height=4,
+            corner=2,
             class='skeleton',
             modifiers={
                 setLinearDamping=10,
@@ -176,9 +176,9 @@ return {
         health=3,
         startState='raise',
         collider={
-            width=12,
-            height=5,
-            corner=3,
+            width=10,
+            height=4,
+            corner=2,
             class='skeleton',
             modifiers={
                 setLinearDamping=10,
@@ -226,15 +226,15 @@ return {
         attackRange=100,     
         attackSpeed=1,
         attackDamage=1,
-        projectile={name='spark',xOffset=6,yOffset=-7},
+        projectile={name='spark',xOffset=6,yOffset=0},
         projectilesPerShot=3,
         knockback=1,
         health=3,
         startState='raise',
         collider={
-            width=12,
-            height=5,
-            corner=3,
+            width=10,
+            height=4,
+            corner=2,
             class='skeleton',
             modifiers={
                 setLinearDamping=10,
@@ -286,9 +286,9 @@ return {
         knockback=10,
         health=3,
         collider={
-            width=10,
+            width=9,
             height=4,
-            corner=3,
+            corner=1,
             class='enemy',
             modifiers={
                 setLinearDamping=10,

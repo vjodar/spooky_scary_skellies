@@ -1,34 +1,36 @@
-local entityClass={}
+--Generates spriteSheets and animation grids for all defined entities
+local sheetsAndGrids=function(def)
+    local spriteSheets,grids={},{}
 
-function entityClass:load()
-    self.definitions=require 'src/entities/entityDefinitions'
-    self.behaviors=require 'src/entities/entityBehaviors'
-
-    self.spriteSheets={}
-    self.grids={}
-    for name,def in pairs(self.definitions) do 
+    for name,def in pairs(def) do 
         local spriteSheetPath='assets/entities/'..name..'.png'
-        self.spriteSheets[name]=love.graphics.newImage(spriteSheetPath)
-        self.grids[name]=anim8.newGrid(
+        spriteSheets[name]=love.graphics.newImage(spriteSheetPath)
+        grids[name]=anim8.newGrid(
             def.drawData.frameWidth,def.drawData.frameHeight,
-            self.spriteSheets[name]:getWidth(),
-            self.spriteSheets[name]:getHeight()
+            spriteSheets[name]:getWidth(),
+            spriteSheets[name]:getHeight()
         )
     end
 
-    --Creates a table of animations given a grid and animation defs
-    function self:parseAnimations(grid,animDefs)
-        local anims={}  
-        for anim,def in pairs(animDefs) do
-            anims[anim]=anim8.newAnimation(
-                grid(def.frames,def.row),def.duration
-            ) 
-        end
-        return anims
-    end
+    return spriteSheets,grids
 end
 
-function entityClass:new(entity,x,y)
+--Generates all animations given a grid and animation definitions
+local parseAnimations=function(grid,animDefs)
+    local anims={}  
+    for anim,def in pairs(animDefs) do
+        anims[anim]=anim8.newAnimation(grid(def.frames,def.row),def.duration) 
+    end
+    return anims
+end
+
+local entityClass={}
+entityClass.definitions=require 'src/entities/entityDefinitions'
+entityClass.behaviors=require 'src/entities/entityBehaviors'
+entityClass.spriteSheets,entityClass.grids=sheetsAndGrids(entityClass.definitions)
+entityClass.parseAnimations=parseAnimations 
+
+function entityClass:new(entity,x,y) --constructor
     local def=self.definitions[entity]
     local e={name=def.name}
     
@@ -62,7 +64,7 @@ function entityClass:new(entity,x,y)
     e.returnToPlayerThreshold=150
     e.aggroRange={w=400,h=300}
     e.nearbyAttackTargets={}
-    e.queryAttackTargetRate=1
+    e.queryAttackTargetRate=0.5
     e.canQueryAttackTarget=true 
 
     --Draw data
@@ -70,7 +72,7 @@ function entityClass:new(entity,x,y)
     e.yOffset=def.drawData.yOffset
     e.scaleX=1
     e.spriteSheet=self.spriteSheets[e.name]
-    e.animations=self:parseAnimations(self.grids[e.name],def.animations)
+    e.animations=self.parseAnimations(self.grids[e.name],def.animations)
     e.animSpeed={min=0.25,max=3,current=1}
     e.damagingFrames=def.animations.attack.damagingFrames or nil 
     e.firingFrame=def.animations.attack.firingFrame or nil

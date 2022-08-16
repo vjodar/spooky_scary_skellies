@@ -1,11 +1,8 @@
 local objects={}
-
-function objects:load() 
-    self.table={} --all entites
-    self.inDrawDistanceTable={} --objects within draw distance
-    self.drawDistance={x=400,y=300}
-    self.sort=function(obj1,obj2) return obj1.y<obj2.y end --sort function
-end
+objects.table={} --all entites
+objects.inDrawDistanceTable={} --objects within draw distance
+objects.drawDistance={x=400,y=300}
+objects.sort=function(obj1,obj2) return obj1.y<obj2.y end --sort function
 
 function objects:update() 
     self.inDrawDistanceTable={} --clear table

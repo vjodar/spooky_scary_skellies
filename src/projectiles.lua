@@ -1,6 +1,4 @@
-local projectiles={}
-
-projectiles.definitions=function()
+local projectileDefinitions=function()
     return {
         arrow={
             name='arrow',
@@ -37,10 +35,19 @@ projectiles.definitions=function()
     }
 end
 
-function projectiles:load()
-    self.definitions=self.definitions()
-    self.updateFunctions={}
-    self.updateFunctions.base=function(self)
+local projectileSprites=function(defs)
+    local sprites={}
+    for p,def in pairs(defs) do 
+        local path='assets/projectiles/'..def.name..'.png'
+        sprites[p]=love.graphics.newImage(path)
+    end
+    return sprites 
+end
+
+local projectileUpdateFunctions=function()
+    local fns={}
+
+    fns.base=function(self)
         self.remainingTravelTime=self.remainingTravelTime-dt 
         if self.remainingTravelTime<0 then 
             self.collider:destroy()
@@ -64,11 +71,8 @@ function projectiles:load()
             return false 
         end
     end
-    self.updateFunctions.arrow=self.updateFunctions.base 
-    self.updateFunctions.flame=self.updateFunctions.base
-    self.updateFunctions.icicle=self.updateFunctions.base
 
-    self.updateFunctions.spark=function(self)
+    fns.spark=function(self)
         self.remainingTravelTime=self.remainingTravelTime-dt 
         if self.remainingTravelTime<0 then 
             self.collider:destroy()
@@ -106,30 +110,54 @@ function projectiles:load()
             end
         end 
     end
+    
+    fns.bone=fns.base 
+    fns.arrow=fns.base 
+    fns.flame=fns.base
+    fns.icicle=fns.base
 
-    self.drawFunction=function(self)
+    return fns 
+end
+
+local projectileDrawFunctions=function()
+    return function(self)
         self.shadow:draw(self.x,self.y,self.angle)
         love.graphics.draw(
             self.sprite,self.x,self.y+self.yOffset,
             self.angle,1,1,self.origin.x,self.origin.y
         )
     end
-    
-    self.sprites={}
-    for p,def in pairs(self.definitions) do 
-        local path='assets/projectiles/'..def.name..'.png'
-        self.sprites[p]=love.graphics.newImage(path)
-    end
 end
+
+--Creates a collider given a definition and position
+local projectileCreateCollider=function()
+    return {
+        rectangle=function(x,y,cDef)
+            return World:newRectangleCollider(x,y,cDef.width,cDef.height)
+        end,
+        bsg=function(x,y,cDef)
+            return World:newBSGRectangleCollider(x,y,cDef.width,cDef.height,cDef.corner)
+        end,
+        circle=function(x,y,cDef)
+            return World:newCircleCollider(x,y,cDef.radius)
+        end,
+    }
+end
+
+local projectiles={}
+projectiles.definitions=projectileDefinitions()
+projectiles.sprites=projectileSprites(projectiles.definitions)
+projectiles.updateFunctions=projectileUpdateFunctions()
+projectiles.drawFunction=projectileDrawFunctions()
+projectiles.createCollider=projectileCreateCollider()
 
 function projectiles:new(args)
     local def=self.definitions[args.name]    
     local p={name=args.name}
 
     --Collider 
-    p.collider=World:newRectangleCollider(
-        args.x,args.y,def.collider.width,def.collider.height
-    )
+    local colliderType=def.collider.type or 'rectangle'
+    p.collider=self.createCollider[colliderType](args.x,args.y,def.collider)
     p.collider:setBullet(true)
     p.collider:setCollisionClass('projectile')
     p.collider:setFixedRotation(true)
@@ -153,7 +181,7 @@ function projectiles:new(args)
     p.update=self.updateFunctions[p.name]
     p.draw=self.drawFunction
 
-    p.collider:setLinearVelocity(
+    p.collider:setLinearVelocity( --initial velocity (launch)
         cos(p.angle)*p.moveSpeed,sin(p.angle)*p.moveSpeed
     )
     

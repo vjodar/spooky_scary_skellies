@@ -1,11 +1,26 @@
 function love.load()
+    dt=0 --delta time global
+    acceptInput=false --flag to restrict inputs to one state at a time
+    paletteBlack={53/255,53/255,64/255} --black in our palette
+    gameStates={} --state stack
+
+    love.graphics.setDefaultFilter('nearest','nearest') --set pixelated look
+    love.graphics.setBackgroundColor(paletteBlack) --set background color
+
+    --common math functions
+    abs,floor,ceil=math.abs,math.floor,math.ceil
+    min,max,rnd=math.min,math.max,love.math.random
+    pi,cos,sin,atan2=math.pi,math.cos,math.sin,math.atan2
+    getAngle=function(s,t) return atan2((t.y-s.y),(t.x-s.x)) end
+    getDistance=function(a,b) return ((abs(b.x-a.x))^2+(abs(b.y-a.y))^2)^0.5 end
+    
     --Libraries
     wf=require 'src/libraries/windfield'
     humpCam=require 'src/libraries/camera'
     anim8=require 'src/libraries/anim8'
 
     --Modules
-    Camera=require 'src/camera' --automatically initialized
+    Camera=require 'src/camera'
     Objects=require 'src/objects'
     Shadows=require 'src/shadows'
     Player=require 'src/player'
@@ -15,22 +30,7 @@ function love.load()
     --GameStates
     Controls=require 'src/gameStates/controlState'
     Timer=require 'src/gameStates/timerState'
-    PlayState=require 'src/gameStates/playState'
-    
-    dt=0 --delta time global
-    acceptInput=false --flag to restrict inputs to one state at a time
-    paletteBlack={53/255,53/255,64/255} --black in our palette
-    gameStates={} --state stack
-
-    --common math functions
-    abs,floor,ceil,rnd=math.abs,math.floor,math.ceil
-    min,max,rnd=math.min,math.max,love.math.random
-    pi,cos,sin,atan2=math.pi,math.cos,math.sin,math.atan2
-    getAngle=function(s,t) return atan2((t.y-s.y),(t.x-s.x)) end
-    getDistance=function(a,b) return ((abs(b.x-a.x))^2+(abs(b.y-a.y))^2)^0.5 end
-
-    love.graphics.setDefaultFilter('nearest','nearest') --set pixelated look
-    love.graphics.setBackgroundColor(paletteBlack) --set background color
+    PlayState=require 'src/gameStates/playState'        
     
     table.insert(gameStates,Controls) --controls first
     table.insert(gameStates,Timer) --timer second

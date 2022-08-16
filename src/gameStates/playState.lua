@@ -15,11 +15,7 @@ function PlayState:load()
 
     map=love.graphics.newImage('assets/maps/placeholder.png')
 
-    Objects:load()
-    Shadows:load()
     Player:load(10,10)
-    Entities:load()
-    Projectiles:load()
 
     Camera.target=Player
     Camera.cam:zoomTo(3)

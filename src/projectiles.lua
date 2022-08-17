@@ -4,32 +4,36 @@ local projectileDefinitions=function()
             name='arrow',
             moveSpeed=300,
             collider={
-                width=1,
-                height=1,
+                width=3,
+                height=3,
+                class='allyProjectile',
             },
         },
         flame={
             name='flame',
             moveSpeed=200,
             collider={
-                width=1,
-                height=1,
+                width=3,
+                height=3,
+                class='allyProjectile',
             },
         },
         icicle={
             name='icicle',
             moveSpeed=160,
             collider={
-                width=1,
-                height=1,
+                width=3,
+                height=3,
+                class='allyProjectile',
             },
         },
         spark={
             name='spark',
             moveSpeed=150,
             collider={
-                width=1,
-                height=1,
+                width=3,
+                height=3,
+                class='allyProjectile',
             },
         },
     }
@@ -58,8 +62,8 @@ local projectileUpdateFunctions=function()
 
         if self:enter('enemy') then
             local data=self:getEnterCollisionData('enemy')    
-            local enemy=data.collider:getObject()
-            if enemy~=nil then
+            local enemy=data.collider
+            if enemy~=nil and enemy.state~='dead' then
                 enemy:takeDamage(self)
                 self:destroy()
                 return false
@@ -79,7 +83,7 @@ local projectileUpdateFunctions=function()
             return false
         end
 
-        if self.changeDirectionTime==nil then 
+        if self.changeDirectionTime==nil then
             self.changeDirectionTime=rnd()*0.5
             self.angles={}            
             for i=1,20 do -- (-0.2pi,0.2pi) spread from current angle
@@ -102,31 +106,35 @@ local projectileUpdateFunctions=function()
 
         if self:enter('enemy') then
             local data=self:getEnterCollisionData('enemy')    
-            local enemy=data.collider:getObject()
-            if enemy~=nil then
+            local enemy=data.collider
+            if enemy~=nil and enemy.state~='dead' then
                 enemy:takeDamage(self)
                 self:destroy()
                 return false
             end
         end 
     end
-    
-    fns.bone=fns.base 
-    fns.arrow=fns.base 
-    fns.flame=fns.base
-    fns.icicle=fns.base
 
     return fns 
 end
 
 local projectileDrawFunctions=function()
-    return function(self)
+    local fns={}
+    fns.base=function(self)
         self.shadow:draw(self.x,self.y,self.angle)
         love.graphics.draw(
             self.sprite,self.x,self.y+self.yOffset,
             self.angle,1,1,self.origin.x,self.origin.y
         )
     end
+
+    fns.spark=function(self)
+        love.graphics.draw(
+            self.sprite,self.x,self.y+self.yOffset,
+            rnd()*3,1,1,self.origin.x,self.origin.y
+        )
+    end
+    return fns 
 end
 
 --Creates a collider given a definition and position
@@ -148,17 +156,17 @@ local projectiles={}
 projectiles.definitions=projectileDefinitions()
 projectiles.sprites=projectileSprites(projectiles.definitions)
 projectiles.updateFunctions=projectileUpdateFunctions()
-projectiles.drawFunction=projectileDrawFunctions()
+projectiles.drawFunctions=projectileDrawFunctions()
 projectiles.createCollider=projectileCreateCollider()
 
-function projectiles:new(args)
+function projectiles:new(args) --args={x,y,name,attackDamage,knockback,yOffset}
     local def=self.definitions[args.name]    
     local colliderType=def.collider.type or 'rectangle'
 
     --Collider 
     local p=self.createCollider[colliderType](args.x,args.y,def.collider)
     p:setBullet(true)
-    p:setCollisionClass('projectile')
+    p:setCollisionClass(def.collider.class)
     p:setFixedRotation(true)
 
     --General data
@@ -177,8 +185,8 @@ function projectiles:new(args)
     p.shadow=Shadows:new(def.name)
 
     --Methods (update and draw)
-    p.update=self.updateFunctions[p.name]
-    p.draw=self.drawFunction
+    p.update=self.updateFunctions[p.name] or self.updateFunctions.base
+    p.draw=self.drawFunctions[p.name] or self.drawFunctions.base
 
     p:setLinearVelocity( --initial velocity (launch)
         cos(p.angle)*p.moveSpeed,sin(p.angle)*p.moveSpeed

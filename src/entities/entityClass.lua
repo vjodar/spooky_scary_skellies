@@ -58,8 +58,6 @@ function entityClass:new(entity,x,y) --constructor
     e.canAttack=true
     e.moveTarget=e
     e.angle=0
-    e.moveTargetOffset=0
-    e.distanceFromPlayer=0
     e.returnToPlayerThreshold=150
     e.aggroRange={w=400,h=300}
     e.nearbyAttackTargets={}

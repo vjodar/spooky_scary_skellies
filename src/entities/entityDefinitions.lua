@@ -117,7 +117,7 @@ return {
         attackSpeed=1.5,   
         attackDamage=1, 
         projectile={name='flame',xOffset=6,yOffset=-7},
-        knockback=1,
+        knockback=5,
         health=3,
         startState='raise',
         collider={
@@ -172,7 +172,7 @@ return {
         attackSpeed=1,
         attackDamage=1,
         projectile={name='icicle',xOffset=6,yOffset=-7},
-        knockback=1,
+        knockback=5,
         health=3,
         startState='raise',
         collider={

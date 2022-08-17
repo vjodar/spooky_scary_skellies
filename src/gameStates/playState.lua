@@ -15,25 +15,21 @@ function PlayState:update()
     World:update(dt)
     Objects:update()
     if Controls.pressed.mouse then
-        local mouseX,mouseY=Controls.getMousePosition()
-        -- Projectiles:new({
-        --     x=Player.x,y=Player.y,name='spark',
-        --     attackDamage=1,knockback=1,angle=getAngle(Player,{x=mouseX,y=mouseY}),
-        --     yOffset=-5
-        -- })
-        -- Projectiles:new({
-        --     x=projectile.x,y=projectile.y,name=projectile.name,
-        --     attackDamage=self.attackDamage,knockback=self.knockback,
-        --     angle=angleToTarget,yOffset=projectile.yOffset
-        -- })
-        -- for i=1,10 do Entities:new('skeletonWarrior',Controls.getMousePosition()) end
-        -- for i=1,1 do Entities:new('skeletonArcher',Controls.getMousePosition()) end 
-        -- for i=1,1 do Entities:new('skeletonMageFire',Controls.getMousePosition()) end 
-        for i=1,1 do Entities:new('skeletonMageIce',Controls.getMousePosition()) end 
-        -- for i=1,1 do Entities:new('skeletonMageElectric',Controls.getMousePosition()) end 
+        -- for i=1,1 do Entities:new('skeletonWarrior',Controls.getMousePosition()) end
+        -- for i=1,10 do Entities:new('skeletonArcher',Controls.getMousePosition()) end 
+        -- for i=1,10 do Entities:new('skeletonMageFire',Controls.getMousePosition()) end 
+        -- for i=1,1 do Entities:new('skeletonMageIce',Controls.getMousePosition()) end 
+        for i=1,1 do Entities:new('skeletonMageElectric',Controls.getMousePosition()) end 
     end
     if Controls.pressed.mouse2 then 
-        for i=1,2 do Entities:new('slime',Controls.getMousePosition()) end
+        -- local mx,my=Controls.getMousePosition()
+        -- Projectiles:new({
+        --     x=Player.x,y=Player.y,name='icicle',
+        --     attackDamage=1,knockback=1,
+        --     angle=getAngle(Player,{x=mx,y=my}),
+        --     yOffset=-10
+        -- })
+        for i=1,10 do Entities:new('slime',Controls.getMousePosition()) end
     end
 end
 

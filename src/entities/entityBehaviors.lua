@@ -10,9 +10,6 @@ behaviors.onLoops={
             self:changeState('raise')
         end
     end,
-    changeToMove=function(self)
-        return function() self:changeState('move') end
-    end,
 }
 
 --Methods------------------------------------------------------------------------------------------
@@ -29,8 +26,17 @@ behaviors.methods={
 
     changeState=function(self,newState)
         self.state=newState 
-        if self.animations[newState] then 
-            self.animations.current=self.animations[newState]
+        local associatedAnimation={
+            raise='raise',
+            lower='lower',
+            idle='idle',
+            attack='attack',
+            moveToPlayer='move',
+            moveToTarget='move',
+            moveToLocation='move',
+        }
+        if self.animations[associatedAnimation[newState]] then 
+            self.animations.current=self.animations[associatedAnimation[newState]]
         end
     end,
 
@@ -46,7 +52,7 @@ behaviors.methods={
         local hp=self.health.current 
         local damage=source.attackDamage or 0 
         local knockback=source.knockback or 0
-        local angle=getAngle(self,source)+pi
+        local angle=getAngle(source,self)
         
         hp=max(0,hp-damage)
         self.health.current=hp
@@ -58,7 +64,8 @@ behaviors.methods={
     end,
 
     dealDamage=function(self,target)
-        target:takeDamage(self) 
+        if target.state=='dead' then return end
+        target:takeDamage(self)
     end,
 
     die=function(self)
@@ -66,8 +73,7 @@ behaviors.methods={
         self:changeState('dead')
     end,
 
-    resetMoveTarget=function(self)
-        self.moveTargetOffset=0
+    clearMoveTarget=function(self)
         self.moveTarget=self
     end,
 
@@ -159,7 +165,7 @@ behaviors.common={ --states common to both skeletons and enemies
     shoot=function(self)
         self:updatePosition()
         self:updateAnimation()
-        self.animations.attack.onLoop=self.onLoops.changeToMove
+        self.animations.attack.onLoop=self.onLoops.changeToIdle
 
         if self.canAttack and self:onFiringFrame() then
             local projectile={
@@ -184,13 +190,11 @@ behaviors.skeleton={ --skeleton specific states
     idle=function(self) 
         self:updatePosition()
         self:updateAnimation()
-        self.distanceFromPlayer=getDistance(self,Player)
     
         --if skeleton is too far from player, move to player
-        if self.distanceFromPlayer>self.returnToPlayerThreshold then
+        if getDistance(self,Player)>self.returnToPlayerThreshold then
             self.moveTarget=Player
-            self.moveTargetOffset=self.returnToPlayerThreshold*0.4
-            self:changeState('move')
+            self:changeState('moveToPlayer')
             return 
         end
 
@@ -202,7 +206,7 @@ behaviors.skeleton={ --skeleton specific states
         then 
             if self.canAttack 
             or getDistance(self,self.moveTarget)>self.attackRange 
-            then self:changeState('move') end 
+            then self:changeState('moveToTarget') end 
             return --return to wait until attack is ready or target dies          
         end
     
@@ -211,26 +215,32 @@ behaviors.skeleton={ --skeleton specific states
             Timer:setOnCooldown(self,'canQueryAttackTarget',self.queryAttackTargetRate)
             self.moveTarget=self:getNearestSkeletonAttackTarget()
             if self.moveTarget~=self then 
-                self.moveTargetOffset=self.attackRange
-                self:changeState('move') 
+                self:changeState('moveToTarget') 
                 return 
             end
         end
     end,
 
-    move=function(self) 
+    moveToTarget=function(self) 
         self:updatePosition()
         self:updateAnimation()
+
+        --if Player is too far, move toward Player
+        if getDistance(self,Player)>self.returnToPlayerThreshold then 
+            self.moveTarget=Player
+            self:changeState('moveToPlayer')
+            return 
+        end
     
         --if moveTarget has died or has been cleared, return to idle
         if self.moveTarget.state=='dead' or self.moveTarget==self then
+            self:clearMoveTarget()
             self:changeState('idle')
-            self:resetMoveTarget()
             return 
         end 
     
-        --continue looking for closer targets unless moveing toward player
-        if self.canQueryAttackTarget and self.moveTarget~=Player then 
+        --continue looking for closer targets 
+        if self.canQueryAttackTarget then 
             Timer:setOnCooldown(self,'canQueryAttackTarget',self.queryAttackTargetRate)
             self.moveTarget=self:getNearestSkeletonAttackTarget()
             if self.moveTarget==self then self:changeState('idle') return end
@@ -239,13 +249,7 @@ behaviors.skeleton={ --skeleton specific states
         if self.moveTarget.x>self.x then self.scaleX=1 else self.scaleX=-1 end 
         self.angle=getAngle(self,self.moveTarget)
     
-        if getDistance(self,self.moveTarget)<self.moveTargetOffset then 
-            if self.moveTarget==Player then 
-                self:resetMoveTarget()
-                self:changeState('idle')
-                return
-            end
-            
+        if getDistance(self,self.moveTarget)<self.attackRange then             
             if self.canAttack then
                 self:changeState('attack')
                 return 
@@ -259,11 +263,37 @@ behaviors.skeleton={ --skeleton specific states
         local yVel=sin(self.angle)*self.moveSpeed
         self:applyForce(xVel,yVel)
     end,
+
+    moveToPlayer=function(self) 
+        self:updatePosition()
+        self:updateAnimation()
+    
+        --if moveTarget has died or has been cleared, return to idle
+        if self.moveTarget.state=='dead' or self.moveTarget==self then
+            self:clearMoveTarget()
+            self:changeState('idle')
+            return 
+        end 
+    
+        if self.moveTarget.x>self.x then self.scaleX=1 else self.scaleX=-1 end 
+        self.angle=getAngle(self,self.moveTarget)
+    
+        --reached player
+        if getDistance(self,self.moveTarget)<self.returnToPlayerThreshold*0.4 then 
+            self:clearMoveTarget()
+            self:changeState('idle')
+            return
+        end
+
+        local xVel=cos(self.angle)*self.moveSpeed
+        local yVel=sin(self.angle)*self.moveSpeed
+        self:applyForce(xVel,yVel)
+    end,
     
     lunge=function(self)
         self:updatePosition()
         self:updateAnimation()
-        self.animations.current.onLoop=self.onLoops.changeToMove 
+        self.animations.current.onLoop=self.onLoops.changeToIdle
         
         if self:onDamagingFrames() then
             if self.canAttack then 
@@ -292,7 +322,7 @@ behaviors.enemy={ --enemy specific states
         if self.moveTarget~=self and self.moveTarget.state~='dead' then 
             if self.canAttack 
             or getDistance(self,self.moveTarget)>self.attackRange 
-            then self:changeState('move') end 
+            then self:changeState('moveToTarget') end 
             return --return to wait until attack is ready or target dies          
         end
         
@@ -300,18 +330,18 @@ behaviors.enemy={ --enemy specific states
         if self.canQueryAttackTarget then 
             Timer:setOnCooldown(self,'canQueryAttackTarget',self.queryAttackTargetRate)
             self.moveTarget=self:getNearestEnemyAttackTarget()
-            if self.moveTarget~=self then self:changeState('move') end
+            if self.moveTarget~=self then self:changeState('moveToTarget') end
         end
     end,
 
-    move=function(self) 
+    moveToTarget=function(self) 
         self:updatePosition()
         self:updateAnimation()
         
         --if target has died, clear moveTarget, return to idle
         if self.moveTarget.state=='dead' then
+            self:clearMoveTarget()
             self:changeState('idle')
-            self.moveTarget=self 
             return 
         end 
     
@@ -322,8 +352,8 @@ behaviors.enemy={ --enemy specific states
             if self.moveTarget==self then self:changeState('idle') return end
         end
     
-        self.angle=getAngle(self,self.moveTarget)
         if self.moveTarget.x>self.x then self.scaleX=1 else self.scaleX=-1 end --face target
+        self.angle=getAngle(self,self.moveTarget)
         
         if getDistance(self,self.moveTarget)<self.attackRange then 
             if self.canAttack then 
@@ -342,7 +372,7 @@ behaviors.enemy={ --enemy specific states
     lunge=function(self) 
         self:updatePosition()
         self:updateAnimation()
-        self.animations.current.onLoop=self.onLoops.changeToMove 
+        self.animations.current.onLoop=self.onLoops.changeToIdle
     
         if self:onDamagingFrames() then 
             if self.canAttack then 
@@ -373,7 +403,8 @@ behaviors.AI={
         raise=behaviors.common.raise,
         lower=behaviors.common.lower,
         idle=behaviors.skeleton.idle,
-        move=behaviors.skeleton.move,
+        moveToPlayer=behaviors.skeleton.moveToPlayer,
+        moveToTarget=behaviors.skeleton.moveToTarget,
         attack=behaviors.skeleton.lunge,
         dead=behaviors.common.dead,
     },
@@ -381,7 +412,8 @@ behaviors.AI={
         raise=behaviors.common.raise,
         lower=behaviors.common.lower,
         idle=behaviors.skeleton.idle,
-        move=behaviors.skeleton.move,
+        moveToPlayer=behaviors.skeleton.moveToPlayer,
+        moveToTarget=behaviors.skeleton.moveToTarget,
         attack=behaviors.common.shoot,
         dead=behaviors.common.dead,
     },
@@ -389,7 +421,8 @@ behaviors.AI={
         raise=behaviors.common.raise,
         lower=behaviors.common.lower,
         idle=behaviors.skeleton.idle,
-        move=behaviors.skeleton.move,
+        moveToPlayer=behaviors.skeleton.moveToPlayer,
+        moveToTarget=behaviors.skeleton.moveToTarget,
         attack=behaviors.common.shoot,
         dead=behaviors.common.dead,
     },
@@ -397,7 +430,8 @@ behaviors.AI={
         raise=behaviors.common.raise,
         lower=behaviors.common.lower,
         idle=behaviors.skeleton.idle,
-        move=behaviors.skeleton.move,
+        moveToPlayer=behaviors.skeleton.moveToPlayer,
+        moveToTarget=behaviors.skeleton.moveToTarget,
         attack=behaviors.common.shoot,
         dead=behaviors.common.dead,
     },
@@ -405,13 +439,14 @@ behaviors.AI={
         raise=behaviors.common.raise,
         lower=behaviors.common.lower,
         idle=behaviors.skeleton.idle,
-        move=behaviors.skeleton.move,
+        moveToPlayer=behaviors.skeleton.moveToPlayer,
+        moveToTarget=behaviors.skeleton.moveToTarget,
         attack=behaviors.common.shoot,
         dead=behaviors.common.dead,
     },
     ['slime']={
         idle=behaviors.enemy.idle,
-        move=behaviors.enemy.move,
+        moveToTarget=behaviors.enemy.moveToTarget,
         attack=behaviors.enemy.lunge,
         dead=behaviors.common.dead,
     },

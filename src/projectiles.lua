@@ -50,24 +50,24 @@ local projectileUpdateFunctions=function()
     fns.base=function(self)
         self.remainingTravelTime=self.remainingTravelTime-dt 
         if self.remainingTravelTime<0 then 
-            self.collider:destroy()
+            self:destroy()
             return false
         end
 
-        self.x,self.y=self.collider:getPosition()
+        self.x,self.y=self:getPosition()
 
-        if self.collider:enter('enemy') then
-            local data=self.collider:getEnterCollisionData('enemy')    
+        if self:enter('enemy') then
+            local data=self:getEnterCollisionData('enemy')    
             local enemy=data.collider:getObject()
             if enemy~=nil then
                 enemy:takeDamage(self)
-                self.collider:destroy()
+                self:destroy()
                 return false
             end
         end 
 
-        if self.collider:enter('solid') then --destroy upon hitting a wall
-            self.collider:destroy() 
+        if self:enter('solid') then --destroy upon hitting a wall
+            self:destroy() 
             return false 
         end
     end
@@ -75,7 +75,7 @@ local projectileUpdateFunctions=function()
     fns.spark=function(self)
         self.remainingTravelTime=self.remainingTravelTime-dt 
         if self.remainingTravelTime<0 then 
-            self.collider:destroy()
+            self:destroy()
             return false
         end
 
@@ -95,17 +95,17 @@ local projectileUpdateFunctions=function()
             end
         end
 
-        self.x,self.y=self.collider:getPosition()
-        self.collider:setLinearVelocity(
+        self.x,self.y=self:getPosition()
+        self:setLinearVelocity(
             cos(self.angle)*self.moveSpeed,sin(self.angle)*self.moveSpeed
         )
 
-        if self.collider:enter('enemy') then
-            local data=self.collider:getEnterCollisionData('enemy')    
+        if self:enter('enemy') then
+            local data=self:getEnterCollisionData('enemy')    
             local enemy=data.collider:getObject()
             if enemy~=nil then
                 enemy:takeDamage(self)
-                self.collider:destroy()
+                self:destroy()
                 return false
             end
         end 
@@ -153,18 +153,17 @@ projectiles.createCollider=projectileCreateCollider()
 
 function projectiles:new(args)
     local def=self.definitions[args.name]    
-    local p={name=args.name}
+    local colliderType=def.collider.type or 'rectangle'
 
     --Collider 
-    local colliderType=def.collider.type or 'rectangle'
-    p.collider=self.createCollider[colliderType](args.x,args.y,def.collider)
-    p.collider:setBullet(true)
-    p.collider:setCollisionClass('projectile')
-    p.collider:setFixedRotation(true)
-    p.collider:setObject(p)
+    local p=self.createCollider[colliderType](args.x,args.y,def.collider)
+    p:setBullet(true)
+    p:setCollisionClass('projectile')
+    p:setFixedRotation(true)
 
     --General data
-    p.x,p.y=p.collider:getPosition()
+    p.name=args.name
+    p.x,p.y=p:getPosition()
     p.attackDamage=args.attackDamage
     p.knockback=args.knockback
     p.angle=args.angle
@@ -181,7 +180,7 @@ function projectiles:new(args)
     p.update=self.updateFunctions[p.name]
     p.draw=self.drawFunction
 
-    p.collider:setLinearVelocity( --initial velocity (launch)
+    p:setLinearVelocity( --initial velocity (launch)
         cos(p.angle)*p.moveSpeed,sin(p.angle)*p.moveSpeed
     )
     

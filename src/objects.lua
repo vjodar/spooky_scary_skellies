@@ -31,4 +31,6 @@ function objects:removeEntity(obj1)
     end
 end
 
+function objects:clear() self.table={} end 
+
 return objects

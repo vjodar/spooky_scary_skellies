@@ -6,7 +6,7 @@ behaviors.onLoops={
     end,
     changeToRaise=function(self)
         return function()
-            self.collider:setPosition(Player.x,Player.y)
+            self:setPosition(Player.x,Player.y)
             self:changeState('raise')
         end
     end,
@@ -35,7 +35,7 @@ behaviors.methods={
     end,
 
     updatePosition=function(self)
-        self.x,self.y=self.collider:getPosition()
+        self.x,self.y=self:getPosition()
     end,
 
     updateAnimation=function(self)
@@ -52,7 +52,7 @@ behaviors.methods={
         self.health.current=hp
 
         local ix,iy=cos(angle)*knockback,sin(angle)*knockback
-        self.collider:applyLinearImpulse(ix,iy)
+        self:applyLinearImpulse(ix,iy)
 
         if self.health.current==0 then self:die() end
     end,
@@ -62,7 +62,7 @@ behaviors.methods={
     end,
 
     die=function(self)
-        self.collider:destroy()
+        self:destroy()
         self:changeState('dead')
     end,
 
@@ -109,11 +109,9 @@ behaviors.methods={
             h=self.aggroRange.h,
             colliderNames={'player','skeleton'}
         }    
-        local targetColliders=World:queryRectangleArea(
+        local targets=World:queryRectangleArea(
             queryData.x,queryData.y,queryData.w,queryData.h,queryData.colliderNames
         )
-        local targets={}
-        for _,c in pairs(targetColliders) do table.insert(targets,c:getObject()) end 
         return targets
     end,
     
@@ -259,7 +257,7 @@ behaviors.skeleton={ --skeleton specific states
 
         local xVel=cos(self.angle)*self.moveSpeed
         local yVel=sin(self.angle)*self.moveSpeed
-        self.collider:applyForce(xVel,yVel)
+        self:applyForce(xVel,yVel)
     end,
     
     lunge=function(self)
@@ -271,13 +269,13 @@ behaviors.skeleton={ --skeleton specific states
             if self.canAttack then 
                 local ix=cos(self.angle)*self.lungeSpeed
                 local iy=sin(self.angle)*self.lungeSpeed
-                self.collider:applyLinearImpulse(ix,iy)
+                self:applyLinearImpulse(ix,iy)
                 Timer:setOnCooldown(self,'canAttack',self.attackSpeed)
             end
     
-            if self.collider:enter('enemy') then 
-                local data=self.collider:getEnterCollisionData('enemy')
-                local enemy=data.collider:getObject()
+            if self:enter('enemy') then 
+                local data=self:getEnterCollisionData('enemy')
+                local enemy=data.collider
                 if enemy~=nil then self:dealDamage(enemy) end
             end
         end
@@ -338,7 +336,7 @@ behaviors.enemy={ --enemy specific states
         end
         
         local xVel,yVel=cos(self.angle)*self.moveSpeed,sin(self.angle)*self.moveSpeed
-        self.collider:applyForce(xVel,yVel)
+        self:applyForce(xVel,yVel)
     end,
     
     lunge=function(self) 
@@ -350,17 +348,17 @@ behaviors.enemy={ --enemy specific states
             if self.canAttack then 
                 local ix=cos(self.angle)*self.lungeSpeed
                 local iy=sin(self.angle)*self.lungeSpeed
-                self.collider:applyLinearImpulse(ix,iy)  
+                self:applyLinearImpulse(ix,iy)  
                 Timer:setOnCooldown(self,'canAttack',self.attackSpeed)
             end        
     
-            if self.collider:enter('skeleton') then 
-                local data=self.collider:getEnterCollisionData('skeleton')
-                local skeleton=data.collider:getObject()
+            if self:enter('skeleton') then 
+                local data=self:getEnterCollisionData('skeleton')
+                local skeleton=data.collider
                 if skeleton~=nil then self:dealDamage(skeleton) end
             end
     
-            if self.collider:enter('player') then 
+            if self:enter('player') then 
                 --TODO: damage the player
                 -- print("hit the player")
             end

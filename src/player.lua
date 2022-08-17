@@ -1,39 +1,33 @@
-local player={name='player'}
+local player=World:newBSGRectangleCollider(0,0,11,5,3)    
+player:setLinearDamping(20) --apply increased 'friction'
+player:setFixedRotation(true) --collider won't spin/rotate
+player:setCollisionClass('player')
+player:setMass(10) --player is base unit for mass
 
-function player:load(_x,_y)
-    self.collider=World:newBSGRectangleCollider(_x,_y,11,5,3)    
-    self.collider:setLinearDamping(20) --apply increased 'friction'
-    self.collider:setFixedRotation(true) --collider won't spin/rotate
-    self.collider:setCollisionClass('player')
-    self.collider:setObject(self) --attach collider to this object
-    self.collider:setMass(10) --player is base unit for mass
+player.name='player'
+player.x,player.y=player:getPosition()
+player.health={current=100,max=100}
+player.scaleX=1 --used to flip sprites horizontally
+player.moveSpeed=18000
+player.queryForEnemiesRate=0.5 --will query for enemies every 0.5s
+player.queryForEnemiesReady=true
+player.nearbyEnemies={}
+player.aggroRange={w=600,h=450}
 
-    self.x,self.y=self.collider:getPosition()
-    self.health={current=100,max=100}
-    self.scaleX=1 --used to flip sprites horizontally
-    self.moveSpeed=18000
-    self.queryForEnemiesRate=0.5 --will query for enemies every 0.5s
-    self.queryForEnemiesReady=true
-    self.nearbyEnemies={}
-    self.aggroRange={w=600,h=450}
-    
-    self.xOffset,self.yOffset=10,19
-    self.spriteSheet=love.graphics.newImage('assets/entities/player.png')
-    self.grid=anim8.newGrid(20,19,self.spriteSheet:getWidth(),self.spriteSheet:getHeight())
-    self.animations={}
-    self.animations.idle=anim8.newAnimation(self.grid('1-4',1), 0.1)
-    self.animations.moving=anim8.newAnimation(self.grid('1-4',2), 0.1)
-    self.animations.current=self.animations.idle
-    self.animSpeed={min=0.25,max=3,current=1}
+player.xOffset,player.yOffset=10,19
+player.spriteSheet=love.graphics.newImage('assets/entities/player.png')
+player.grid=anim8.newGrid(20,19,player.spriteSheet:getWidth(),player.spriteSheet:getHeight())
+player.animations={}
+player.animations.idle=anim8.newAnimation(player.grid('1-4',1), 0.1)
+player.animations.moving=anim8.newAnimation(player.grid('1-4',2), 0.1)
+player.animations.current=player.animations.idle
+player.animSpeed={min=0.25,max=3,current=1}
 
-    self.shadow=Shadows:new('player')
-
-    table.insert(Objects.table,self)
-end
+player.shadow=Shadows:new('player')
 
 function player:update()
     self.animations.current:update(dt*self.animSpeed.current)
-    self.x,self.y=self.collider:getPosition()
+    self.x,self.y=self:getPosition()
 
     if self.queryForEnemiesReady then 
         Timer:setOnCooldown(self,'queryForEnemiesReady',self.queryForEnemiesRate)
@@ -87,7 +81,7 @@ function player:move()
         self.animations.current=self.animations.idle
     end
 
-    self.collider:applyForce(xVel,yVel)
+    self:applyForce(xVel,yVel)
 end
 
 --return a table of all enemies onscreen
@@ -99,11 +93,9 @@ function player:queryForEnemies()
         h=self.aggroRange.h,
         colliderNames={'enemy'}
     }    
-    local targetColliders=World:queryRectangleArea(
+    local targets=World:queryRectangleArea(
         queryData.x,queryData.y,queryData.w,queryData.h,queryData.colliderNames
     )
-    local targets={}
-    for _,c in pairs(targetColliders) do table.insert(targets,c:getObject()) end 
     return targets
 end
 
@@ -113,5 +105,7 @@ function player:takeDamage(args)
     hp=max(0,hp-damage)
     self.health.current=hp
 end
+
+table.insert(Objects.table,player)
 
 return player

@@ -21,6 +21,7 @@ function love.load()
 
     --Modules
     Camera=require 'src/camera'
+    World=require 'src/world'
     Objects=require 'src/objects'
     Shadows=require 'src/shadows'
     Player=require 'src/player'
@@ -36,8 +37,7 @@ function love.load()
     table.insert(gameStates,Timer) --timer second
     table.insert(gameStates,PlayState) --initial game state
     
-    --Initialize all states in gamestates
-    for i,state in pairs(gameStates) do state:load() end
+    PlayState:startGame() --start the game
 end
 
 function love.update(_dt)
@@ -50,13 +50,9 @@ function love.update(_dt)
 end
 
 function love.draw()
-    Camera.cam:attach()
+    Camera:attach()
     for i,state in pairs(gameStates) do
         if state.draw then state:draw() end 
     end
-    Camera.cam:detach()
+    Camera:detach()
 end
-
---testing-------------------
-function love.keyreleased(_k) if _k=='escape' then love.event.quit() end end
---testing-------------------

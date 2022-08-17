@@ -1,24 +1,13 @@
 local PlayState={}
 
-function PlayState:load()    
-    World=wf.newWorld()
-    World:addCollisionClass('player')
-    World:addCollisionClass('skeleton')
-    World:addCollisionClass('enemy')
-    World:addCollisionClass('projectile',
-       {ignores={'projectile','player','skeleton','enemy'}}
-    )
-    World:addCollisionClass('solid')
-    --testing--------------------------------
-    -- World:setQueryDebugDrawing(true)
-    --testing--------------------------------
+function PlayState:startGame()
 
     map=love.graphics.newImage('assets/maps/placeholder.png')
 
-    Player:load(10,10)
+    Player:setPosition(10,10)
 
     Camera.target=Player
-    Camera.cam:zoomTo(3)
+    Camera:zoomTo(3)
 end
 
 function PlayState:update()
@@ -37,14 +26,14 @@ function PlayState:update()
         --     attackDamage=self.attackDamage,knockback=self.knockback,
         --     angle=angleToTarget,yOffset=projectile.yOffset
         -- })
-        for i=1,10 do Entities:new('skeletonWarrior',Controls.getMousePosition()) end
+        -- for i=1,10 do Entities:new('skeletonWarrior',Controls.getMousePosition()) end
         -- for i=1,1 do Entities:new('skeletonArcher',Controls.getMousePosition()) end 
         -- for i=1,1 do Entities:new('skeletonMageFire',Controls.getMousePosition()) end 
-        -- for i=1,1 do Entities:new('skeletonMageIce',Controls.getMousePosition()) end 
+        for i=1,1 do Entities:new('skeletonMageIce',Controls.getMousePosition()) end 
         -- for i=1,1 do Entities:new('skeletonMageElectric',Controls.getMousePosition()) end 
     end
     if Controls.pressed.mouse2 then 
-        for i=1,20 do Entities:new('slime',Controls.getMousePosition()) end
+        for i=1,2 do Entities:new('slime',Controls.getMousePosition()) end
     end
 end
 

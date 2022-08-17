@@ -32,21 +32,20 @@ entityClass.parseAnimations=parseAnimations
 
 function entityClass:new(entity,x,y) --constructor
     local def=self.definitions[entity]
-    local e={name=def.name}
     
     --Collider data
-    e.collider=World:newBSGRectangleCollider(
+    local e=World:newBSGRectangleCollider(
         x,y,def.collider.width,def.collider.height,def.collider.corner
     )
     for fn,val in pairs(def.collider.modifiers) do
-        e.collider[fn](e.collider,val)
+        e[fn](e,val)
     end
-    e.collider:setFixedRotation(true) 
-    e.collider:setCollisionClass(def.collider.class)
-    e.collider:setObject(e)
+    e:setFixedRotation(true) 
+    e:setCollisionClass(def.collider.class)
 
     --General data
-    e.x,e.y=e.collider:getPosition()
+    e.name=def.name 
+    e.x,e.y=e:getPosition()
     e.health={current=def.health,max=def.health}
     e.moveSpeed=def.moveSpeed
     e.attackRange=def.attackRange

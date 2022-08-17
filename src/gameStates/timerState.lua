@@ -1,10 +1,9 @@
-local TimerState={}
+local timerState={}
+timerState.timers={}
 
-function TimerState:load() 
-    self.timers={} --table of all timers
-end
+function timerState:clear() self.timers={} end
 
-function TimerState:update()
+function timerState:update()
     for i,timer in pairs(self.timers) do 
         --Update each timer, remove any that return false
         if timer:update()==false then table.remove(self.timers,i) end
@@ -12,7 +11,7 @@ function TimerState:update()
 end
 
 --Delays a function call by t seconds
-function TimerState:after(t,fn)
+function timerState:after(t,fn)
     local timer={t=t,fn=fn}
     function timer:update()
         self.t=self.t-dt --decrement time
@@ -23,7 +22,7 @@ function TimerState:after(t,fn)
 end
 
 --Tweens the property (number) of an object to an endValue over time seconds.
-function TimerState:tween(obj,prop,endVal,time)
+function timerState:tween(obj,prop,endVal,time)
     local delta=(endVal-obj[prop])/time
     local timer={
         t=time,
@@ -42,10 +41,10 @@ function TimerState:tween(obj,prop,endVal,time)
 end
 
 --Set a cooldown timer 
-function TimerState:setOnCooldown(obj,cdFlag,cdPeriod)
+function timerState:setOnCooldown(obj,cdFlag,cdPeriod)
     obj[cdFlag]=false
     local releaseCooldown=function() obj[cdFlag]=true end
     self:after(cdPeriod,releaseCooldown)
 end
 
-return TimerState
+return timerState

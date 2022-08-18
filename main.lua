@@ -42,17 +42,17 @@ end
 
 function love.update(_dt)
     dt=_dt --update delta time
-    for i,state in pairs(gameStates) do
+    for i=1, #gameStates do 
         acceptInput=(i==#gameStates) --used to restrict inputs to top gameState
         --run each state in gameStates, remove any that return false
-        if state:update()==false then table.remove(gameStates,i) end 
+        if gameStates[i]:update()==false then table.remove(gameStates,i) end 
     end
 end
 
 function love.draw()
     Camera:attach()
-    for i,state in pairs(gameStates) do
-        if state.draw then state:draw() end 
+    for i=1, #gameStates do 
+        if gameStates[i].draw then gameStates[i]:draw() end
     end
     Camera:detach()
 end

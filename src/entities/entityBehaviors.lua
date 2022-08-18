@@ -93,16 +93,21 @@ behaviors.methods={
 
         --filter out any targets blocked from LOS
         local LOSblockers={'ALL',{except='enemy'}}
-        for i,target in pairs(nearbyEnemies) do 
-            if #World:queryLine(self.x,self.y,target.x,target.y,LOSblockers)>0 then 
+        for i=1, #nearbyEnemies do 
+            if #World:queryLine(
+                self.x,self.y,nearbyEnemies[i].x,
+                nearbyEnemies[i].y,LOSblockers
+            )>0 then 
                 table.remove(nearbyEnemies,i)
             end
         end
         
         local closest=nil --find and return the closest target
-        for _,target in pairs(nearbyEnemies) do 
-            local dist=getDistance(self,target)
-            if closest==nil or closest.d>dist then closest={t=target,d=dist} end
+        for i=1, #nearbyEnemies do 
+            local dist=getDistance(self,nearbyEnemies[i])
+            if closest==nil or closest.d>dist then 
+                closest={t=nearbyEnemies[i],d=dist} 
+            end
         end
         return closest.t
     end,
@@ -128,16 +133,21 @@ behaviors.methods={
 
         --filter out any targets blocked from LOS
         local LOSblockers={'ALL',{except='player','skeleton'}} --TODO: define blocking collision classes
-        for i,target in pairs(nearbyAttackTargets) do 
-            if #World:queryLine(self.x,self.y,target.x,target.y,LOSblockers)>0 then 
+        for i=1, #nearbyAttackTargets do 
+            if #World:queryLine(
+                self.x,self.y,nearbyAttackTargets[i].x,
+                nearbyAttackTargets[i].y,LOSblockers
+            )>0 then 
                 table.remove(nearbyAttackTargets,i)
             end
         end
         
         local closest=nil --find and return the closest target
-        for _,target in pairs(nearbyAttackTargets) do 
-            local dist=getDistance(self,target)
-            if closest==nil or closest.d>dist then closest={t=target,d=dist} end
+        for i=1, #nearbyAttackTargets do
+            local dist=getDistance(self,nearbyAttackTargets[i])
+            if closest==nil or closest.d>dist then 
+                closest={t=nearbyAttackTargets[i],d=dist} 
+            end
         end
         return closest.t
     end,

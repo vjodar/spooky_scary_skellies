@@ -4,9 +4,11 @@ timerState.timers={}
 function timerState:clear() self.timers={} end
 
 function timerState:update()
-    for i,timer in pairs(self.timers) do 
+    for i,timer in ipairs(self.timers) do --must use ipairs() 
         --Update each timer, remove any that return false
-        if timer:update()==false then table.remove(self.timers,i) end
+        if timer:update()==false then
+            table.remove(self.timers,i)
+        end
     end
 end
 

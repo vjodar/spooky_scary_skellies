@@ -15,7 +15,8 @@ local shadowSprites=function()
     sprites.arrow=love.graphics.newImage('assets/shadows/shadow_arrow.png')
     sprites.flame=love.graphics.newImage('assets/shadows/shadow_flame.png')
     sprites.icicle=love.graphics.newImage('assets/shadows/shadow_icicle.png')
-    sprites.spark=love.graphics.newImage('assets/shadows/shadow_spark.png')    
+    sprites.spark=love.graphics.newImage('assets/shadows/shadow_spark.png')
+    sprites.bone=love.graphics.newImage('assets/shadows/shadow_bone.png')
 
     return sprites
 end 

@@ -33,7 +33,6 @@ behaviors.methods={
             attack='attack',
             moveToPlayer='move',
             moveToTarget='move',
-            moveToLocation='move',
         }
         if self.animations[associatedAnimation[newState]] then 
             self.animations.current=self.animations[associatedAnimation[newState]]
@@ -92,7 +91,7 @@ behaviors.methods={
         if #nearbyEnemies==0 then return self end --nothing nearby, reset moveTarget
 
         --filter out any targets blocked from LOS
-        local LOSblockers={'ALL',{except='enemy'}}
+        local LOSblockers={'solid'}
         for i=1, #nearbyEnemies do 
             if #World:queryLine(
                 self.x,self.y,nearbyEnemies[i].x,
@@ -132,7 +131,7 @@ behaviors.methods={
         if #nearbyAttackTargets==0 then return self end --nothing nearby, reset moveTarget
 
         --filter out any targets blocked from LOS
-        local LOSblockers={'ALL',{except='player','skeleton'}} --TODO: define blocking collision classes
+        local LOSblockers={'solid'}
         for i=1, #nearbyAttackTargets do 
             if #World:queryLine(
                 self.x,self.y,nearbyAttackTargets[i].x,

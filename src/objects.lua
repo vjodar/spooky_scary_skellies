@@ -1,7 +1,7 @@
 local objects={}
 objects.table={} --holds all objects
 objects.inDrawDistanceTable={} --objects within draw distance
-objects.drawDistance={x=400,y=300}
+objects.drawDistance={x=800,y=600}
 objects.sort=function(obj1,obj2) return obj1.y<obj2.y end --sort function
 
 function objects:update() 
@@ -30,7 +30,10 @@ end
 
 function objects:removeObject(obj1)
     for i=1, #self.table do 
-        if self.table[i]==obj1 then table.remove(self.table,i) end
+        if self.table[i]==obj1 then 
+            table.remove(self.table,i)
+            return
+        end
     end
 end
 

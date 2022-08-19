@@ -7,13 +7,16 @@ player:setMass(10) --player is base unit for mass
 player.name='player'
 player.x,player.y=player:getPosition()
 player.health={current=100,max=100}
-player.scaleX=1 --used to flip sprites horizontally
 player.moveSpeed=18000
 player.queryForEnemiesRate=0.5 --will query for enemies every 0.5s
 player.queryForEnemiesReady=true
 player.nearbyEnemies={}
 player.aggroRange={w=600,h=450}
+player.attackRate=0.5
+player.attackReady=true
 
+player.scaleX=1 --used to flip sprites horizontally
+player.canTurn=true --used to keep player facing a certain direction
 player.xOffset,player.yOffset=10,19
 player.spriteSheet=love.graphics.newImage('assets/entities/player.png')
 player.grid=anim8.newGrid(20,19,player.spriteSheet:getWidth(),player.spriteSheet:getHeight())
@@ -34,7 +37,13 @@ function player:update()
         self.nearbyEnemies=self:queryForEnemies()
     end
 
-    self:move()
+    if acceptInput then 
+        self:move()
+        if Controls.down.mouse and self.attackReady then 
+            self:launchBone() 
+            Timer:setOnCooldown(self,'attackReady',self.attackRate)
+        end
+    end
 end
 
 function player:draw()
@@ -54,12 +63,12 @@ function player:move()
 
     if Controls.down.dirLeft then
         target.x=target.x-1
-        self.scaleX=-1
+        if self.canTurn then self.scaleX=-1 end 
         moving=true
     end
     if Controls.down.dirRight then
         target.x=target.x+1
-        self.scaleX=1
+        if self.canTurn then self.scaleX=1 end 
         moving=true 
     end
     if Controls.down.dirUp then
@@ -104,6 +113,18 @@ function player:takeDamage(args)
     local hp=self.health.current
     hp=max(0,hp-damage)
     self.health.current=hp
+end
+
+function player:launchBone()
+    local mouseX,mouseY=Controls.getMousePosition()
+    Projectiles:new({
+        x=self.x,y=self.y,name='bone',attackDamage=1,knockback=1,
+        angle=getAngle(Player,{x=mouseX,y=mouseY}),yOffset=-10
+    })
+    if mouseX>self.x then self.scaleX=1 
+    else self.scaleX=-1 
+    end
+    Timer:setOnCooldown(self,'canTurn',0.2)
 end
 
 table.insert(Objects.table,player)

@@ -4,8 +4,8 @@ local projectileDefinitions=function()
             name='bone',
             moveSpeed=100,
             collider={
-                width=3,
-                height=3,
+                w=3,
+                h=3,
                 class='allyProjectile',
             }
         },
@@ -13,8 +13,8 @@ local projectileDefinitions=function()
             name='arrow',
             moveSpeed=300,
             collider={
-                width=3,
-                height=3,
+                w=3,
+                h=3,
                 class='allyProjectile',
             },
         },
@@ -22,8 +22,8 @@ local projectileDefinitions=function()
             name='flame',
             moveSpeed=200,
             collider={
-                width=3,
-                height=3,
+                w=3,
+                h=3,
                 class='allyProjectile',
             },
         },
@@ -31,8 +31,8 @@ local projectileDefinitions=function()
             name='icicle',
             moveSpeed=160,
             collider={
-                width=3,
-                height=3,
+                w=3,
+                h=3,
                 class='allyProjectile',
             },
         },
@@ -40,8 +40,8 @@ local projectileDefinitions=function()
             name='spark',
             moveSpeed=150,
             collider={
-                width=3,
-                height=3,
+                w=3,
+                h=3,
                 class='allyProjectile',
             },
         },
@@ -91,25 +91,31 @@ local projectileUpdateFunctions=function()
             if self.remainingTravelTime<0
             or getDistance(self,Camera.target)>400 
             then 
-                self:destroy()
+                World:remove(self)
                 return false
             end
     
-            self.x,self.y=self:getPosition()
-    
-            if self:enter('enemy') then
-                local data=self:getEnterCollisionData('enemy')    
-                local enemy=data.collider
-                if enemy~=nil then
-                    self:onHit(enemy)
-                    self:destroy()
-                    return false
+            --update position
+            local goalX=self.x+self.vx*dt 
+            local goalY=self.y+self.vy*dt 
+            local realX,realY,cols=World:move(self,goalX,goalY,self.filter)
+            self.x,self.y=realX,realY 
+
+            --handle collisions
+            for i=1,#cols do 
+                local other=cols[i].other 
+                local touch=cols[i].touch 
+
+                if other.collisionClass=='enemy' then
+                    self:onHit(other)
+                    World:remove(self)
+                    return false 
+                end 
+
+                if other.collisionClass=='solid' then 
+                    World:remove(self)
+                    return false 
                 end
-            end 
-    
-            if self:enter('solid') then
-                self:destroy() 
-                return false 
             end
         end,
     
@@ -119,7 +125,7 @@ local projectileUpdateFunctions=function()
             if self.remainingTravelTime<0 
             or getDistance(self,Camera.target)>400 
             then
-                self:destroy()
+                World:remove(self)
                 return false
             end
     
@@ -136,25 +142,35 @@ local projectileUpdateFunctions=function()
                 if self.changeDirectionTime<0 then 
                     self.changeDirectionTime=rnd()*0.5
                     self.angle=self.angle+(self.angles[rnd(#self.angles)])
+                    
+                    --update direction
+                    local magnitude=getMagnitude(self.vy,self.vx)
+                    self.vx=cos(self.angle)*magnitude
+                    self.vy=sin(self.angle)*magnitude
                 end
             end
-    
-            self.x,self.y=self:getPosition()
-            self:setLinearVelocity(
-                cos(self.angle)*self.moveSpeed,sin(self.angle)*self.moveSpeed
-            )
-    
-            if self:enter('enemy') then
-                local data=self:getEnterCollisionData('enemy')    
-                local enemy=data.collider
-                if enemy~=nil then
-                    self:onHit(enemy)
-                    self:destroy()
-                    return false
+            
+            --update position
+            local goalX=self.x+self.vx*dt 
+            local goalY=self.y+self.vy*dt 
+            local realX,realY,cols=World:move(self,goalX,goalY,self.filter)
+            self.x,self.y=realX,realY 
+
+            --handle collisions
+            for i=1,#cols do 
+                local other=cols[i].other 
+                local touch=cols[i].touch 
+
+                if other.collisionClass=='enemy' then
+                    self:onHit(other)
+                    World:remove(self)
+                    return false 
+                end 
+
+                if other.collisionClass=='solid' then 
+                    --TODO: setup bounce off solid objects behavior
                 end
-            end 
-    
-            --TODO: setup bounce off solid objects behavior
+            end    
         end,
 
     }
@@ -168,45 +184,31 @@ local projectileDrawFunctions=function()
         base=function(self)
             self.shadow:draw(self.x,self.y,self.angle)
             love.graphics.draw(
-                self.sprite,self.x,self.y+self.yOffset,
-                self.angle,1,1,self.origin.x,self.origin.y
+                self.sprite,self.x+self.xOffset,self.y+self.yOffset,
+                self.angle,1,1,self.xOrigin,self.yOrigin
             )
         end,
     
         --Projectile randomly rotates each frame
         spark=function(self)
             self.rotation=rnd()*6
+            self.shadow:draw(self.x,self.y,self.rotation)
             love.graphics.draw(
-                self.sprite,self.x,self.y+self.yOffset,
-                self.rotation,1,1,self.origin.x,self.origin.y
+                self.sprite,self.x+self.xOffset,self.y+self.yOffset,
+                self.rotation,1,1,self.xOrigin,self.yOrigin
             )
         end,
 
         --Projectile spins
         bone=function(self)
-            self.rotation=self.rotation+dt*20
+            self.rotation=self.rotation+dt*self.moveSpeed*0.1
             self.shadow:draw(self.x,self.y,self.rotation)
             love.graphics.draw(
-                self.sprite,self.x,self.y+self.yOffset,
-                self.rotation,1,1,self.origin.x,self.origin.y
+                self.sprite,self.x+self.xOffset,self.y+self.yOffset,
+                self.rotation,1,1,self.xOrigin,self.yOrigin
             )
         end,
 
-    }
-end
-
---Creates a collider given a definition and position
-local projectileCreateCollider=function()
-    return {
-        rectangle=function(x,y,cDef)
-            return World:newRectangleCollider(x,y,cDef.width,cDef.height)
-        end,
-        bsg=function(x,y,cDef)
-            return World:newBSGRectangleCollider(x,y,cDef.width,cDef.height,cDef.corner)
-        end,
-        circle=function(x,y,cDef)
-            return World:newCircleCollider(x,y,cDef.radius)
-        end,
     }
 end
 
@@ -216,43 +218,43 @@ projectiles.sprites=projectileSprites(projectiles.definitions)
 projectiles.onHitFunctions=projectileOnHitFunctions()
 projectiles.updateFunctions=projectileUpdateFunctions()
 projectiles.drawFunctions=projectileDrawFunctions()
-projectiles.createCollider=projectileCreateCollider()
 
 function projectiles:new(args) --args={x,y,name,attackDamage,knockback,yOffset}
-    local def=self.definitions[args.name]    
-    local colliderType=def.collider.type or 'rectangle'
+    local def=self.definitions[args.name]
 
-    --Collider 
-    local p=self.createCollider[colliderType](args.x,args.y,def.collider)
-    p:setBullet(true)
-    p:setCollisionClass(def.collider.class)
-    p:setFixedRotation(true)
+    --Collider Data
+    local p={name=args.name}
+    p.x,p.y=args.x,args.y 
+    p.w,p.h=def.collider.w,def.collider.h
+    p.collisionClass=def.collider.class
+    p.filter=World.collisionFilters[p.collisionClass]
 
     --General data
-    p.name=args.name
-    p.x,p.y=p:getPosition()
+    p.angle=args.angle
     p.attackDamage=args.attackDamage
     p.knockback=args.knockback
-    p.angle=args.angle
-    p.rotation=rnd()*3.15
+    p.rotation=rnd()*pi
     p.moveSpeed=def.moveSpeed
     p.remainingTravelTime=(200/def.moveSpeed)*2 --1sec per 100units/sec
 
     --Draw data
     p.sprite=self.sprites[def.name]
-    p.yOffset=args.yOffset
-    p.origin={x=p.sprite:getWidth()*0.5,y=p.sprite:getHeight()*0.5}
-    p.shadow=Shadows:new(def.name)
+    p.xOffset=p.w*0.5
+    p.yOffset=p.h*0.5+args.yOffset
+    p.xOrigin=p.sprite:getWidth()*0.5
+    p.yOrigin=p.sprite:getHeight()*0.5
+    p.shadow=Shadows:new(def.name,p.w,p.h)
 
     --Methods (update and draw)
     p.onHit=self.onHitFunctions[p.name] or self.onHitFunctions.base 
     p.update=self.updateFunctions[p.name] or self.updateFunctions.base
     p.draw=self.drawFunctions[p.name] or self.drawFunctions.base
 
-    p:setLinearVelocity( --initial velocity (launch)
-        cos(p.angle)*p.moveSpeed,sin(p.angle)*p.moveSpeed
-    )
+    --Set initial/launch velocity
+    p.vx=cos(p.angle)*p.moveSpeed 
+    p.vy=sin(p.angle)*p.moveSpeed
     
+    World:addItem(p)
     table.insert(Objects.table,p)
     return p
 end

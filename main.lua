@@ -14,11 +14,17 @@ function love.load()
     getAngle=function(s,t) return atan2((t.y-s.y),(t.x-s.x)) end
     getDistance=function(a,b) return ((abs(b.x-a.x))^2+(abs(b.y-a.y))^2)^0.5 end
     getMagnitude=function(a,b) return abs((a^2+b^2)^0.5) end
+    getCenter=function(a) return {x=a.x+a.w*0.5,y=a.y+a.h*0.5} end
     
     --Libraries
     bump=require 'src/libraries/bump'
     humpCam=require 'src/libraries/camera'
     anim8=require 'src/libraries/anim8'
+
+    --GameStates
+    Controls=require 'src/gameStates/controlState'
+    Timer=require 'src/gameStates/timerState'
+    PlayState=require 'src/gameStates/playState'    
 
     --Modules
     Camera=require 'src/camera'
@@ -27,12 +33,7 @@ function love.load()
     Shadows=require 'src/shadows'
     Player=require 'src/player'
     Entities=require 'src/entities/entityClass'
-    Projectiles=require 'src/projectiles'
-
-    --GameStates
-    Controls=require 'src/gameStates/controlState'
-    Timer=require 'src/gameStates/timerState'
-    PlayState=require 'src/gameStates/playState'        
+    Projectiles=require 'src/projectiles'    
     
     table.insert(gameStates,Controls) --controls first
     table.insert(gameStates,Timer) --timer second

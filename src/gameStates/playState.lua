@@ -4,8 +4,6 @@ function PlayState:startGame()
 
     map=love.graphics.newImage('assets/maps/placeholder.png')
 
-    -- Player:setPosition(10,10)
-
     Camera.target=Player
     Camera:zoomTo(3)
 end
@@ -22,7 +20,7 @@ function PlayState:update()
         -- for i=1,1 do Entities:new('slime',Controls.getMousePosition()) end
     end
     if Controls.pressed.mouse2 then         
-        -- for i=1,10 do Entities:new('slime',Controls.getMousePosition()) end
+        -- for i=1,10 do Entities:new('slime',Controls.getMousePosition()) end        
     end
 end
 

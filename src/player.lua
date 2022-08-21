@@ -7,20 +7,14 @@
 local player={name='player'}
 
 --Collider data
-player.collisionClass='ally'
 player.x,player.y=0,0
 player.w,player.h=12,7
 player.vx,player.vy=0,0
 player.moveSpeed=1000
 player.linearDamping=10
 player.stopThreshold=3*60 --speed slow enough to consider stopped (at 60FPS)
-player.filter=function(item,other)
-    if other.collisionClass=='enemy' then return 'bounce' 
-    elseif other.collisionClass=='enemyProjectile' then return 'cross'
-    elseif other.collisionClass=='ally' then return 'slide' 
-    elseif other.collisionClass=='allyProjectile' then return nil 
-    end 
-end
+player.collisionClass='ally'
+player.filter=World.collisionFilters[player.collisionClass]
 
 --General Data
 player.health={current=100,max=100}
@@ -42,9 +36,22 @@ player.animations.moving=anim8.newAnimation(player.grid('1-4',2), 0.1)
 player.animations.current=player.animations.idle
 player.animSpeed={min=0.25,max=3,current=1}
 player.scaleX=1 --used to flip sprites horizontally
-player.canTurn=true --used to keep player facing a certain direction
 
-player.shadow=Shadows:new('player')
+--Cooldown flags, periods, and callback functions
+player.canTurn={
+    flag=true, --used to lock facing direction
+    cooldownPeriod=0.5,
+}
+Timer.giveCooldownCallbacks(player.canTurn)
+
+player.canAttack={
+    flag=true,
+    cooldownPeriod=0.5, --can attack every 0.5s
+}
+Timer.giveCooldownCallbacks(player.canAttack)
+
+--Shadow
+player.shadow=Shadows:new('player',player.w,player.h)
 
 function player:update()
     self.animations.current:update(dt*self.animSpeed.current)
@@ -57,10 +64,10 @@ function player:update()
 
     if acceptInput then 
         self:move()
-        -- if Controls.down.mouse and self.attackReady then 
-        --     self:launchBone() 
-        --     Timer:setOnCooldown(self,'attackReady',self.attackRate)
-        -- end
+        if Controls.down.mouse and self.canAttack.flag then 
+            self:launchBone() 
+            self.canAttack.setOnCooldown()
+        end
     end
 end
 
@@ -113,12 +120,12 @@ function player:move()
     --Change velocity by finding angle to target
     if Controls.down.dirLeft then
         target.x=target.x-1
-        if self.canTurn then self.scaleX=-1 end 
+        if self.canTurn.flag then self.scaleX=-1 end 
         moving=true
     end
     if Controls.down.dirRight then
         target.x=target.x+1
-        if self.canTurn then self.scaleX=1 end 
+        if self.canTurn.flag then self.scaleX=1 end 
         moving=true 
     end
     if Controls.down.dirUp then
@@ -160,23 +167,40 @@ function player:queryForEnemies()
     return targets
 end
 
-function player:takeDamage(args)
-    local damage=args.damage or 1
-    local hp=self.health.current
+function player:takeDamage(source)
+    local hp=self.health.current 
+    local damage=source.attackDamage or 0 
+    local knockback=source.knockback or 0
+    local kbAngle=getAngle(getCenter(source),getCenter(self))
+    
     hp=max(0,hp-damage)
     self.health.current=hp
+
+    --Apply knockback force
+    self.vx=self.vx+cos(kbAngle)*knockback
+    self.vy=self.vy+sin(kbAngle)*knockback
+
+    if self.health.current==0 then print("I'm dead! :O") end
 end
 
 function player:launchBone()
     local mouseX,mouseY=Controls.getMousePosition()
+    -- Projectiles:new({
+    --     x=self.x,y=self.y,name='arrow',attackDamage=1,knockback=1,
+    --     angle=getAngle(Player,{x=mouseX,y=mouseY}),yOffset=-10
+    -- })
+
+    --testing-----------------------------------------------
+    self.collisionClass='enemy'
     Projectiles:new({
-        x=self.x,y=self.y,name='bone',attackDamage=1,knockback=1,
-        angle=getAngle(Player,{x=mouseX,y=mouseY}),yOffset=-10
+        x=mouseX,y=mouseY,name='spark',attackDamage=1,knockback=300,
+        angle=getAngle({x=mouseX,y=mouseY},getCenter(Player)),yOffset=-10
     })
-    if mouseX>self.x then self.scaleX=1 
-    else self.scaleX=-1 
-    end
-    Timer:setOnCooldown(self,'canTurn',0.2)
+    --testing-----------------------------------------------
+
+    --face target direction, lock turning
+    self.scaleX=(mouseX>self.x and 1 or -1)
+    self.canTurn.setOnCooldown()
 end
 
 World:addItem(player)

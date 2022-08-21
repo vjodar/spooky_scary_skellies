@@ -13,19 +13,26 @@ function objects:update()
         and abs(Camera.target.y-self.table[i].y)<self.drawDistance.y 
         then table.insert(self.inDrawDistanceTable,self.table[i]) end
     end
-
-    table.sort(self.inDrawDistanceTable,self.sort) --sort by y position
-
+    
     --update object. If it returns false, remove it from table
     for i=1, #self.inDrawDistanceTable do 
         if self.inDrawDistanceTable[i]:update()==false then 
             self:removeObject(self.inDrawDistanceTable[i]) 
         end
     end
+    
+    --sort objects by y-position to provide semi-3D perspective.
+    --sort after updating in order to keep non-deterministic collision priority.
+    table.sort(self.inDrawDistanceTable,self.sort)
 end
 
 function objects:draw() 
-    for i=1, #self.inDrawDistanceTable do self.inDrawDistanceTable[i]:draw() end
+    for i=1, #self.inDrawDistanceTable do 
+        self.inDrawDistanceTable[i]:draw() 
+        --testing----------------------------------
+        World:drawItem(self.inDrawDistanceTable[i])
+        --testing----------------------------------
+    end
 end
 
 function objects:removeObject(obj1)

@@ -1,17 +1,8 @@
-local world=wf.newWorld()
-world:addCollisionClass('player')
-world:addCollisionClass('skeleton')
-world:addCollisionClass('enemy')
-world:addCollisionClass('allyProjectile',{
-   ignores={'allyProjectile','player','skeleton'}
-})
-world:addCollisionClass('enemyProjectile',{
-   ignores={'enemyProjectile','allyProjectile','enemy'}
-})
-world:addCollisionClass('solid')
+local world=bump.newWorld(32)
 
---testing--------------------------------
--- world:setQueryDebugDrawing(true)
---testing--------------------------------
+function world:addItem(item) self:add(item,item.x,item.y,item.w,item.h) end
+function world:drawItem(item) 
+   love.graphics.rectangle('line',item.x,item.y,item.w,item.h)
+end
 
 return world

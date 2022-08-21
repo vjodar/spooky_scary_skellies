@@ -25,18 +25,13 @@ local shadows={}
 shadows.sprites=shadowSprites()
 shadows.drawFunction=function(s,x,y,rot)
     love.graphics.setColor(1,1,1,0.6)
-    love.graphics.draw(s.sprite,x,y,rot,1,1,s.xOffset,s.yOffset)
+    love.graphics.draw(s.sprite,x,y,rot,1,1)
     love.graphics.setColor(1,1,1,1)
 end
 
 --contructor
 function shadows:new(name)
-    local s={}
-    s.sprite=self.sprites[name]
-    s.xOffset=s.sprite:getWidth()*0.5
-    s.yOffset=s.sprite:getHeight()*0.5
-    s.draw=self.drawFunction
-    return s
+    return {sprite=self.sprites[name],draw=self.drawFunction}
 end
 
 return shadows 

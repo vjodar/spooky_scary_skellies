@@ -13,9 +13,10 @@ function love.load()
     pi,cos,sin,atan2=math.pi,math.cos,math.sin,math.atan2
     getAngle=function(s,t) return atan2((t.y-s.y),(t.x-s.x)) end
     getDistance=function(a,b) return ((abs(b.x-a.x))^2+(abs(b.y-a.y))^2)^0.5 end
+    getMagnitude=function(a,b) return abs((a^2+b^2)^0.5) end
     
     --Libraries
-    wf=require 'src/libraries/windfield'
+    bump=require 'src/libraries/bump'
     humpCam=require 'src/libraries/camera'
     anim8=require 'src/libraries/anim8'
 

@@ -166,14 +166,12 @@ local function parseIntervals(durations)
 end
 
 local Animationmt = { __index = Animation }
-local nop = function() end
 
-local function newAnimation(frames, durations, onLoop)
+local function newAnimation(frames, durations)
   local td = type(durations);
   if (td ~= 'number' or durations <= 0) and td ~= 'table' then
     error("durations must be a positive number. Was " .. tostring(durations) )
   end
-  onLoop = onLoop or nop
   durations = parseDurations(durations, #frames)
   local intervals, totalDuration = parseIntervals(durations)
   return setmetatable({
@@ -181,7 +179,6 @@ local function newAnimation(frames, durations, onLoop)
       durations      = durations,
       intervals      = intervals,
       totalDuration  = totalDuration,
-      onLoop         = onLoop,
       timer          = 0,
       position       = 1,
       status         = "playing",
@@ -193,7 +190,7 @@ local function newAnimation(frames, durations, onLoop)
 end
 
 function Animation:clone()
-  local newAnim = newAnimation(self.frames, self.durations, self.onLoop)
+  local newAnim = newAnimation(self.frames, self.durations)
   newAnim.flippedH, newAnim.flippedV = self.flippedH, self.flippedV
   return newAnim
 end
@@ -230,11 +227,11 @@ function Animation:update(dt)
   local loops = math.floor(self.timer / self.totalDuration)
   if loops ~= 0 then
     self.timer = self.timer - self.totalDuration * loops
-    local f = type(self.onLoop) == 'function' and self.onLoop or self[self.onLoop]
-    f(self, loops)
   end
 
   self.position = seekFrameIndex(self.intervals, self.timer)
+
+  return loops~=0 --returns true upon looping
 end
 
 function Animation:pause()

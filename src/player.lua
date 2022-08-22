@@ -10,7 +10,7 @@ local player={name='player'}
 player.x,player.y=0,0
 player.w,player.h=12,7
 player.vx,player.vy=0,0
-player.moveSpeed=1000
+player.moveSpeed=17*60 --17units/sec at 60fps 
 player.linearDamping=10
 player.stopThreshold=3*60 --speed slow enough to consider stopped (at 60FPS)
 player.collisionClass='ally'
@@ -18,12 +18,9 @@ player.filter=World.collisionFilters[player.collisionClass]
 
 --General Data
 player.health={current=100,max=100}
-player.queryForEnemiesRate=0.5 --will query for enemies every 0.5s
-player.queryForEnemiesReady=true
 player.nearbyEnemies={}
 player.aggroRange={w=600,h=450}
-player.attackRate=0.5
-player.attackReady=true
+player.attackPeriod=0.5
 
 --Draw data
 player.spriteSheet=love.graphics.newImage('assets/entities/player.png') --20x19
@@ -38,17 +35,14 @@ player.animSpeed={min=0.25,max=3,current=1}
 player.scaleX=1 --used to flip sprites horizontally
 
 --Cooldown flags, periods, and callback functions
-player.canTurn={
-    flag=true, --used to lock facing direction
-    cooldownPeriod=0.5,
-}
-Timer.giveCooldownCallbacks(player.canTurn)
+player.canTurn={flag=true,cooldownPeriod=0.2}
+Timer:giveCooldownCallbacks(player.canTurn)
 
-player.canAttack={
-    flag=true,
-    cooldownPeriod=0.5, --can attack every 0.5s
-}
-Timer.giveCooldownCallbacks(player.canAttack)
+player.canAttack={flag=true,cooldownPeriod=player.attackPeriod}
+Timer:giveCooldownCallbacks(player.canAttack)
+
+player.canQueryAttackTargets={flag=true,cooldownPeriod=0.5}
+Timer:giveCooldownCallbacks(player.canQueryAttackTargets)
 
 --Shadow
 player.shadow=Shadows:new('player',player.w,player.h)
@@ -57,10 +51,10 @@ function player:update()
     self.animations.current:update(dt*self.animSpeed.current)
     self:updatePosition() --also handles collisions
 
-    -- if self.queryForEnemiesReady then 
-    --     Timer:setOnCooldown(self,'queryForEnemiesReady',self.queryForEnemiesRate)
-    --     self.nearbyEnemies=self:queryForEnemies()
-    -- end
+    if self.canQueryAttackTargets.flag then 
+        self.canQueryAttackTargets.setOnCooldown()
+        self.nearbyEnemies=self:queryForEnemies()
+    end
 
     if acceptInput then 
         self:move()
@@ -80,6 +74,7 @@ function player:draw()
     -- --testing------------------------------------------
     -- love.graphics.print(self.vx,self.x-10,self.y-10)
     -- love.graphics.print(self.vy,self.x-10,self.y)
+    love.graphics.print(love.timer.getFPS(),self.x-10,self.y-30)
     -- --testing------------------------------------------
 end
 
@@ -98,11 +93,11 @@ function player:updatePosition()
     if abs(self.vy)<self.stopThreshold*dt then self.vy=0 end
 
     --handle collisions
-    for i=1,#cols do 
+    for i=1,#cols do
         local other=cols[i].other --other collider
         local touch=cols[i].touch --point of collision
     
-        local magnitude=abs(pTheorem(player.vx,player.vy))            
+        local magnitude=getMagnitude(player.vx,player.vy)         
         local angleBefore=getAngle(player,touch)
         local angleAfter=angleBefore+pi 
     
@@ -159,12 +154,11 @@ function player:queryForEnemies()
         y=self.y-(self.aggroRange.h*0.5),
         w=self.aggroRange.w,
         h=self.aggroRange.h,
-        colliderNames={'enemy'}
+        filter=World.queryFilters.ally 
     }    
-    local targets=World:queryRectangleArea(
-        queryData.x,queryData.y,queryData.w,queryData.h,queryData.colliderNames
-    )
-    return targets
+    local targets=World:queryRect(
+        queryData.x,queryData.y,queryData.w,queryData.h,queryData.filter
+    )     return targets
 end
 
 function player:takeDamage(source)
@@ -185,17 +179,19 @@ end
 
 function player:launchBone()
     local mouseX,mouseY=Controls.getMousePosition()
-    -- Projectiles:new({
-    --     x=self.x,y=self.y,name='arrow',attackDamage=1,knockback=1,
-    --     angle=getAngle(Player,{x=mouseX,y=mouseY}),yOffset=-10
-    -- })
+    local playerCenter=getCenter(self)
+    Projectiles:new({
+        x=playerCenter.x,y=playerCenter.y,name='bone',
+        attackDamage=1,knockback=500,
+        angle=getAngle(playerCenter,{x=mouseX,y=mouseY}),yOffset=-10
+    })
 
     --testing-----------------------------------------------
-    self.collisionClass='enemy'
-    Projectiles:new({
-        x=mouseX,y=mouseY,name='spark',attackDamage=1,knockback=300,
-        angle=getAngle({x=mouseX,y=mouseY},getCenter(Player)),yOffset=-10
-    })
+    -- self.collisionClass='enemy'
+    -- Projectiles:new({
+    --     x=mouseX,y=mouseY,name='bone',attackDamage=1,knockback=200,
+    --     angle=getAngle({x=mouseX,y=mouseY},getCenter(Player)),yOffset=-10
+    -- })
     --testing-----------------------------------------------
 
     --face target direction, lock turning

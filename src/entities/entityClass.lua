@@ -31,28 +31,26 @@ entityClass.spriteSheets,entityClass.grids=sheetsAndGrids(entityClass.definition
 entityClass.parseAnimations=parseAnimations 
 
 function entityClass:new(entity,x,y) --constructor
-    local def=self.definitions[entity]
-    
+    local def=self.definitions[entity]    
+    local e={name=def.name}
+
     --Collider data
-    local e=World:newBSGRectangleCollider(
-        x,y,def.collider.width,def.collider.height,def.collider.corner
-    )
-    for fn,val in pairs(def.collider.modifiers) do
-        e[fn](e,val)
-    end
-    e:setFixedRotation(true) 
-    e:setCollisionClass(def.collider.class)
+    e.x,e.y=x,y 
+    e.w,e.h=def.collider.w,def.collider.h
+    e.vx,e.vy=0,0
+    e.linearDamping=def.collider.linearDamping or 10
+    e.restitution=def.collider.restitution or 0.5
+    e.stopThreshold=3*60 --at 60fps, stop moving when speed<=3
+    e.collisionClass=def.collider.class 
+    e.filter=World.collisionFilters[e.collisionClass]
 
     --General data
-    e.name=def.name 
-    e.x,e.y=e:getPosition()
     e.health={current=def.health,max=def.health}
     e.moveSpeed=def.moveSpeed
     e.attackRange=def.attackRange
-    e.attackSpeed=def.attackSpeed
     e.attackDamage=def.attackDamage
     e.knockback=def.knockback
-    e.lungeSpeed=def.lungeSpeed or nil
+    e.lungeForce=def.lungeForce or nil
     e.projectile=def.projectile or nil
     e.projectilesPerShot=def.projectilesPerShot or 1
     e.canAttack=true
@@ -61,30 +59,39 @@ function entityClass:new(entity,x,y) --constructor
     e.returnToPlayerThreshold=150
     e.aggroRange={w=400,h=300}
     e.nearbyAttackTargets={}
-    e.queryAttackTargetRate=0.5
-    e.canQueryAttackTarget=true 
+    e.targetsAlreadyAttacked={} --only damage a target once per attack
 
     --Draw data
-    e.xOffset=def.drawData.xOffset
-    e.yOffset=def.drawData.yOffset
-    e.scaleX=1
+    e.xOffset=e.w*0.5
+    e.yOffset=-(e.h-1)
+    e.xOrigin=def.drawData.frameWidth*0.5
+    e.yOrigin=def.drawData.frameHeight*0.5
+    e.scaleX=1 --used to face right (1) or left (-1)
     e.spriteSheet=self.spriteSheets[e.name]
     e.animations=self.parseAnimations(self.grids[e.name],def.animations)
     e.animSpeed={min=0.25,max=3,current=1}
     e.damagingFrames=def.animations.attack.damagingFrames or nil 
     e.firingFrame=def.animations.attack.firingFrame or nil
 
-    e.shadow=Shadows:new(e.name)
+    --Shadow
+    e.shadow=Shadows:new(e.name,e.w,e.h)
+
+    --Cooldown flags, periods, and callbacks
+    e.canAttack={flag=true,cooldownPeriod=def.attackPeriod}
+    Timer:giveCooldownCallbacks(e.canAttack)
+
+    e.canQueryAttackTargets={flag=true,cooldownPeriod=0.5}
+    Timer:giveCooldownCallbacks(e.canQueryAttackTargets)
     
     --Actions/AI
-    e.onLoops={}
-    for i,fn in pairs(self.behaviors.onLoops) do e.onLoops[i]=fn(e) end
     e.methods={} --includes update and draw functions
     for i,method in pairs(self.behaviors.methods) do e[i]=method end 
     e.AI=self.behaviors.AI[e.name]
 
     local startState=def.startState or 'idle'
     e:changeState(startState)
+
+    World:addItem(e)
     table.insert(Objects.table,e)
     return e
 end

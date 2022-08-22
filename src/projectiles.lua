@@ -74,7 +74,7 @@ local projectileOnHitFunctions=function()
     
         icicle=function(self,target)
             if target.state=='dead' then return end 
-            target:takeDamae(self)
+            target:takeDamage(self)
             --TODO: freeze/slow target
         end,
         
@@ -133,10 +133,15 @@ local projectileUpdateFunctions=function()
                 self.changeDirectionTime=rnd()*0.5
                 self.angles={}            
                 for i=1,20 do -- (-0.2pi,0.2pi) spread from current angle
-                    table.insert(self.angles,-(i*0.01*math.pi))
-                    table.insert(self.angles,(i*0.01*math.pi))
+                    table.insert(self.angles,-(i*0.01*pi))
+                    table.insert(self.angles,(i*0.01*pi))
                 end
                 self.angle=self.angle+(self.angles[rnd(#self.angles)])
+                    
+                --update direction
+                local magnitude=getMagnitude(self.vy,self.vx)
+                self.vx=cos(self.angle)*magnitude
+                self.vy=sin(self.angle)*magnitude
             else
                 self.changeDirectionTime=self.changeDirectionTime-dt 
                 if self.changeDirectionTime<0 then 
@@ -180,7 +185,7 @@ end
 local projectileDrawFunctions=function()
     return {
         
-        --Projectile is angled toward it initial direction
+        --Projectile is angled toward its initial direction
         base=function(self)
             self.shadow:draw(self.x,self.y,self.angle)
             love.graphics.draw(
@@ -201,7 +206,7 @@ local projectileDrawFunctions=function()
 
         --Projectile spins
         bone=function(self)
-            self.rotation=self.rotation+dt*self.moveSpeed*0.1
+            self.rotation=self.rotation+dt*self.moveSpeed*0.15
             self.shadow:draw(self.x,self.y,self.rotation)
             love.graphics.draw(
                 self.sprite,self.x+self.xOffset,self.y+self.yOffset,
@@ -221,9 +226,9 @@ projectiles.drawFunctions=projectileDrawFunctions()
 
 function projectiles:new(args) --args={x,y,name,attackDamage,knockback,yOffset}
     local def=self.definitions[args.name]
+    local p={name=def.name} --projectile
 
     --Collider Data
-    local p={name=args.name}
     p.x,p.y=args.x,args.y 
     p.w,p.h=def.collider.w,def.collider.h
     p.collisionClass=def.collider.class

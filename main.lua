@@ -44,6 +44,9 @@ end
 
 function love.update(_dt)
     dt=_dt --update delta time
+    --testing-----------------------------------------------------------------------
+    -- if not love.keyboard.isDown('space') then return end --step 1 frame at a time
+    --testing-----------------------------------------------------------------------
     for i=1, #gameStates do 
         acceptInput=(i==#gameStates) --used to restrict inputs to top gameState
         --run each state in gameStates, remove any that return false

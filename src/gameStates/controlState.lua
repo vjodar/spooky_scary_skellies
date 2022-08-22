@@ -5,9 +5,6 @@ local function defaultInputs() --list of all inputs
         dirUp=false,
         dirDown=false,
         mouse=false,
-        --testing-----------
-        mouse2=false,
-        --testing-----------
     }
 end
 
@@ -23,9 +20,6 @@ end
 local function defaultMouseMappings()
     return {
         mouse=1,
-        --testing-------------
-        mouse2=2,
-        --testing-------------
     }
 end
 
@@ -64,9 +58,5 @@ function controlState:update()
 end
 
 function controlState.getMousePosition() return Camera:mousePosition() end
-
---testing-------------------
-function love.keyreleased(_k) if _k=='escape' then love.event.quit() end end
---testing-------------------
 
 return controlState

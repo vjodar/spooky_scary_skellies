@@ -44,11 +44,11 @@ end
 --Gives a cooldown object its releaseCooldown and setOnCooldown callback function.
 --Defining these callbacks upon initialization and passing them to timerState:after()
 --is much faster than defining the releaseCooldown inside a timerState:after() call.
-function timerState.giveCooldownCallbacks(cd)
+function timerState:giveCooldownCallbacks(cd)
     cd.releaseCooldown=function() cd.flag=true end
     cd.setOnCooldown=function() 
         cd.flag=false 
-        Timer:after(cd.cooldownPeriod,cd.releaseCooldown) 
+        self:after(cd.cooldownPeriod,cd.releaseCooldown) 
     end
 end
 

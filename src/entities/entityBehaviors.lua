@@ -1,17 +1,5 @@
 local behaviors={}
 
-behaviors.onLoops={
-    changeToIdle=function(self)
-        return function() self:changeState('idle')  end
-    end,
-    changeToRaise=function(self)
-        return function()
-            self:setPosition(Player.x,Player.y)
-            self:changeState('raise')
-        end
-    end,
-}
-
 --Methods------------------------------------------------------------------------------------------
 
 behaviors.methods={
@@ -19,8 +7,8 @@ behaviors.methods={
     draw=function(self)
         self.shadow:draw(self.x,self.y)
         self.animations.current:draw(
-            self.spriteSheet,self.x,self.y,
-            nil,self.scaleX,1,self.xOffset,self.yOffset
+            self.spriteSheet,self.x+self.xOffset,self.y+self.yOffset,
+            nil,self.scaleX,1,self.xOrigin,self.yOrigin
         )
     end,
 
@@ -28,7 +16,6 @@ behaviors.methods={
         self.state=newState 
         local associatedAnimation={
             raise='raise',
-            lower='lower',
             idle='idle',
             attack='attack',
             moveToPlayer='move',
@@ -40,24 +27,48 @@ behaviors.methods={
     end,
 
     updatePosition=function(self)
-        self.x,self.y=self:getPosition()
+        local goalX=self.x+self.vx*dt 
+        local goalY=self.y+self.vy*dt 
+        local realX,realY,cols=World:move(self,goalX,goalY,self.filter)
+        self.x,self.y=realX,realY 
+    
+        --apply friction/linearDamping
+        self.vx=self.vx-(self.vx*self.linearDamping*dt)
+        self.vy=self.vy-(self.vy*self.linearDamping*dt)
+    
+        --stop moving when sufficiently slow
+        if abs(self.vx)<self.stopThreshold*dt then self.vx=0 end
+        if abs(self.vy)<self.stopThreshold*dt then self.vy=0 end        
+
+        --push entities of same class out of the way (except player)
+        for i=1,#cols do
+            local other=cols[i].other 
+            if other.collisionClass==self.collisionClass
+            and other.name~='player' 
+            then 
+                local angle=getAngle(getCenter(self),getCenter(other))
+                other.vx=other.vx+cos(angle)*self.moveSpeed*dt
+                other.vy=other.vy+sin(angle)*self.moveSpeed*dt
+            end
+        end
+
+        return cols --return the collisions this move produced
     end,
 
     updateAnimation=function(self)
-        self.animations.current:update(dt*self.animSpeed.current)
+        return self.animations.current:update(dt*self.animSpeed.current)
     end,
 
     takeDamage=function(self,source)
-        local hp=self.health.current 
         local damage=source.attackDamage or 0 
         local knockback=source.knockback or 0
-        local angle=getAngle(source,self)
+        local kbAngle=getAngle(getCenter(source),getCenter(self))
         
-        hp=max(0,hp-damage)
-        self.health.current=hp
+        self.health.current=max(self.health.current-damage,0)
 
-        local ix,iy=cos(angle)*knockback,sin(angle)*knockback
-        self:applyLinearImpulse(ix,iy)
+        --Apply knockback force
+        self.vx=self.vx+cos(kbAngle)*knockback
+        self.vy=self.vy+sin(kbAngle)*knockback
 
         if self.health.current==0 then self:die() end
     end,
@@ -68,7 +79,7 @@ behaviors.methods={
     end,
 
     die=function(self)
-        self:destroy()
+        World:remove(self) 
         self:changeState('dead')
     end,
 
@@ -90,16 +101,16 @@ behaviors.methods={
         local nearbyEnemies=Player.nearbyEnemies
         if #nearbyEnemies==0 then return self end --nothing nearby, reset moveTarget
 
-        --filter out any targets blocked from LOS
-        local LOSblockers={'solid'}
-        for i=1, #nearbyEnemies do 
-            if #World:queryLine(
-                self.x,self.y,nearbyEnemies[i].x,
-                nearbyEnemies[i].y,LOSblockers
-            )>0 then 
-                table.remove(nearbyEnemies,i)
-            end
-        end
+        -- --filter out any targets blocked from LOS
+        -- local LOSblockers={'solid'}
+        -- for i=1, #nearbyEnemies do 
+        --     if #World:queryLine(
+        --         self.x,self.y,nearbyEnemies[i].x,
+        --         nearbyEnemies[i].y,LOSblockers
+        --     )>0 then 
+        --         table.remove(nearbyEnemies,i)
+        --     end
+        -- end
         
         local closest=nil --find and return the closest target
         for i=1, #nearbyEnemies do 
@@ -117,10 +128,10 @@ behaviors.methods={
             y=self.y-(self.aggroRange.h*0.5),
             w=self.aggroRange.w,
             h=self.aggroRange.h,
-            colliderNames={'player','skeleton'}
+            filter=World.queryFilters.enemy
         }    
-        local targets=World:queryRectangleArea(
-            queryData.x,queryData.y,queryData.w,queryData.h,queryData.colliderNames
+        local targets=World:queryRect(
+            queryData.x,queryData.y,queryData.w,queryData.h,queryData.filter
         )
         return targets
     end,
@@ -130,16 +141,16 @@ behaviors.methods={
         local nearbyAttackTargets=self:queryForEnemyAttackTargets()
         if #nearbyAttackTargets==0 then return self end --nothing nearby, reset moveTarget
 
-        --filter out any targets blocked from LOS
-        local LOSblockers={'solid'}
-        for i=1, #nearbyAttackTargets do 
-            if #World:queryLine(
-                self.x,self.y,nearbyAttackTargets[i].x,
-                nearbyAttackTargets[i].y,LOSblockers
-            )>0 then 
-                table.remove(nearbyAttackTargets,i)
-            end
-        end
+        -- --filter out any targets blocked from LOS
+        -- local LOSblockers={'solid'}
+        -- for i=1, #nearbyAttackTargets do 
+        --     if #World:queryLine(
+        --         self.x,self.y,nearbyAttackTargets[i].x,
+        --         nearbyAttackTargets[i].y,LOSblockers
+        --     )>0 then 
+        --         table.remove(nearbyAttackTargets,i)
+        --     end
+        -- end
         
         local closest=nil --find and return the closest target
         for i=1, #nearbyAttackTargets do
@@ -157,14 +168,8 @@ behaviors.methods={
 behaviors.common={ --states common to both skeletons and enemies
     raise=function(self)
         self:updatePosition()
-        self:updateAnimation()
-        self.animations.raise.onLoop=self.onLoops.changeToIdle
-    end,
-    
-    lower=function(self)
-        self:updatePosition()
-        self:updateAnimation()
-        self.animations.lower.onLoop=self.onLoops.changeToRaise
+        local onLoop=self:updateAnimation()
+        if onLoop then self:changeState('idle') end
     end,
     
     dead=function(self) 
@@ -173,8 +178,8 @@ behaviors.common={ --states common to both skeletons and enemies
 
     shoot=function(self)
         self:updatePosition()
-        self:updateAnimation()
-        self.animations.attack.onLoop=self.onLoops.changeToIdle
+        local onLoop=self:updateAnimation()
+        if onLoop then self:changeState('idle') end 
 
         if self.canAttack and self:onFiringFrame() then
             local projectile={
@@ -196,9 +201,9 @@ behaviors.common={ --states common to both skeletons and enemies
 }
 
 behaviors.skeleton={ --skeleton specific states
-    idle=function(self) 
-        self:updatePosition()
+    idle=function(self)
         self:updateAnimation()
+        self:updatePosition()
     
         --if skeleton is too far from player, move to player
         if getDistance(self,Player)>self.returnToPlayerThreshold then
@@ -213,15 +218,15 @@ behaviors.skeleton={ --skeleton specific states
         and self.moveTarget~=self 
         and self.moveTarget.state~='dead'
         then 
-            if self.canAttack 
+            if self.canAttack.flag 
             or getDistance(self,self.moveTarget)>self.attackRange 
             then self:changeState('moveToTarget') end 
             return --return to wait until attack is ready or target dies          
         end
     
         --find and target the nearest enemy
-        if self.canQueryAttackTarget then 
-            Timer:setOnCooldown(self,'canQueryAttackTarget',self.queryAttackTargetRate)
+        if self.canQueryAttackTargets.flag then 
+            self.canQueryAttackTargets.setOnCooldown()
             self.moveTarget=self:getNearestSkeletonAttackTarget()
             if self.moveTarget~=self then 
                 self:changeState('moveToTarget') 
@@ -231,8 +236,8 @@ behaviors.skeleton={ --skeleton specific states
     end,
 
     moveToTarget=function(self) 
-        self:updatePosition()
         self:updateAnimation()
+        self:updatePosition()
 
         --if Player is too far, move toward Player
         if getDistance(self,Player)>self.returnToPlayerThreshold then 
@@ -249,17 +254,14 @@ behaviors.skeleton={ --skeleton specific states
         end 
     
         --continue looking for closer targets 
-        if self.canQueryAttackTarget then 
-            Timer:setOnCooldown(self,'canQueryAttackTarget',self.queryAttackTargetRate)
+        if self.canQueryAttackTargets.flag then 
+            self.canQueryAttackTargets.setOnCooldown()
             self.moveTarget=self:getNearestSkeletonAttackTarget()
             if self.moveTarget==self then self:changeState('idle') return end
         end
     
-        if self.moveTarget.x>self.x then self.scaleX=1 else self.scaleX=-1 end 
-        self.angle=getAngle(self,self.moveTarget)
-    
         if getDistance(self,self.moveTarget)<self.attackRange then             
-            if self.canAttack then
+            if self.canAttack.flag then
                 self:changeState('attack')
                 return 
             else 
@@ -268,14 +270,17 @@ behaviors.skeleton={ --skeleton specific states
             end
         end
 
-        local xVel=cos(self.angle)*self.moveSpeed
-        local yVel=sin(self.angle)*self.moveSpeed
-        self:applyForce(xVel,yVel)
+        self.scaleX=(self.moveTarget.x>self.x and 1 or -1) --face target
+        self.angle=getAngle(self,self.moveTarget)
+        local vxIncrement=cos(self.angle)*self.moveSpeed*dt 
+        local vyIncrement=sin(self.angle)*self.moveSpeed*dt 
+        self.vx=self.vx+vxIncrement
+        self.vy=self.vy+vyIncrement 
     end,
 
     moveToPlayer=function(self) 
-        self:updatePosition()
         self:updateAnimation()
+        self:updatePosition()
     
         --if moveTarget has died or has been cleared, return to idle
         if self.moveTarget.state=='dead' or self.moveTarget==self then
@@ -284,9 +289,6 @@ behaviors.skeleton={ --skeleton specific states
             return 
         end 
     
-        if self.moveTarget.x>self.x then self.scaleX=1 else self.scaleX=-1 end 
-        self.angle=getAngle(self,self.moveTarget)
-    
         --reached player
         if getDistance(self,self.moveTarget)<self.returnToPlayerThreshold*0.4 then 
             self:clearMoveTarget()
@@ -294,58 +296,86 @@ behaviors.skeleton={ --skeleton specific states
             return
         end
 
-        local xVel=cos(self.angle)*self.moveSpeed
-        local yVel=sin(self.angle)*self.moveSpeed
-        self:applyForce(xVel,yVel)
+        self.scaleX=(self.moveTarget.x>self.x and 1 or -1) --face target
+        self.angle=getAngle(self,self.moveTarget)
+        local vxIncrement=cos(self.angle)*self.moveSpeed*dt 
+        local vyIncrement=sin(self.angle)*self.moveSpeed*dt 
+        self.vx=self.vx+vxIncrement
+        self.vy=self.vy+vyIncrement
     end,
     
     lunge=function(self)
-        self:updatePosition()
-        self:updateAnimation()
-        self.animations.current.onLoop=self.onLoops.changeToIdle
-        
+        local onLoop=self:updateAnimation()
+        if onLoop then 
+            self.targetsAlreadyAttacked={}
+            self:changeState('idle') 
+        end 
+
+        local collisions=self:updatePosition()        
         if self:onDamagingFrames() then
-            if self.canAttack then 
-                local ix=cos(self.angle)*self.lungeSpeed
-                local iy=sin(self.angle)*self.lungeSpeed
-                self:applyLinearImpulse(ix,iy)
-                Timer:setOnCooldown(self,'canAttack',self.attackSpeed)
+            if self.canAttack.flag then 
+                self.canAttack.setOnCooldown()
+                self.angle=getAngle(self,self.moveTarget)
+                local fx=cos(self.angle)*self.lungeForce
+                local fy=sin(self.angle)*self.lungeForce
+                self.vx=self.vx+fx
+                self.vy=self.vy+fy  
             end
     
-            if self:enter('enemy') then 
-                local data=self:getEnterCollisionData('enemy')
-                local enemy=data.collider
-                if enemy~=nil then self:dealDamage(enemy) end
+            --handle collisions
+            for i=1,#collisions do
+                local other=collisions[i].other --other collider
+                
+                if other.collisionClass=='enemy' then 
+                    --Only hurt targets once per attack
+                    for i=1,#self.targetsAlreadyAttacked do 
+                        if other==self.targetsAlreadyAttacked[i] then return end
+                    end
+
+                    local touch=collisions[i].touch --point of collision     
+                    local magnitude=getMagnitude(self.vx,self.vy)         
+                    local angle=getAngle(touch,self)
+
+                    --bounce self away from target, losing some momentum
+                    self.vx=cos(angle)*magnitude*self.restitution
+                    self.vy=sin(angle)*magnitude*self.restitution
+
+                    --damage target, add to targetsAlreadyAttacked
+                    self:dealDamage(other)
+                    table.insert(self.targetsAlreadyAttacked,other)
+                end
             end
+        else 
+            self.scaleX=(self.moveTarget.x>self.x and 1 or -1) --face target         
         end
     end,
 }
 
 behaviors.enemy={ --enemy specific states
     idle=function(self) 
-        self:updatePosition()
         self:updateAnimation()
+        self:updatePosition()
 
         --if target is a living skeleton and enemy can attack or is out of 
         --range, move toward the target in order to attack.
         if self.moveTarget~=self and self.moveTarget.state~='dead' then 
-            if self.canAttack 
+            if self.canAttack.flag 
             or getDistance(self,self.moveTarget)>self.attackRange 
             then self:changeState('moveToTarget') end 
             return --return to wait until attack is ready or target dies          
         end
         
         --find and target the nearest skeleton/player
-        if self.canQueryAttackTarget then 
-            Timer:setOnCooldown(self,'canQueryAttackTarget',self.queryAttackTargetRate)
+        if self.canQueryAttackTargets.flag then 
+            self.canQueryAttackTargets.setOnCooldown()
             self.moveTarget=self:getNearestEnemyAttackTarget()
             if self.moveTarget~=self then self:changeState('moveToTarget') end
         end
     end,
 
     moveToTarget=function(self) 
-        self:updatePosition()
         self:updateAnimation()
+        self:updatePosition()
         
         --if target has died, clear moveTarget, return to idle
         if self.moveTarget.state=='dead' then
@@ -355,17 +385,15 @@ behaviors.enemy={ --enemy specific states
         end 
     
         --continue looking for closer targets
-        if self.canQueryAttackTarget then 
-            Timer:setOnCooldown(self,'canQueryAttackTarget',self.queryAttackTargetRate)
+        if self.canQueryAttackTargets.flag then 
+            self.canQueryAttackTargets.setOnCooldown()
             self.moveTarget=self:getNearestEnemyAttackTarget()
             if self.moveTarget==self then self:changeState('idle') return end
         end
-    
-        if self.moveTarget.x>self.x then self.scaleX=1 else self.scaleX=-1 end --face target
-        self.angle=getAngle(self,self.moveTarget)
         
+        --if target is within attack range, attack. Otherwise move toward it
         if getDistance(self,self.moveTarget)<self.attackRange then 
-            if self.canAttack then 
+            if self.canAttack.flag then 
                 self:changeState('attack')
                 return 
             else 
@@ -373,34 +401,58 @@ behaviors.enemy={ --enemy specific states
                 return
             end  
         end
-        
-        local xVel,yVel=cos(self.angle)*self.moveSpeed,sin(self.angle)*self.moveSpeed
-        self:applyForce(xVel,yVel)
+
+        self.scaleX=(self.moveTarget.x>self.x and 1 or -1) --face target
+        self.angle=getAngle(self,self.moveTarget)
+        local vxIncrement=cos(self.angle)*self.moveSpeed*dt 
+        local vyIncrement=sin(self.angle)*self.moveSpeed*dt 
+        self.vx=self.vx+vxIncrement
+        self.vy=self.vy+vyIncrement
     end,
     
     lunge=function(self) 
-        self:updatePosition()
-        self:updateAnimation()
-        self.animations.current.onLoop=self.onLoops.changeToIdle
-    
+        local onLoop=self:updateAnimation()
+        if onLoop then
+            self.targetsAlreadyAttacked={}
+            self:changeState('idle')
+        end
+
+        local collisions=self:updatePosition()    
         if self:onDamagingFrames() then 
-            if self.canAttack then 
-                local ix=cos(self.angle)*self.lungeSpeed
-                local iy=sin(self.angle)*self.lungeSpeed
-                self:applyLinearImpulse(ix,iy)  
-                Timer:setOnCooldown(self,'canAttack',self.attackSpeed)
-            end        
+            if self.canAttack.flag then 
+                self.canAttack.setOnCooldown()
+                self.angle=getAngle(self,self.moveTarget)
+                local fx=cos(self.angle)*self.lungeForce
+                local fy=sin(self.angle)*self.lungeForce
+                self.vx=self.vx+fx
+                self.vy=self.vy+fy        
+            end 
     
-            if self:enter('skeleton') then 
-                local data=self:getEnterCollisionData('skeleton')
-                local skeleton=data.collider
-                if skeleton~=nil then self:dealDamage(skeleton) end
+            --handle collisions
+            for i=1,#collisions do
+                local other=collisions[i].other --other collider
+                
+                if other.collisionClass=='ally' then 
+                    --Only hurt targets once per attack
+                    for i=1,#self.targetsAlreadyAttacked do 
+                        if other==self.targetsAlreadyAttacked[i] then return end
+                    end
+
+                    local touch=collisions[i].touch --point of collision     
+                    local magnitude=getMagnitude(self.vx,self.vy)         
+                    local angle=getAngle(touch,self)
+
+                    --bounce self away from target, losing some momentum
+                    self.vx=cos(angle)*magnitude*self.restitution
+                    self.vy=sin(angle)*magnitude*self.restitution
+
+                    --damage target, add to targetsAlreadyAttacked
+                    self:dealDamage(other)
+                    table.insert(self.targetsAlreadyAttacked,other)
+                end
             end
-    
-            if self:enter('player') then 
-                --TODO: damage the player
-                -- print("hit the player")
-            end
+        else 
+            self.scaleX=(self.moveTarget.x>self.x and 1 or -1) --face target         
         end
     end,
 }
@@ -410,7 +462,6 @@ behaviors.enemy={ --enemy specific states
 behaviors.AI={
     ['skeletonWarrior']={
         raise=behaviors.common.raise,
-        lower=behaviors.common.lower,
         idle=behaviors.skeleton.idle,
         moveToPlayer=behaviors.skeleton.moveToPlayer,
         moveToTarget=behaviors.skeleton.moveToTarget,
@@ -419,7 +470,6 @@ behaviors.AI={
     },
     ['skeletonArcher']={
         raise=behaviors.common.raise,
-        lower=behaviors.common.lower,
         idle=behaviors.skeleton.idle,
         moveToPlayer=behaviors.skeleton.moveToPlayer,
         moveToTarget=behaviors.skeleton.moveToTarget,
@@ -428,7 +478,6 @@ behaviors.AI={
     },
     ['skeletonMageFire']={
         raise=behaviors.common.raise,
-        lower=behaviors.common.lower,
         idle=behaviors.skeleton.idle,
         moveToPlayer=behaviors.skeleton.moveToPlayer,
         moveToTarget=behaviors.skeleton.moveToTarget,
@@ -437,7 +486,6 @@ behaviors.AI={
     },
     ['skeletonMageIce']={
         raise=behaviors.common.raise,
-        lower=behaviors.common.lower,
         idle=behaviors.skeleton.idle,
         moveToPlayer=behaviors.skeleton.moveToPlayer,
         moveToTarget=behaviors.skeleton.moveToTarget,
@@ -446,7 +494,6 @@ behaviors.AI={
     },
     ['skeletonMageElectric']={
         raise=behaviors.common.raise,
-        lower=behaviors.common.lower,
         idle=behaviors.skeleton.idle,
         moveToPlayer=behaviors.skeleton.moveToPlayer,
         moveToTarget=behaviors.skeleton.moveToTarget,

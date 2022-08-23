@@ -1,14 +1,9 @@
--- local player=World:newBSGRectangleCollider(0,0,11,5,3)    
--- player:setLinearDamping(20) --apply increased 'friction'
--- player:setFixedRotation(true) --collider won't spin/rotate
--- player:setCollisionClass('player')
--- player:setMass(10) --player is base unit for mass
-
 local player={name='player'}
 
 --Collider data
 player.x,player.y=0,0
 player.w,player.h=12,7
+player.center=getCenter(player)
 player.vx,player.vy=0,0
 player.moveSpeed=17*60 --17units/sec at 60fps 
 player.linearDamping=10
@@ -21,12 +16,20 @@ player.health={current=100,max=100}
 player.nearbyEnemies={}
 player.aggroRange={w=600,h=450}
 player.attackPeriod=0.5
+player.allyReturnThreshold={x=220,y=150} --distance from player before skeletons run back
 
 --Draw data
-player.spriteSheet=love.graphics.newImage('assets/entities/player.png') --20x19
-player.xOffset,player.yOffset=6,-6
-player.xOrigin,player.yOrigin=10,9.5 --half frame dimentions
-player.grid=anim8.newGrid(20,19,player.spriteSheet:getWidth(),player.spriteSheet:getHeight())
+player.spriteSheet=love.graphics.newImage('assets/entities/player.png')
+player.frameWidth=20
+player.frameHeight=19
+player.xOffset=player.w*0.5
+player.yOffset=-(player.h-1)
+player.xOrigin=player.frameWidth*0.5
+player.yOrigin=player.frameHeight*0.5
+player.grid=anim8.newGrid(
+    player.frameWidth,player.frameHeight,
+    player.spriteSheet:getWidth(),player.spriteSheet:getHeight()
+)
 player.animations={}
 player.animations.idle=anim8.newAnimation(player.grid('1-4',1), 0.1)
 player.animations.moving=anim8.newAnimation(player.grid('1-4',2), 0.1)
@@ -74,7 +77,8 @@ function player:draw()
     -- --testing------------------------------------------
     -- love.graphics.print(self.vx,self.x-10,self.y-10)
     -- love.graphics.print(self.vy,self.x-10,self.y)
-    love.graphics.print(love.timer.getFPS(),self.x-10,self.y-30)
+    -- love.graphics.print(love.timer.getFPS(),self.x-10,self.y-30)
+    -- love.graphics.print(#Objects.table,self.x-10,self.y-60)
     -- --testing------------------------------------------
 end
 
@@ -83,6 +87,7 @@ function player:updatePosition()
     local goalY=self.y+self.vy*dt 
     local realX,realY,cols=World:move(self,goalX,goalY,self.filter)
     self.x,self.y=realX,realY 
+    self.center=getCenter(self)
 
     --apply friction/linearDamping
     self.vx=self.vx-(self.vx*self.linearDamping*dt)
@@ -165,7 +170,7 @@ function player:takeDamage(source)
     local hp=self.health.current 
     local damage=source.attackDamage or 0 
     local knockback=source.knockback or 0
-    local kbAngle=getAngle(getCenter(source),getCenter(self))
+    local kbAngle=getAngle(source.center,self.center)
     
     hp=max(0,hp-damage)
     self.health.current=hp
@@ -179,11 +184,10 @@ end
 
 function player:launchBone()
     local mouseX,mouseY=Controls.getMousePosition()
-    local playerCenter=getCenter(self)
     Projectiles:new({
         x=playerCenter.x,y=playerCenter.y,name='bone',
         attackDamage=1,knockback=500,
-        angle=getAngle(playerCenter,{x=mouseX,y=mouseY}),yOffset=-10
+        angle=getAngle(self.center,{x=mouseX,y=mouseY}),yOffset=-10
     })
 
     --testing-----------------------------------------------

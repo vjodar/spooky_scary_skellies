@@ -10,7 +10,7 @@ return {
         health=6,
         startState='raise',
         collider={
-            w=11,
+            w=10,
             h=6,
             class='ally',
         },
@@ -49,27 +49,23 @@ return {
     },
     skeletonArcher={
         name='skeletonArcher',
-        moveSpeed=90,     
+        moveSpeed=19*60,     
         attackRange=150,  
-        attackSpeed=1, 
+        attackPeriod=1, 
         attackDamage=1,
         projectile={name='arrow',xOffset=14,yOffset=-9},
-        knockback=20,
+        knockback=200,
         health=3,
         startState='raise',
         collider={
-            width=10,
-            height=4,
-            corner=2,
-            class='skeleton',
-            modifiers={
-                setLinearDamping=10,
-                setMass=0.1,
-            },
+            w=10,
+            h=6,
+            class='ally',
         },
         drawData={
             frameWidth=42,
             frameHeight=22,
+            yOffset=-8,
         },
         animations={
             raise={
@@ -102,27 +98,23 @@ return {
     },
     skeletonMageFire={
         name='skeletonMageFire',
-        moveSpeed=80,  
+        moveSpeed=18*60,  
         attackRange=100,  
-        attackSpeed=1.5,   
+        attackPeriod=1.5,   
         attackDamage=1, 
         projectile={name='flame',xOffset=6,yOffset=-7},
-        knockback=5,
+        knockback=150,
         health=3,
         startState='raise',
         collider={
-            width=10,
-            height=4,
-            corner=2,
-            class='skeleton',
-            modifiers={
-                setLinearDamping=10,
-                setMass=0.1,
-            },
+            w=10,
+            h=6,
+            class='ally',
         },
         drawData={
             frameWidth=24,
             frameHeight=24,
+            yOffset=-9,
         },
         animations={
             raise={
@@ -155,27 +147,23 @@ return {
     },
     skeletonMageIce={
         name='skeletonMageIce',
-        moveSpeed=80,    
+        moveSpeed=18*60,    
         attackRange=100,     
-        attackSpeed=1,
+        attackPeriod=1,
         attackDamage=1,
         projectile={name='icicle',xOffset=6,yOffset=-7},
-        knockback=5,
+        knockback=150,
         health=3,
         startState='raise',
         collider={
-            width=10,
-            height=4,
-            corner=2,
-            class='skeleton',
-            modifiers={
-                setLinearDamping=10,
-                setMass=0.1,
-            },
+            w=10,
+            h=6,
+            class='ally',
         },
         drawData={
             frameWidth=24,
             frameHeight=24,
+            yOffset=-9,
         },
         animations={
             raise={
@@ -208,28 +196,24 @@ return {
     },
     skeletonMageElectric={
         name='skeletonMageElectric',
-        moveSpeed=80,    
+        moveSpeed=18*60,    
         attackRange=100,     
-        attackSpeed=1,
+        attackPeriod=1,
         attackDamage=1,
-        projectile={name='spark',xOffset=6,yOffset=0},
+        projectile={name='spark',xOffset=6,yOffset=-7},
         projectilesPerShot=3,
-        knockback=1,
+        knockback=100,
         health=3,
         startState='raise',
         collider={
-            width=10,
-            height=4,
-            corner=2,
-            class='skeleton',
-            modifiers={
-                setLinearDamping=10,
-                setMass=0.1,
-            },
+            w=10,
+            h=6,
+            class='ally',
         },
         drawData={
             frameWidth=24,
             frameHeight=24,
+            yOffset=-9,
         },
         animations={
             raise={

@@ -31,6 +31,13 @@ behaviors.methods={
         local goalY=self.y+self.vy*dt 
         local realX,realY,cols=World:move(self,goalX,goalY,self.filter)
         self.x,self.y=realX,realY 
+        self.center=getCenter(self)
+
+        --update angle/direction, face target
+        self.angle=getAngle(self.center,self.moveTarget.center)
+        if self.moveTarget~=self then --only turn when moving
+            self.scaleX=self.moveTarget.x>self.x and 1 or -1
+        end
     
         --apply friction/linearDamping
         self.vx=self.vx-(self.vx*self.linearDamping*dt)
@@ -46,9 +53,9 @@ behaviors.methods={
             if other.collisionClass==self.collisionClass
             and other.name~='player' 
             then 
-                local angle=getAngle(getCenter(self),getCenter(other))
-                other.vx=other.vx+cos(angle)*self.moveSpeed*dt
-                other.vy=other.vy+sin(angle)*self.moveSpeed*dt
+                local angle=getAngle(self.center,other.center)
+                other.vx=other.vx+cos(angle)*self.moveSpeed*2*dt
+                other.vy=other.vy+sin(angle)*self.moveSpeed*2*dt
             end
         end
 
@@ -62,7 +69,7 @@ behaviors.methods={
     takeDamage=function(self,source)
         local damage=source.attackDamage or 0 
         local knockback=source.knockback or 0
-        local kbAngle=getAngle(getCenter(source),getCenter(self))
+        local kbAngle=getAngle(source.center,self.center)
         
         self.health.current=max(self.health.current-damage,0)
 
@@ -181,13 +188,14 @@ behaviors.common={ --states common to both skeletons and enemies
         local onLoop=self:updateAnimation()
         if onLoop then self:changeState('idle') end 
 
-        if self.canAttack and self:onFiringFrame() then
+        if self.canAttack.flag and self:onFiringFrame() then
+            self.canAttack.setOnCooldown()
             local projectile={
                 name=self.projectile.name,
-                x=self.x+self.projectile.xOffset*self.scaleX,
-                y=self.y,yOffset=self.projectile.yOffset
+                x=self.center.x+self.projectile.xOffset*self.scaleX,
+                y=self.center.y,yOffset=self.projectile.yOffset
             }
-            local angleToTarget=getAngle(projectile,self.moveTarget)
+            local angleToTarget=getAngle(projectile,target.center)
             for i=1,self.projectilesPerShot do
                 Projectiles:new({
                     x=projectile.x,y=projectile.y,name=projectile.name,
@@ -195,7 +203,6 @@ behaviors.common={ --states common to both skeletons and enemies
                     angle=angleToTarget,yOffset=projectile.yOffset
                 })
             end
-            Timer:setOnCooldown(self,'canAttack',self.attackSpeed)
         end
     end,
 }
@@ -205,8 +212,10 @@ behaviors.skeleton={ --skeleton specific states
         self:updateAnimation()
         self:updatePosition()
     
-        --if skeleton is too far from player, move to player
-        if getDistance(self,Player)>self.returnToPlayerThreshold then
+        --if skeleton is too far from player, move back to player
+        if abs(Player.center.x-self.center.x)>Player.allyReturnThreshold.x 
+        or abs(Player.center.y-self.center.y)>Player.allyReturnThreshold.y
+        then
             self.moveTarget=Player
             self:changeState('moveToPlayer')
             return 
@@ -239,8 +248,10 @@ behaviors.skeleton={ --skeleton specific states
         self:updateAnimation()
         self:updatePosition()
 
-        --if Player is too far, move toward Player
-        if getDistance(self,Player)>self.returnToPlayerThreshold then 
+        --if skeleton is too far from player, move back to player
+        if abs(Player.center.x-self.center.x)>Player.allyReturnThreshold.x 
+        or abs(Player.center.y-self.center.y)>Player.allyReturnThreshold.y
+        then
             self.moveTarget=Player
             self:changeState('moveToPlayer')
             return 
@@ -270,8 +281,6 @@ behaviors.skeleton={ --skeleton specific states
             end
         end
 
-        self.scaleX=(self.moveTarget.x>self.x and 1 or -1) --face target
-        self.angle=getAngle(self,self.moveTarget)
         local vxIncrement=cos(self.angle)*self.moveSpeed*dt 
         local vyIncrement=sin(self.angle)*self.moveSpeed*dt 
         self.vx=self.vx+vxIncrement
@@ -289,15 +298,15 @@ behaviors.skeleton={ --skeleton specific states
             return 
         end 
     
-        --reached player
-        if getDistance(self,self.moveTarget)<self.returnToPlayerThreshold*0.4 then 
+        --reached player       
+        if abs(Player.center.x-self.center.x)<Player.allyReturnThreshold.x*0.5
+        and abs(Player.center.y-self.center.y)<Player.allyReturnThreshold.y*0.5
+        then
             self:clearMoveTarget()
             self:changeState('idle')
             return
         end
 
-        self.scaleX=(self.moveTarget.x>self.x and 1 or -1) --face target
-        self.angle=getAngle(self,self.moveTarget)
         local vxIncrement=cos(self.angle)*self.moveSpeed*dt 
         local vyIncrement=sin(self.angle)*self.moveSpeed*dt 
         self.vx=self.vx+vxIncrement
@@ -315,7 +324,6 @@ behaviors.skeleton={ --skeleton specific states
         if self:onDamagingFrames() then
             if self.canAttack.flag then 
                 self.canAttack.setOnCooldown()
-                self.angle=getAngle(self,self.moveTarget)
                 local fx=cos(self.angle)*self.lungeForce
                 local fy=sin(self.angle)*self.lungeForce
                 self.vx=self.vx+fx
@@ -344,9 +352,7 @@ behaviors.skeleton={ --skeleton specific states
                     self:dealDamage(other)
                     table.insert(self.targetsAlreadyAttacked,other)
                 end
-            end
-        else 
-            self.scaleX=(self.moveTarget.x>self.x and 1 or -1) --face target         
+            end    
         end
     end,
 }
@@ -402,8 +408,6 @@ behaviors.enemy={ --enemy specific states
             end  
         end
 
-        self.scaleX=(self.moveTarget.x>self.x and 1 or -1) --face target
-        self.angle=getAngle(self,self.moveTarget)
         local vxIncrement=cos(self.angle)*self.moveSpeed*dt 
         local vyIncrement=sin(self.angle)*self.moveSpeed*dt 
         self.vx=self.vx+vxIncrement
@@ -421,7 +425,6 @@ behaviors.enemy={ --enemy specific states
         if self:onDamagingFrames() then 
             if self.canAttack.flag then 
                 self.canAttack.setOnCooldown()
-                self.angle=getAngle(self,self.moveTarget)
                 local fx=cos(self.angle)*self.lungeForce
                 local fy=sin(self.angle)*self.lungeForce
                 self.vx=self.vx+fx
@@ -450,9 +453,7 @@ behaviors.enemy={ --enemy specific states
                     self:dealDamage(other)
                     table.insert(self.targetsAlreadyAttacked,other)
                 end
-            end
-        else 
-            self.scaleX=(self.moveTarget.x>self.x and 1 or -1) --face target         
+            end  
         end
     end,
 }

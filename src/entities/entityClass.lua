@@ -37,6 +37,7 @@ function entityClass:new(entity,x,y) --constructor
     --Collider data
     e.x,e.y=x,y 
     e.w,e.h=def.collider.w,def.collider.h
+    e.center=getCenter(e)
     e.vx,e.vy=0,0
     e.linearDamping=def.collider.linearDamping or 10
     e.restitution=def.collider.restitution or 0.5
@@ -56,14 +57,13 @@ function entityClass:new(entity,x,y) --constructor
     e.canAttack=true
     e.moveTarget=e
     e.angle=0
-    e.returnToPlayerThreshold=150
     e.aggroRange={w=400,h=300}
     e.nearbyAttackTargets={}
     e.targetsAlreadyAttacked={} --only damage a target once per attack
 
     --Draw data
     e.xOffset=e.w*0.5
-    e.yOffset=-(e.h-1)
+    e.yOffset=def.drawData.yOffset or -(e.h-1)
     e.xOrigin=def.drawData.frameWidth*0.5
     e.yOrigin=def.drawData.frameHeight*0.5
     e.scaleX=1 --used to face right (1) or left (-1)

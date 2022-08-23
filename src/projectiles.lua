@@ -2,7 +2,7 @@ local projectileDefinitions=function()
     return {
         bone={
             name='bone',
-            moveSpeed=100,
+            moveSpeed=150,
             collider={
                 w=3,
                 h=3,
@@ -100,6 +100,7 @@ local projectileUpdateFunctions=function()
             local goalY=self.y+self.vy*dt 
             local realX,realY,cols=World:move(self,goalX,goalY,self.filter)
             self.x,self.y=realX,realY 
+            self.center=getCenter(self)
 
             --handle collisions
             for i=1,#cols do 
@@ -160,6 +161,7 @@ local projectileUpdateFunctions=function()
             local goalY=self.y+self.vy*dt 
             local realX,realY,cols=World:move(self,goalX,goalY,self.filter)
             self.x,self.y=realX,realY 
+            self.center=getCenter(self)
 
             --handle collisions
             for i=1,#cols do 
@@ -231,6 +233,7 @@ function projectiles:new(args) --args={x,y,name,attackDamage,knockback,yOffset}
     --Collider Data
     p.x,p.y=args.x,args.y 
     p.w,p.h=def.collider.w,def.collider.h
+    p.center=getCenter(p)
     p.collisionClass=def.collider.class
     p.filter=World.collisionFilters[p.collisionClass]
 

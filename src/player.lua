@@ -23,7 +23,7 @@ player.spriteSheet=love.graphics.newImage('assets/entities/player.png')
 player.frameWidth=20
 player.frameHeight=19
 player.xOffset=player.w*0.5
-player.yOffset=-(player.h-1)
+player.yOffset=(player.h-player.frameHeight)*0.5
 player.xOrigin=player.frameWidth*0.5
 player.yOrigin=player.frameHeight*0.5
 player.grid=anim8.newGrid(
@@ -77,8 +77,8 @@ function player:draw()
     -- --testing------------------------------------------
     -- love.graphics.print(self.vx,self.x-10,self.y-10)
     -- love.graphics.print(self.vy,self.x-10,self.y)
-    -- love.graphics.print(love.timer.getFPS(),self.x-10,self.y-30)
-    -- love.graphics.print(#Objects.table,self.x-10,self.y-60)
+    love.graphics.print(love.timer.getFPS(),self.x-10,self.y-30)
+    love.graphics.print(#Objects.table,self.x-10,self.y-60)
     -- --testing------------------------------------------
 end
 
@@ -155,15 +155,16 @@ end
 --return a table of all enemies onscreen
 function player:queryForEnemies() 
     local queryData={
-        x=self.x-(self.aggroRange.w*0.5),
-        y=self.y-(self.aggroRange.h*0.5),
+        x=self.center.x-(self.aggroRange.w*0.5),
+        y=self.center.y-(self.aggroRange.h*0.5),
         w=self.aggroRange.w,
         h=self.aggroRange.h,
         filter=World.queryFilters.ally 
     }    
     local targets=World:queryRect(
         queryData.x,queryData.y,queryData.w,queryData.h,queryData.filter
-    )     return targets
+    )     
+    return targets
 end
 
 function player:takeDamage(source)
@@ -185,7 +186,7 @@ end
 function player:launchBone()
     local mouseX,mouseY=Controls.getMousePosition()
     Projectiles:new({
-        x=playerCenter.x,y=playerCenter.y,name='bone',
+        x=self.center.x,y=self.center.y,name='bone',
         attackDamage=1,knockback=500,
         angle=getAngle(self.center,{x=mouseX,y=mouseY}),yOffset=-10
     })

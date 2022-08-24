@@ -8,13 +8,7 @@ function love.load()
     love.graphics.setBackgroundColor(paletteBlack) --set background color
 
     --common math functions
-    abs,floor,ceil=math.abs,math.floor,math.ceil
-    min,max,rnd=math.min,math.max,love.math.random
-    pi,cos,sin,atan2=math.pi,math.cos,math.sin,math.atan2
-    getAngle=function(s,t) return atan2((t.y-s.y),(t.x-s.x)) end
-    getDistance=function(a,b) return ((abs(b.x-a.x))^2+(abs(b.y-a.y))^2)^0.5 end
-    getMagnitude=function(a,b) return abs((a^2+b^2)^0.5) end
-    getCenter=function(a) return {x=a.x+a.w*0.5,y=a.y+a.h*0.5} end
+    generateCommonMaths()
     
     --Libraries
     bump=require 'src/libraries/bump'
@@ -60,4 +54,93 @@ function love.draw()
         if gameStates[i].draw then gameStates[i]:draw() end
     end
     Camera:detach()
+end
+
+function generateCommonMaths()
+    abs,floor,ceil=math.abs,math.floor,math.ceil
+    min,max,rnd=math.min,math.max,love.math.random
+    pi,cos,sin,atan2=math.pi,math.cos,math.sin,math.atan2
+    getAngle=function(s,t) return atan2((t.y-s.y),(t.x-s.x)) end
+    getDistance=function(a,b) return ((abs(b.x-a.x))^2+(abs(b.y-a.y))^2)^0.5 end
+    getMagnitude=function(a,b) return abs((a^2+b^2)^0.5) end
+    getCenter=function(a) return {x=a.x+a.w*0.5,y=a.y+a.h*0.5} end
+    getRectDistance=function(a,b) --shortest distance between two rectangles
+        local A={
+            center={x=a.x+a.w*0.5,y=a.y+a.h*0.5},
+            topLeft={x=a.x,y=a.y},
+            topRight={x=a.x+a.w,y=a.y},
+            botLeft={x=a.x,y=a.y+a.h},
+            botRight={x=a.x+a.w,y=a.y+a.h},
+        }
+
+        local B={
+            center={x=b.x+b.w*0.5,y=b.y+b.h*0.5},
+            topLeft={x=b.x,y=b.y},
+            topRight={x=b.x+b.w,y=b.y},
+            botLeft={x=b.x,y=b.y+b.h},
+            botRight={x=b.x+b.w,y=b.y+b.h},
+        }       
+
+        local w=abs(B.center.x-A.center.x)*0.5
+        local h=abs(B.center.y-A.center.y)*0.5
+
+        local closestPointA,closestPointB={x=0,y=0},{x=0,y=0}
+
+        --A's center is somewhere to the left of B's center
+        if A.center.x<B.center.x then
+            if A.center.y<B.center.y then --A is in upper left quadrant
+                if A.botRight.x>B.topLeft.x then 
+                    closestPointA={x=A.center.x+w,y=A.botLeft.y}
+                    closestPointB={x=B.center.x-w,y=B.topLeft.y}
+                elseif A.botRight.y>B.topLeft.y then 
+                    closestPointA={x=A.topRight.x,y=A.center.y+h}
+                    closestPointB={x=B.topLeft.x,y=B.center.y-h}
+                else 
+                    closestPointA={x=A.botRight.x,y=A.botRight.y}
+                    closestPointB={x=B.topLeft.x,y=B.topLeft.y}
+                end
+
+            else --A is in lower left quadrant
+                if A.topRight.x>B.botLeft.x then 
+                    closestPointA={x=A.center.x+w,y=A.topLeft.y}
+                    closestPointB={x=B.center.x-w,y=B.botLeft.y }
+                elseif A.topRight.y<B.botLeft.y then 
+                    closestPointA={x=A.topRight.x,y=A.center.y-h}
+                    closestPointB={x=B.topLeft.x,y=B.center.y+h}
+                else
+                    closestPointA={x=A.topRight.x,y=A.topRight.y}
+                    closestPointB={x=B.botLeft.x,y=B.botLeft.y}
+                end
+            end
+            
+        --A's center is somewhere to the right of B's center
+        else                 
+            if A.center.y<B.center.y then --A is in upper right quadrant
+                if A.botLeft.x<B.topRight.x then 
+                    closestPointA={x=A.center.x-w,y=A.botLeft.y}
+                    closestPointB={x=B.center.x+w,y=B.topLeft.y}
+                elseif A.botLeft.y>B.topRight.y then 
+                    closestPointA={x=A.topLeft.x,y=A.center.y+h}
+                    closestPointB={x=B.topRight.x,y=B.center.y-h }
+                else 
+                    closestPointA={x=A.botLeft.x,y=A.botLeft.y}
+                    closestPointB={x=B.topRight.x,y=B.topRight.y}
+                end
+
+            else --A is in lower right quadrant 
+                if A.topLeft.x<B.botRight.x then 
+                    closestPointA={x=A.center.x-w,y=A.topLeft.y}
+                    closestPointB={x=B.center.x+w,y=B.botLeft.y}
+                elseif A.topLeft.y<B.botRight.y then 
+                    closestPointA={x=A.topLeft.x,y=A.center.y-h}
+                    closestPointB={x=B.topRight.x,y=B.center.y+h }
+                else
+                    closestPointA={x=A.topLeft.x,y=A.topLeft.y}
+                    closestPointB={x=B.botRight.x,y=B.botRight.y}
+                end
+            end
+        end
+
+        return getDistance(closestPointA,closestPointB)
+    end
 end

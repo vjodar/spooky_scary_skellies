@@ -54,20 +54,19 @@ function entityClass:new(entity,x,y) --constructor
     e.lungeForce=def.lungeForce or nil
     e.projectile=def.projectile or nil
     e.projectilesPerShot=def.projectilesPerShot or 1
-    e.canAttack=true
     e.moveTarget=e
     e.angle=0
     e.aggroRange={w=400,h=300}
     e.nearbyAttackTargets={}
-    e.targetsAlreadyAttacked={} --only damage a target once per attack
+    e.targetsAlreadyAttacked={} --only damage a given target once per attack
 
     --Draw data
+    e.spriteSheet=self.spriteSheets[e.name]
     e.xOffset=e.w*0.5
-    e.yOffset=def.drawData.yOffset or -(e.h-1)
+    e.yOffset=(e.h-def.drawData.frameHeight)*0.5
     e.xOrigin=def.drawData.frameWidth*0.5
     e.yOrigin=def.drawData.frameHeight*0.5
     e.scaleX=1 --used to face right (1) or left (-1)
-    e.spriteSheet=self.spriteSheets[e.name]
     e.animations=self.parseAnimations(self.grids[e.name],def.animations)
     e.animSpeed={min=0.25,max=3,current=1}
     e.damagingFrames=def.animations.attack.damagingFrames or nil 
@@ -85,7 +84,9 @@ function entityClass:new(entity,x,y) --constructor
     
     --Actions/AI
     e.methods={} --includes update and draw functions
-    for i,method in pairs(self.behaviors.methods) do e[i]=method end 
+    local methods=self.behaviors.methods
+    for i,method in pairs(methods.common) do e[i]=method end 
+    for i,method in pairs(methods[e.collisionClass]) do e[i]=method end 
     e.AI=self.behaviors.AI[e.name]
 
     local startState=def.startState or 'idle'

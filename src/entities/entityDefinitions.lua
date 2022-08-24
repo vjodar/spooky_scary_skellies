@@ -65,7 +65,6 @@ return {
         drawData={
             frameWidth=42,
             frameHeight=22,
-            yOffset=-8,
         },
         animations={
             raise={
@@ -114,7 +113,6 @@ return {
         drawData={
             frameWidth=24,
             frameHeight=24,
-            yOffset=-9,
         },
         animations={
             raise={
@@ -163,7 +161,6 @@ return {
         drawData={
             frameWidth=24,
             frameHeight=24,
-            yOffset=-9,
         },
         animations={
             raise={
@@ -213,7 +210,6 @@ return {
         drawData={
             frameWidth=24,
             frameHeight=24,
-            yOffset=-9,
         },
         animations={
             raise={

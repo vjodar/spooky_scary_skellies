@@ -50,7 +50,7 @@ return {
     skeletonArcher={
         name='skeletonArcher',
         moveSpeed=19*60,     
-        attackRange=150,  
+        attackRange=200,  
         attackPeriod=1, 
         attackDamage=1,
         projectile={name='arrow',xOffset=14,yOffset=-9},
@@ -98,7 +98,7 @@ return {
     skeletonMageFire={
         name='skeletonMageFire',
         moveSpeed=18*60,  
-        attackRange=100,  
+        attackRange=150,  
         attackPeriod=1.5,   
         attackDamage=1, 
         projectile={name='flame',xOffset=6,yOffset=-7},
@@ -146,7 +146,7 @@ return {
     skeletonMageIce={
         name='skeletonMageIce',
         moveSpeed=18*60,    
-        attackRange=100,     
+        attackRange=150,     
         attackPeriod=1,
         attackDamage=1,
         projectile={name='icicle',xOffset=6,yOffset=-7},
@@ -198,7 +198,7 @@ return {
         attackPeriod=1,
         attackDamage=1,
         projectile={name='spark',xOffset=6,yOffset=-7},
-        projectilesPerShot=3,
+        projectilesPerShot=2,
         knockback=100,
         health=3,
         startState='raise',
@@ -247,7 +247,7 @@ return {
         attackPeriod=1.5,
         attackDamage=1,
         knockback=200,
-        lungeForce=400,
+        lungeForce=500,
         health=3,
         collider={
             w=11,

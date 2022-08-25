@@ -85,7 +85,7 @@ end
 function player:updatePosition()
     local goalX=self.x+self.vx*dt 
     local goalY=self.y+self.vy*dt 
-    local realX,realY,cols=World:move(self,goalX,goalY,self.filter)
+    local realX,realY,cols,len=World:move(self,goalX,goalY,self.filter)
     self.x,self.y=realX,realY 
     self.center=getCenter(self)
 
@@ -97,17 +97,14 @@ function player:updatePosition()
     if abs(self.vx)<self.stopThreshold*dt then self.vx=0 end
     if abs(self.vy)<self.stopThreshold*dt then self.vy=0 end
 
-    --handle collisions
-    for i=1,#cols do
-        local other=cols[i].other --other collider
-        local touch=cols[i].touch --point of collision
-    
-        local magnitude=getMagnitude(player.vx,player.vy)         
-        local angleBefore=getAngle(player,touch)
-        local angleAfter=angleBefore+pi 
-    
-        self.vx=cos(angleAfter)*magnitude
-        self.vy=sin(angleAfter)*magnitude
+    --push allies out of the way
+    for i=1,len do
+        local other=cols[i].other 
+        if other.collisionClass=='ally' then 
+            local angle=getAngle(self.center,other.center)
+            other.vx=other.vx+cos(angle)*self.moveSpeed*2*dt
+            other.vy=other.vy+sin(angle)*self.moveSpeed*2*dt
+        end
     end
 end
 
@@ -200,7 +197,7 @@ function player:launchBone()
     --testing-----------------------------------------------
 
     --face target direction, lock turning
-    self.scaleX=(mouseX>self.x and 1 or -1)
+    self.scaleX=(mouseX>self.center.x and 1 or -1)
     self.canTurn.setOnCooldown()
 end
 

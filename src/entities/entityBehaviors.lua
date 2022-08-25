@@ -27,10 +27,10 @@ behaviors.methods.common={
 
     move=function(self)
         --apply a force in the entity's angle to move it
-        local vxIncrement=cos(self.angle)*self.moveSpeed*dt 
-        local vyIncrement=sin(self.angle)*self.moveSpeed*dt 
-        self.vx=self.vx+vxIncrement
-        self.vy=self.vy+vyIncrement
+        local fx=cos(self.angle)*self.moveSpeed*dt 
+        local fy=sin(self.angle)*self.moveSpeed*dt 
+        self.vx=self.vx+fx
+        self.vy=self.vy+fy
     end,
 
     updatePosition=function(self)
@@ -61,8 +61,8 @@ behaviors.methods.common={
             and other.name~='player' 
             then 
                 local angle=getAngle(self.center,other.center)
-                other.vx=other.vx+cos(angle)*self.moveSpeed*2*dt
-                other.vy=other.vy+sin(angle)*self.moveSpeed*2*dt
+                other.vx=other.vx+cos(angle)*self.moveSpeed*dt
+                other.vy=other.vy+sin(angle)*self.moveSpeed*dt
             end
         end
 
@@ -113,14 +113,26 @@ behaviors.methods.common={
 
 behaviors.methods.ally={
 
+    --if skeleton is too far from player, return to near the player
     remainNearPlayer=function(self)
-        --if skeleton is too far from player, move back to player
-        if abs(Player.center.x-self.center.x)>Player.allyReturnThreshold.x 
+        if abs(Player.center.x-self.center.x)>Player.allyReturnThreshold.x
         or abs(Player.center.y-self.center.y)>Player.allyReturnThreshold.y
         then
-            self.moveTarget=Player
+            --choose an offset from the player's center point
+            local xRange=Player.allyReturnThreshold.x*0.4
+            local yRange=Player.allyReturnThreshold.y*0.4
+            self.nearPlayerLocation={x=rnd(-xRange,yRange),y=rnd(-yRange,yRange)}
+
+            --set moveTarget to Player position offset by nearPlayerLocation 
+            --needs to be a table with a center field to work with self:move()
+            self.moveTarget={center={
+                x=Player.center.x+self.nearPlayerLocation.x,
+                y=Player.center.y+self.nearPlayerLocation.y,
+            }}
             self:changeState('moveToPlayer')
+            return false 
         end
+        return true 
     end,
 
     --Gets the closest attack target within LOS from the Player's nearbyEnemies table
@@ -233,14 +245,11 @@ behaviors.states.ally={
     idle=function(self)
         self:updateAnimation()
         self:updatePosition()
-        self:remainNearPlayer()
+        if self:remainNearPlayer()==false then return end
 
         --if target is a living enemy and skeleton can attack or is out of 
         --range, move toward the target in order to attack.
-        if self.moveTarget~=Player 
-        and self.moveTarget~=self 
-        and self.moveTarget.state~='dead'
-        then 
+        if self.moveTarget~=self and self.moveTarget.state~='dead' then 
             if self.canAttack.flag 
             or getRectDistance(self,self.moveTarget)>self.attackRange 
             then self:changeState('moveToTarget') end 
@@ -261,7 +270,7 @@ behaviors.states.ally={
     moveToTarget=function(self) 
         self:updateAnimation()
         self:updatePosition()
-        self:remainNearPlayer()
+        if self:remainNearPlayer()==false then return end
     
         --if moveTarget has died or has been cleared, return to idle
         if self.moveTarget.state=='dead' or self.moveTarget==self then
@@ -278,12 +287,8 @@ behaviors.states.ally={
         end
     
         if getRectDistance(self,self.moveTarget)<self.attackRange then             
-            if self.canAttack.flag then
-                self:changeState('attack')
-                return 
-            else 
-                self:changeState('idle') 
-                return  
+            if self.canAttack.flag then self:changeState('attack') return 
+            else self:changeState('idle') return
             end
         end
 
@@ -301,15 +306,35 @@ behaviors.states.ally={
             return 
         end 
     
-        --reached player       
-        if abs(Player.center.x-self.center.x)<Player.allyReturnThreshold.x*0.5
-        and abs(Player.center.y-self.center.y)<Player.allyReturnThreshold.y*0.5
-        then
+        --reached nearby player location  
+        if getDistance(self.moveTarget.center,self.center)<20 then 
             self:clearMoveTarget()
             self:changeState('idle')
             return
         end
 
+        --if an enemy is nearby, move to attack it only if skeleton
+        --is within 70% of return threshold
+        if self.canQueryAttackTargets.flag then
+            self.canQueryAttackTargets.setOnCooldown()
+            local nearbyTarget=self:getNearestAllyAttackTarget()
+            if nearbyTarget~=self 
+            and abs(Player.center.x-self.center.x)<Player.allyReturnThreshold.x*0.7
+            and abs(Player.center.y-self.center.y)<Player.allyReturnThreshold.y*0.7
+            then
+                self.moveTarget=nearbyTarget 
+                self:changeState('moveToTarget')
+                return
+            end 
+        end
+
+        
+        --update moveTarget to be same nearby location relative to Player
+        self.moveTarget={center={
+            x=Player.center.x+self.nearPlayerLocation.x,
+            y=Player.center.y+self.nearPlayerLocation.y,
+        }}
+        
         self:move()
     end,
     
@@ -384,7 +409,7 @@ behaviors.states.enemy={
         self:updatePosition()
         
         --if target has died, clear moveTarget, return to idle
-        if self.moveTarget.state=='dead' then
+        if self.moveTarget.state=='dead' or self.moveTarget==self then
             self:clearMoveTarget()
             self:changeState('idle')
             return 
@@ -399,12 +424,8 @@ behaviors.states.enemy={
         
         --if target is within attack range, attack. Otherwise move toward it
         if getRectDistance(self,self.moveTarget)<self.attackRange then 
-            if self.canAttack.flag then 
-                self:changeState('attack')
-                return 
-            else 
-                self:changeState('idle')
-                return
+            if self.canAttack.flag then self:changeState('attack') return 
+            else self:changeState('idle') return 
             end  
         end
 

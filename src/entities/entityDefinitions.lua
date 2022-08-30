@@ -1,5 +1,5 @@
 return {
-    skeletonWarrior={
+    ['skeletonWarrior']={
         name='skeletonWarrior',
         moveSpeed=20*60,
         attackRange=40,  
@@ -47,7 +47,7 @@ return {
             },
         },
     },
-    skeletonArcher={
+    ['skeletonArcher']={
         name='skeletonArcher',
         moveSpeed=19*60,     
         attackRange=200,  
@@ -95,7 +95,7 @@ return {
             },
         },
     },
-    skeletonMageFire={
+    ['skeletonMageFire']={
         name='skeletonMageFire',
         moveSpeed=18*60,  
         attackRange=150,  
@@ -143,7 +143,7 @@ return {
             },
         },
     },
-    skeletonMageIce={
+    ['skeletonMageIce']={
         name='skeletonMageIce',
         moveSpeed=18*60,    
         attackRange=150,     
@@ -191,7 +191,7 @@ return {
             },
         },
     },
-    skeletonMageElectric={
+    ['skeletonMageElectric']={
         name='skeletonMageElectric',
         moveSpeed=18*60,    
         attackRange=100,     
@@ -240,7 +240,7 @@ return {
             },
         },
     },
-    slime={
+    ['slime']={
         name='slime',
         moveSpeed=15*60,
         attackRange=40,        
@@ -280,6 +280,137 @@ return {
                 row=4,
                 duration=0.1,
                 damagingFrames={3,8}
+            },
+        },
+    },
+    ['pumpkin']={
+        name='pumpkin',
+        moveSpeed=15*60,
+        attackRange=40,        
+        attackPeriod=2,
+        attackDamage=1,
+        knockback=200,
+        lungeForce=400,
+        health=3,
+        collider={
+            w=12,
+            h=8,
+            class='enemy',
+            restitution=0.7,
+        },
+        drawData={
+            frameWidth=16,
+            frameHeight=16,
+        },
+        animations={
+            wake={
+                frames='1-4',
+                row=1,
+                duration=0.1,
+            },
+            idle={
+                frames='1-4',
+                row=1,
+                duration=0.1,
+            },
+            move={
+                frames='1-4',
+                row=2,
+                duration=0.1,
+            },
+            attack={
+                frames=1,
+                row=3,
+                duration=0.4,
+                damagingFrames={1,1}
+            },
+        },
+    },
+    ['golem']={
+        name='golem',
+        moveSpeed=10*60,
+        attackRange=70,        
+        attackPeriod=3,
+        attackDamage=1,
+        knockback=400,
+        kbResistance=70,
+        lungeForce=800,
+        health=10,
+        collider={
+            w=14,
+            h=8,
+            class='enemy',
+            restitution=0,
+            linearDamping=7,
+        },
+        drawData={
+            frameWidth=16,
+            frameHeight=19,
+        },
+        animations={
+            wake={
+                frames='1-4',
+                row=1,
+                duration=0.1,
+            },
+            idle={
+                frames='1-4',
+                row=1,
+                duration=0.1,
+            },
+            move={
+                frames='1-4',
+                row=2,
+                duration=0.1,
+            },
+            attack={
+                frames='1-9',
+                row=3,
+                duration=0.1,
+                damagingFrames={4,9}
+            },
+        },
+    },
+    ['spider']={
+        name='spider',
+        moveSpeed=20*60,
+        attackRange=50,        
+        attackPeriod=1,
+        attackDamage=1,
+        knockback=100,
+        lungeForce=800,
+        health=3,
+        collider={
+            w=14,
+            h=8,
+            class='enemy',
+            restitution=0.2,
+        },
+        drawData={
+            frameWidth=14,
+            frameHeight=16,
+        },
+        animations={
+            wake={
+                frames='1-4',
+                row=1,
+                duration=0.1,
+            },
+            idle={
+                frames='1-4',
+                row=1,
+                duration=0.1,
+            },
+            move={
+                frames='1-4',
+                row=2,
+                duration=0.04,
+            },
+            attack={
+                frames='1-2',
+                row=3,
+                duration=0.2,
+                damagingFrames={2,2}
             },
         },
     },

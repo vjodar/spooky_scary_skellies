@@ -29,17 +29,17 @@ function love.keyreleased(k)
         -- for i=1,1 do Entities:new('skeletonMageElectric',Controls.getMousePosition()) end 
     end
     if k=='p' then 
-        for i=1,1 do Entities:new('slime',Controls.getMousePosition()) end
+        for i=1,1 do Entities:new('golem',Controls.getMousePosition()) end
     end
     if k=='k' then 
-        for i=1,200 do Entities:new('skeletonWarrior',rnd(0,400),rnd(0,300)) end
-        -- for i=1,200 do Entities:new('skeletonArcher',rnd(0,400),rnd(0,300)) end
-        -- for i=1,200 do Entities:new('skeletonMageFire',rnd(0,400),rnd(0,300)) end
-        -- for i=1,200 do Entities:new('skeletonMageIce',rnd(0,400),rnd(0,300)) end
-        -- for i=1,200 do Entities:new('skeletonMageElectric',rnd(0,400),rnd(0,300)) end
+        for i=1,100 do Entities:new('skeletonWarrior',rnd(0,400),rnd(0,300)) end
+        -- for i=1,50 do Entities:new('skeletonArcher',rnd(0,400),rnd(0,300)) end
+        -- for i=1,50 do Entities:new('skeletonMageFire',rnd(0,400),rnd(0,300)) end
+        -- for i=1,50 do Entities:new('skeletonMageIce',rnd(0,400),rnd(0,300)) end
+        -- for i=1,50 do Entities:new('skeletonMageElectric',rnd(0,400),rnd(0,300)) end
     end
     if k=='l' then 
-        for i=1,300 do Entities:new('slime',rnd(0,400),rnd(0,300)) end
+        for i=1,200 do Entities:new('spider',rnd(0,400),rnd(0,300)) end
     end
 end
 --testing-------------------

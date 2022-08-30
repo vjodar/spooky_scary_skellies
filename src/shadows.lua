@@ -10,6 +10,9 @@ local shadowSprites=function()
 
     --enemies
     sprites.slime=love.graphics.newImage('assets/shadows/shadow_slime.png')
+    sprites.pumpkin=love.graphics.newImage('assets/shadows/shadow_pumpkin.png')
+    sprites.golem=love.graphics.newImage('assets/shadows/shadow_golem.png')
+    sprites.spider=love.graphics.newImage('assets/shadows/shadow_spider.png')
 
     --projectiles
     sprites.arrow=love.graphics.newImage('assets/shadows/shadow_arrow.png')

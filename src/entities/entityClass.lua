@@ -51,12 +51,13 @@ function entityClass:new(entity,x,y) --constructor
     e.attackRange=def.attackRange
     e.attackDamage=def.attackDamage
     e.knockback=def.knockback
+    e.kbResistance=def.kbResistance or 0
     e.lungeForce=def.lungeForce or nil
     e.projectile=def.projectile or nil
     e.projectilesPerShot=def.projectilesPerShot or 1
     e.moveTarget=e
     e.angle=0
-    e.aggroRange={w=600,h=450}
+    e.aggroRange={w=1000,h=750}
     e.nearbyAttackTargets={}
     e.targetsAlreadyAttacked={} --only damage a given target once per attack
 

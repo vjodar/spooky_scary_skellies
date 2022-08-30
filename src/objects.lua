@@ -1,46 +1,23 @@
 local objects={}
 objects.table={} --holds all objects
-objects.inDrawDistanceTable={} --objects within draw distance
-objects.drawDistance={x=800,y=600}
-objects.sort=function(obj1,obj2) return obj1.y<obj2.y end --sort function
+objects.ySort=function(obj1,obj2) return obj1.y<obj2.y end --sort function
 
-function objects:update() 
-    self.inDrawDistanceTable={} --clear table
-
-    --fill inDrawDistanceTable with objects within draw distance
-    for i=1, #self.table do
-        if abs(Camera.target.x-self.table[i].x)<self.drawDistance.x
-        and abs(Camera.target.y-self.table[i].y)<self.drawDistance.y 
-        then table.insert(self.inDrawDistanceTable,self.table[i]) end
-    end
-    
+function objects:update()     
     --update object. If it returns false, remove it from table
-    for i=1, #self.inDrawDistanceTable do 
-        if self.inDrawDistanceTable[i]:update()==false then 
-            self:removeObject(self.inDrawDistanceTable[i]) 
-        end
+    for i,obj in ipairs(self.table) do 
+        if obj:update()==false then table.remove(self.table,i) end
     end
     
     --sort objects by y-position to provide semi-3D perspective.
-    --sort after updating in order to keep non-deterministic collision priority.
-    table.sort(self.inDrawDistanceTable,self.sort)
+    --sort after updating to preserve non-deterministic collision priority.
+    table.sort(self.table,self.ySort)
 end
 
 function objects:draw() 
-    for i=1, #self.inDrawDistanceTable do 
-        self.inDrawDistanceTable[i]:draw() 
+    for i=1, #self.table do self.table[i]:draw() 
         --testing----------------------------------
-        World:drawItem(self.inDrawDistanceTable[i])
+        -- World:drawItem(self.table[i])
         --testing----------------------------------
-    end
-end
-
-function objects:removeObject(obj1)
-    for i=1, #self.table do 
-        if self.table[i]==obj1 then 
-            table.remove(self.table,i)
-            return
-        end
     end
 end
 

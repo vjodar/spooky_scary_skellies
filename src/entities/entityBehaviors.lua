@@ -2,9 +2,13 @@ local behaviors={}
 
 behaviors.methods={} --Methods---------------------------------------------------------------------
 behaviors.methods.common={
+
     update=function(self) return self.AI[self.state](self) end,
+
     draw=function(self)
         self.shadow:draw(self.x,self.y)
+        -- love.graphics.setColor(0.8,0.9,1,1) --light blue tint for freeze
+        -- love.graphics.setColor(1,0.8,0.8,1) --red tint for burn
         self.animations.current:draw(
             self.spriteSheet,self.x+self.xOffset,self.y+self.yOffset,
             nil,self.scaleX,1,self.xOrigin,self.yOrigin
@@ -61,8 +65,8 @@ behaviors.methods.common={
             and other.name~='player' 
             then 
                 local angle=getAngle(self.center,other.center)
-                other.vx=other.vx+cos(angle)*self.moveSpeed*dt
-                other.vy=other.vy+sin(angle)*self.moveSpeed*dt
+                other.vx=other.vx+cos(angle)*other.moveSpeed*dt
+                other.vy=other.vy+sin(angle)*other.moveSpeed*dt
             end
         end
 
@@ -75,8 +79,9 @@ behaviors.methods.common={
 
     takeDamage=function(self,source)
         local damage=source.attackDamage or 0 
-        local knockback=source.knockback or 0
         local kbAngle=getAngle(source.center,self.center)
+        local knockback=source.knockback or 0
+        knockback=knockback-knockback*(self.kbResistance/100)
         
         self.health.current=max(self.health.current-damage,0)
 
@@ -119,8 +124,8 @@ behaviors.methods.ally={
         or abs(Player.center.y-self.center.y)>Player.allyReturnThreshold.y
         then
             --choose an offset from the player's center point
-            local xRange=Player.allyReturnThreshold.x*0.4
-            local yRange=Player.allyReturnThreshold.y*0.4
+            local xRange=Player.allyReturnThreshold.x*0.5
+            local yRange=Player.allyReturnThreshold.y*0.5
             self.nearPlayerLocation={x=rnd(-xRange,yRange),y=rnd(-yRange,yRange)}
 
             --set moveTarget to Player position offset by nearPlayerLocation 
@@ -518,6 +523,24 @@ behaviors.AI={ --AI-------------------------------------------------------------
         dead=behaviors.states.common.dead,
     },
     ['slime']={
+        idle=behaviors.states.enemy.idle,
+        moveToTarget=behaviors.states.enemy.moveToTarget,
+        attack=behaviors.states.enemy.lunge,
+        dead=behaviors.states.common.dead,
+    },
+    ['pumpkin']={
+        idle=behaviors.states.enemy.idle,
+        moveToTarget=behaviors.states.enemy.moveToTarget,
+        attack=behaviors.states.enemy.lunge,
+        dead=behaviors.states.common.dead,
+    },
+    ['golem']={
+        idle=behaviors.states.enemy.idle,
+        moveToTarget=behaviors.states.enemy.moveToTarget,
+        attack=behaviors.states.enemy.lunge,
+        dead=behaviors.states.common.dead,
+    },
+    ['spider']={
         idle=behaviors.states.enemy.idle,
         moveToTarget=behaviors.states.enemy.moveToTarget,
         attack=behaviors.states.enemy.lunge,

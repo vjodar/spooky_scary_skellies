@@ -10,6 +10,16 @@ local sheetsAndGrids=function(def)
             spriteSheets[name]:getWidth(),
             spriteSheets[name]:getHeight()
         )
+
+        --create spriteSheets for any alternates
+        if def.drawData.altSpriteSheets then 
+            for i=1,#def.drawData.altSpriteSheets do 
+                local altSheetName=def.drawData.altSpriteSheets[i]
+                local altPath='assets/entities/'..altSheetName..'.png'
+                spriteSheets[altSheetName]=love.graphics.newImage(altPath)
+                grids[altSheetName]=grids[name] --same grid as main spriteSheet
+            end
+        end
     end
 
     return spriteSheets,grids
@@ -24,11 +34,27 @@ local parseAnimations=function(grid,animDefs)
     return anims
 end
 
+--Return a spriteSheet's name among an entity's main and alternates, if any.
+local chooseSpriteSheet=function(def)
+    --if entity has alternate spriteSheets, choose randomly
+    if def.drawData.altSpriteSheets then 
+        local selections={def.name}
+        for i=1,#def.drawData.altSpriteSheets do 
+            table.insert(selections,def.drawData.altSpriteSheets[i])
+        end
+        return selections[rnd(#selections)]
+
+    else --no alternates, just choose the main spriteSheet
+        return def.name 
+    end
+end
+
 local entityClass={}
 entityClass.definitions=require 'src/entities/entityDefinitions'
 entityClass.behaviors=require 'src/entities/entityBehaviors'
 entityClass.spriteSheets,entityClass.grids=sheetsAndGrids(entityClass.definitions)
 entityClass.parseAnimations=parseAnimations 
+entityClass.chooseSpriteSheet=chooseSpriteSheet
 
 function entityClass:new(entity,x,y) --constructor
     local def=self.definitions[entity]    
@@ -62,12 +88,12 @@ function entityClass:new(entity,x,y) --constructor
     e.targetsAlreadyAttacked={} --only damage a given target once per attack
 
     --Draw data
-    e.spriteSheet=self.spriteSheets[e.name]
+    e.spriteSheet=self.spriteSheets[self.chooseSpriteSheet(def)]
     e.xOffset=e.w*0.5
     e.yOffset=(e.h-def.drawData.frameHeight)*0.5
     e.xOrigin=def.drawData.frameWidth*0.5
     e.yOrigin=def.drawData.frameHeight*0.5
-    e.scaleX=1 --used to face right (1) or left (-1)
+    e.scaleX=rndSign() --used to face right (1) or left (-1)
     e.animations=self.parseAnimations(self.grids[e.name],def.animations)
     e.animSpeed={min=0.25,max=3,current=1}
     e.damagingFrames=def.animations.attack.damagingFrames or nil 

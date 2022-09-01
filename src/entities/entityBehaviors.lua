@@ -498,31 +498,8 @@ behaviors.AI={ --AI-------------------------------------------------------------
         attack=behaviors.states.common.shoot,
         dead=behaviors.states.common.dead,
     },
-    ['skeletonMageFire']={
-        raise=behaviors.states.common.raise,
-        idle=behaviors.states.ally.idle,
-        moveToPlayer=behaviors.states.ally.moveToPlayer,
-        moveToTarget=behaviors.states.ally.moveToTarget,
-        attack=behaviors.states.common.shoot,
-        dead=behaviors.states.common.dead,
-    },
-    ['skeletonMageIce']={
-        raise=behaviors.states.common.raise,
-        idle=behaviors.states.ally.idle,
-        moveToPlayer=behaviors.states.ally.moveToPlayer,
-        moveToTarget=behaviors.states.ally.moveToTarget,
-        attack=behaviors.states.common.shoot,
-        dead=behaviors.states.common.dead,
-    },
-    ['skeletonMageElectric']={
-        raise=behaviors.states.common.raise,
-        idle=behaviors.states.ally.idle,
-        moveToPlayer=behaviors.states.ally.moveToPlayer,
-        moveToTarget=behaviors.states.ally.moveToTarget,
-        attack=behaviors.states.common.shoot,
-        dead=behaviors.states.common.dead,
-    },
     ['slime']={
+        raise=behaviors.states.common.raise,
         idle=behaviors.states.enemy.idle,
         moveToTarget=behaviors.states.enemy.moveToTarget,
         attack=behaviors.states.enemy.lunge,
@@ -534,18 +511,20 @@ behaviors.AI={ --AI-------------------------------------------------------------
         attack=behaviors.states.enemy.lunge,
         dead=behaviors.states.common.dead,
     },
-    ['golem']={
+    ['possessedArcher']={
         idle=behaviors.states.enemy.idle,
         moveToTarget=behaviors.states.enemy.moveToTarget,
-        attack=behaviors.states.enemy.lunge,
-        dead=behaviors.states.common.dead,
-    },
-    ['spider']={
-        idle=behaviors.states.enemy.idle,
-        moveToTarget=behaviors.states.enemy.moveToTarget,
-        attack=behaviors.states.enemy.lunge,
+        attack=behaviors.states.common.shoot,
         dead=behaviors.states.common.dead,
     },
 }
+--shared AI
+behaviors.AI['skeletonMageFire']=behaviors.AI.skeletonArcher
+behaviors.AI['skeletonMageIce']=behaviors.AI.skeletonArcher
+behaviors.AI['skeletonMageElectric']=behaviors.AI.skeletonArcher
+behaviors.AI['golem']=behaviors.AI.pumpkin
+behaviors.AI['spider']=behaviors.AI.pumpkin
+behaviors.AI['bat']=behaviors.AI.pumpkin
+behaviors.AI['zombie']=behaviors.AI.slime
 
 return behaviors 

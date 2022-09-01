@@ -45,6 +45,15 @@ local projectileDefinitions=function()
                 class='allyProjectile',
             },
         },
+        darkArrow={
+            name='darkArrow',
+            moveSpeed=300,
+            collider={
+                w=3,
+                h=3,
+                class='enemyProjectile',
+            },
+        },
     }
 end
 
@@ -89,7 +98,7 @@ local projectileUpdateFunctions=function()
         base=function(self)
             self.remainingTravelTime=self.remainingTravelTime-dt 
             if self.remainingTravelTime<0
-            or getDistance(self,Camera.target)>400 
+            or getDistance(self.center,Camera.target.center)>600 
             then 
                 World:remove(self)
                 return false
@@ -107,11 +116,13 @@ local projectileUpdateFunctions=function()
                 local other=cols[i].other 
                 local touch=cols[i].touch 
 
-                if other.collisionClass=='enemy' then
+                if (self.collisionClass=='allyProjectile' and other.collisionClass=='enemy')
+                or (self.collisionClass=='enemyProjectile' and other.collisionClass=='ally')
+                then 
                     self:onHit(other)
                     World:remove(self)
                     return false 
-                end 
+                end                
 
                 if other.collisionClass=='solid' then 
                     World:remove(self)
@@ -168,11 +179,13 @@ local projectileUpdateFunctions=function()
                 local other=cols[i].other 
                 local touch=cols[i].touch 
 
-                if other.collisionClass=='enemy' then
+                if (self.collisionClass=='allyProjectile' and other.collisionClass=='enemy')
+                or (self.collisionClass=='enemyProjectile' and other.collisionClass=='ally')
+                then 
                     self:onHit(other)
                     World:remove(self)
                     return false 
-                end 
+                end
 
                 if other.collisionClass=='solid' then 
                     --TODO: setup bounce off solid objects behavior

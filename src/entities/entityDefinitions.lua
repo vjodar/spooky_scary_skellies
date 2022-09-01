@@ -53,7 +53,7 @@ return {
         attackRange=200,  
         attackPeriod=1, 
         attackDamage=1,
-        projectile={name='arrow',xOffset=14,yOffset=-9},
+        projectile={name='arrow',xOffset=12,yOffset=-10},
         knockback=200,
         health=3,
         startState='raise',
@@ -63,7 +63,7 @@ return {
             class='ally',
         },
         drawData={
-            frameWidth=42,
+            frameWidth=38,
             frameHeight=22,
         },
         animations={
@@ -249,6 +249,7 @@ return {
         knockback=200,
         lungeForce=500,
         health=3,
+        startState='raise',
         collider={
             w=11,
             h=5,
@@ -260,8 +261,8 @@ return {
             frameHeight=14,
         },
         animations={
-            wake={
-                frames='1-4',
+            raise={
+                frames='1-7',
                 row=1,
                 duration=0.1,
             },
@@ -294,7 +295,7 @@ return {
         health=3,
         collider={
             w=12,
-            h=8,
+            h=7,
             class='enemy',
             restitution=0.7,
         },
@@ -373,7 +374,7 @@ return {
     },
     ['spider']={
         name='spider',
-        moveSpeed=20*60,
+        moveSpeed=18*60,
         attackRange=50,        
         attackPeriod=1,
         attackDamage=1,
@@ -381,8 +382,8 @@ return {
         lungeForce=800,
         health=3,
         collider={
-            w=14,
-            h=8,
+            w=12,
+            h=7,
             class='enemy',
             restitution=0.2,
         },
@@ -391,11 +392,6 @@ return {
             frameHeight=16,
         },
         animations={
-            wake={
-                frames='1-4',
-                row=1,
-                duration=0.1,
-            },
             idle={
                 frames='1-4',
                 row=1,
@@ -411,6 +407,124 @@ return {
                 row=3,
                 duration=0.2,
                 damagingFrames={2,2}
+            },
+        },
+    },
+    ['bat']={
+        name='bat',
+        moveSpeed=17*60,
+        attackRange=30,        
+        attackPeriod=1,
+        attackDamage=1,
+        knockback=100,
+        lungeForce=500,
+        health=3,
+        collider={
+            w=6,
+            h=4,
+            class='enemy',
+        },
+        drawData={
+            frameWidth=16,
+            frameHeight=12,
+        },
+        animations={
+            idle={
+                frames='1-3',
+                row=1,
+                duration=0.1,
+            },
+            move={
+                frames='1-3',
+                row=1,
+                duration=0.07,
+            },
+            attack={
+                frames=1,
+                row=1,
+                duration=0.3,
+                damagingFrames={1,1}
+            },
+        },
+    },
+    ['zombie']={
+        name='zombie',
+        moveSpeed=8*60,
+        attackRange=30,        
+        attackPeriod=2,
+        attackDamage=1,
+        knockback=100,
+        lungeForce=500,
+        health=6,
+        startState='raise',
+        collider={
+            w=10,
+            h=6,
+            class='enemy',
+        },
+        drawData={
+            altSpriteSheets={'zombie_2','zombie_3'},
+            frameWidth=18,
+            frameHeight=21,
+        },
+        animations={
+            raise={
+                frames='1-13',
+                row=1,
+                duration=0.1,
+            },
+            idle={
+                frames='1-4',
+                row=2,
+                duration=0.15,
+            },
+            move={
+                frames='1-4',
+                row=3,
+                duration=0.15,
+            },
+            attack={
+                frames='1-4',
+                row=4,
+                duration={0.2,0.1,0.1,0.3},
+                damagingFrames={2,4}
+            },
+        },
+    },
+    ['possessedArcher']={
+        name='possessedArcher',
+        moveSpeed=15*60,     
+        attackRange=140,  
+        attackPeriod=1, 
+        attackDamage=1,
+        projectile={name='darkArrow',xOffset=12,yOffset=-10},
+        knockback=300,
+        health=3,
+        collider={
+            w=12,
+            h=7,
+            class='enemy',
+        },
+        drawData={
+            frameWidth=34,
+            frameHeight=26,
+        },
+        animations={
+            idle={
+                frames='1-4',
+                row=1,
+                duration=0.1,
+            },
+            move={
+                frames='1-4',
+                row=2,
+                duration=0.1,
+            },
+            attack={
+                frames='1-4',
+                row=3,
+                duration={0.1,0.1,0.3,0.1},
+                firingFrame=4,
             },
         },
     },

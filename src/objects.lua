@@ -14,7 +14,8 @@ function objects:update()
 end
 
 function objects:draw() 
-    for i=1, #self.table do self.table[i]:draw() 
+    for i=1, #self.table do 
+        self.table[i]:draw() 
         --testing----------------------------------
         -- World:drawItem(self.table[i])
         --testing----------------------------------

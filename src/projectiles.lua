@@ -1,6 +1,6 @@
 local projectileDefinitions=function()
     return {
-        bone={
+        ['bone']={
             name='bone',
             moveSpeed=150,
             collider={
@@ -9,7 +9,7 @@ local projectileDefinitions=function()
                 class='allyProjectile',
             }
         },
-        arrow={
+        ['arrow']={
             name='arrow',
             moveSpeed=300,
             collider={
@@ -18,7 +18,7 @@ local projectileDefinitions=function()
                 class='allyProjectile',
             },
         },
-        flame={
+        ['flame']={
             name='flame',
             moveSpeed=200,
             collider={
@@ -27,7 +27,7 @@ local projectileDefinitions=function()
                 class='allyProjectile',
             },
         },
-        icicle={
+        ['icicle']={
             name='icicle',
             moveSpeed=160,
             collider={
@@ -36,7 +36,7 @@ local projectileDefinitions=function()
                 class='allyProjectile',
             },
         },
-        spark={
+        ['spark']={
             name='spark',
             moveSpeed=150,
             collider={
@@ -45,12 +45,40 @@ local projectileDefinitions=function()
                 class='allyProjectile',
             },
         },
-        darkArrow={
+        ['darkArrow']={
             name='darkArrow',
             moveSpeed=300,
             collider={
                 w=3,
                 h=3,
+                class='enemyProjectile',
+            },
+        },
+        ['pickaxe']={
+            name='pickaxe',
+            moveSpeed=130,
+            collider={
+                w=3,
+                h=3,
+                class='enemyProjectile',
+            },
+        },
+        ['apple']={
+            name='apple',
+            moveSpeed=130,
+            collider={
+                w=3,
+                h=3,
+                class='enemyProjectile',
+            },
+        },
+        ['jack-o-lantern']={
+            name='jack-o-lantern',
+            moveSpeed=150,
+            explosionRadius=50,
+            collider={
+                w=5,
+                h=5,
                 class='enemyProjectile',
             },
         },
@@ -68,26 +96,113 @@ end
 
 --Defining how a projectile behaves upon collisions.
 local projectileOnHitFunctions=function()
-    return {
+    local onHitFunctions={
     
-        base=function(self,target) 
-            if target.state=='dead' then return end  
-            target:takeDamage(self) 
+        --damages targets, destroys upon hitting solids
+        ['base']=function(self,target,touch)
+            if target.collisionClass=='solid' then 
+                World:remove(self)
+                return false
+            end
+
+            if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
+            or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
+            then 
+                if target.state=='dead' then return end  
+                target:takeDamage(self) 
+                World:remove(self)
+                return false
+            end 
         end,
     
-        flame=function(self,target)
-            if target.state=='dead' then return end 
-            target:takeDamage(self)
-            --TODO: AOE burning effect
+        --damages and sets targets on fire, destroys upon hitting solids
+        ['flame']=function(self,target,touch)
+            if target.collisionClass=='solid' then 
+                World:remove(self)
+                return false
+            end
+
+            if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
+            or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
+            then 
+                if target.state=='dead' then return end  
+                target:takeDamage(self)
+                --TODO: set target on fire
+                World:remove(self)
+                return false
+            end 
         end,
     
-        icicle=function(self,target)
-            if target.state=='dead' then return end 
-            target:takeDamage(self)
-            --TODO: freeze/slow target
+        --damages and freezes targets, destroys upon hitting solids
+        ['icicle']=function(self,target,touch)
+            if target.collisionClass=='solid' then 
+                World:remove(self)
+                return false
+            end
+               
+            if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
+            or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
+            then 
+                if target.state=='dead' then return end  
+                target:takeDamage(self)
+                --TODO: freeze target
+                World:remove(self)
+                return false
+            end 
+        end,
+
+        --damages targets, bounces off solids
+        ['spark']=function(self,target,touch)     
+            if target.collisionClass=='solid' then 
+                local angle=getAngle(touch,self)
+                self.vx=cos(angle)*self.moveSpeed 
+                self.vy=sin(angle)*self.moveSpeed
+                self.angle=angle
+                return
+            end
+               
+            if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
+            or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
+            then 
+                if target.state=='dead' then return end  
+                target:takeDamage(self)
+                --TODO: freeze target
+                World:remove(self)
+                return false
+            end 
+        end,
+
+        --damages all targets within AOE upon hitting a target or solid
+        ['explode']=function(self,target,touch) 
+            if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
+            or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
+            or target.collisionClass=='solid'
+            then 
+                local queryData={
+                    x=self.x-self.explosionRadius*0.5,
+                    y=self.y-self.explosionRadius*0.5,
+                    w=self.explosionRadius,h=self.explosionRadius
+                }
+                local filter=World.queryFilters.ally
+                if self.collisionClass=='enemyProjectile' then 
+                    filter=World.queryFilters.enemy
+                end
+                local targets=World:queryRect(
+                    queryData.x,queryData.y,queryData.w,queryData.h,filter
+                )
+                for i=1,#targets do 
+                    if targets[i].state~='dead' then targets[i]:takeDamage(self) end
+                end
+                World:remove(self)
+                return false
+            end 
         end,
         
     }
+
+    onHitFunctions['jack-o-lantern']=onHitFunctions.explode
+
+    return onHitFunctions
 end
 
 --Defining how a projectile travels.
@@ -95,7 +210,7 @@ local projectileUpdateFunctions=function()
     return {
 
         --Travel in a straight line until hitting an target, solid wall, or expiring.
-        base=function(self)
+        ['base']=function(self)
             self.remainingTravelTime=self.remainingTravelTime-dt 
             if self.remainingTravelTime<0
             or getDistance(self.center,Camera.target.center)>600 
@@ -112,27 +227,11 @@ local projectileUpdateFunctions=function()
             self.center=getCenter(self)
 
             --handle collisions
-            for i=1,#cols do 
-                local other=cols[i].other 
-                local touch=cols[i].touch 
-
-                if (self.collisionClass=='allyProjectile' and other.collisionClass=='enemy')
-                or (self.collisionClass=='enemyProjectile' and other.collisionClass=='ally')
-                then 
-                    self:onHit(other)
-                    World:remove(self)
-                    return false 
-                end                
-
-                if other.collisionClass=='solid' then 
-                    World:remove(self)
-                    return false 
-                end
-            end
+            for i=1,#cols do return self:onHit(cols[i].other,cols[i].touch) end
         end,
     
         --Changes directions rapidly (every 0.1s-0.5s), bounces off solid walls.
-        spark=function(self)
+        ['spark']=function(self)
             self.remainingTravelTime=self.remainingTravelTime-dt
             if self.remainingTravelTime<0 
             or getDistance(self,Camera.target)>400 
@@ -175,22 +274,7 @@ local projectileUpdateFunctions=function()
             self.center=getCenter(self)
 
             --handle collisions
-            for i=1,#cols do 
-                local other=cols[i].other 
-                local touch=cols[i].touch 
-
-                if (self.collisionClass=='allyProjectile' and other.collisionClass=='enemy')
-                or (self.collisionClass=='enemyProjectile' and other.collisionClass=='ally')
-                then 
-                    self:onHit(other)
-                    World:remove(self)
-                    return false 
-                end
-
-                if other.collisionClass=='solid' then 
-                    --TODO: setup bounce off solid objects behavior
-                end
-            end    
+            for i=1,#cols do return self:onHit(cols[i].other,cols[i].touch) end
         end,
 
     }
@@ -198,10 +282,10 @@ end
 
 --Defining how a projectile is drawn
 local projectileDrawFunctions=function()
-    return {
+    local drawFunctions={
         
         --Projectile is angled toward its initial direction
-        base=function(self)
+        ['base']=function(self)
             self.shadow:draw(self.x,self.y,self.angle)
             love.graphics.draw(
                 self.sprite,self.x+self.xOffset,self.y+self.yOffset,
@@ -210,7 +294,7 @@ local projectileDrawFunctions=function()
         end,
     
         --Projectile randomly rotates each frame
-        spark=function(self)
+        ['spark']=function(self)
             self.rotation=rnd()*6
             self.shadow:draw(self.x,self.y,self.rotation)
             love.graphics.draw(
@@ -220,8 +304,10 @@ local projectileDrawFunctions=function()
         end,
 
         --Projectile spins
-        bone=function(self)
-            self.rotation=self.rotation+dt*self.moveSpeed*0.15
+        ['bone']=function(self)
+            if self.vx>0 then self.rotation=self.rotation+dt*self.moveSpeed*0.15
+            else self.rotation=self.rotation-dt*self.moveSpeed*0.15
+            end
             self.shadow:draw(self.x,self.y,self.rotation)
             love.graphics.draw(
                 self.sprite,self.x+self.xOffset,self.y+self.yOffset,
@@ -229,7 +315,27 @@ local projectileDrawFunctions=function()
             )
         end,
 
+        --Projectile doesn't rotate, but still faces the correct side
+        ['apple']=function(self)
+            self.shadow:draw(self.x,self.y)
+            love.graphics.draw(
+                self.sprite,self.x+self.xOffset,self.y+self.yOffset,
+                nil,getSign(self.vx),1,self.xOrigin,self.yOrigin
+            )
+            -- if self.explosionRadius then 
+            --     love.graphics.rectangle(
+            --         'line',self.x-self.explosionRadius*0.5,
+            --         self.y-self.explosionRadius*0.5,
+            --         self.explosionRadius,self.explosionRadius
+            --     )
+            -- end
+        end,
+
     }
+    drawFunctions['pickaxe']=drawFunctions.bone
+    drawFunctions['jack-o-lantern']=drawFunctions.apple
+
+    return drawFunctions
 end
 
 local projectiles={}
@@ -256,7 +362,8 @@ function projectiles:new(args) --args={x,y,name,attackDamage,knockback,yOffset}
     p.knockback=args.knockback
     p.rotation=rnd()*pi
     p.moveSpeed=def.moveSpeed
-    p.remainingTravelTime=(200/def.moveSpeed)*2 --1sec per 100units/sec
+    p.explosionRadius=def.explosionRadius or nil
+    p.remainingTravelTime=(200/def.moveSpeed)*4 --2sec per 100units/sec
 
     --Draw data
     p.sprite=self.sprites[def.name]

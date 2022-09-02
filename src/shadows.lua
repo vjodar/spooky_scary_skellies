@@ -12,10 +12,14 @@ local shadowNames={
     'pumpkin',
     'golem',
     'spider',
-    -- 'slimeMatron',
+    'slimeMatron',
     'bat',
     'zombie',
     'possessedArcher',
+    'possessedKnight',
+    'undeadMiner',
+    'ent',
+    'headlessHorseman',
 
     --projectiles
     'arrow',
@@ -24,6 +28,9 @@ local shadowNames={
     'spark',
     'bone',
     'darkArrow',
+    'pickaxe',
+    'apple',
+    'jack-o-lantern',
 }
 
 local sharedSprites={
@@ -35,6 +42,8 @@ local sharedSprites={
     spider='pumpkin',
     zombie='skeletonWarrior',
     possessedArcher='player',
+    possessedKnight='player',
+    undeadMiner='skeletonWarrior',
 
     darkArrow='arrow',
 }

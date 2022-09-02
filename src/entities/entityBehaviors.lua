@@ -526,5 +526,9 @@ behaviors.AI['golem']=behaviors.AI.pumpkin
 behaviors.AI['spider']=behaviors.AI.pumpkin
 behaviors.AI['bat']=behaviors.AI.pumpkin
 behaviors.AI['zombie']=behaviors.AI.slime
+behaviors.AI['possessedKnight']=behaviors.AI.slime
+behaviors.AI['undeadMiner']=behaviors.AI.possessedArcher
+behaviors.AI['ent']=behaviors.AI.possessedArcher
+behaviors.AI['headlessHorseman']=behaviors.AI.possessedArcher
 
 return behaviors 

@@ -61,6 +61,7 @@ function generateCommonMaths()
     min,max,rnd=math.min,math.max,love.math.random
     pi,cos,sin,atan2=math.pi,math.cos,math.sin,math.atan2
     rndSign=function() local t={-1,1} return t[rnd(2)] end
+    getSign=function(n) if n>0 then return 1 else return -1 end end 
     getAngle=function(s,t) return atan2((t.y-s.y),(t.x-s.x)) end
     getDistance=function(a,b) return ((abs(b.x-a.x))^2+(abs(b.y-a.y))^2)^0.5 end
     getMagnitude=function(a,b) return abs((a^2+b^2)^0.5) end

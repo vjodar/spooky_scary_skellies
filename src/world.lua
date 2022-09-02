@@ -24,13 +24,13 @@ world.collisionFilters={
    allyProjectile=function(item,other)
       local class=other.collisionClass
       if class=='enemy' then return 'touch'
-      elseif class=='solid' then return 'touch'
+      elseif class=='solid' then return 'bounce'
       end
    end,
    enemyProjectile=function(item,other)
       local class=other.collisionClass
       if class=='ally' then return 'touch'
-      elseif class=='solid' then return 'touch'
+      elseif class=='solid' then return 'bounce'
       end
    end,
 }

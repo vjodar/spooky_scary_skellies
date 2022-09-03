@@ -23,6 +23,7 @@ behaviors.methods.common={
             attack='attack',
             moveToPlayer='move',
             moveToTarget='move',
+            moveToLocation='move',
         }
         if self.animations[associatedAnimation[newState]] then 
             self.animations.current=self.animations[associatedAnimation[newState]]
@@ -123,21 +124,25 @@ behaviors.methods.ally={
         if abs(Player.center.x-self.center.x)>Player.allyReturnThreshold.x
         or abs(Player.center.y-self.center.y)>Player.allyReturnThreshold.y
         then
-            --choose an offset from the player's center point
-            local xRange=Player.allyReturnThreshold.x*0.5
-            local yRange=Player.allyReturnThreshold.y*0.5
-            self.nearPlayerLocation={x=rnd(-xRange,yRange),y=rnd(-yRange,yRange)}
-
-            --set moveTarget to Player position offset by nearPlayerLocation 
-            --needs to be a table with a center field to work with self:move()
-            self.moveTarget={center={
-                x=Player.center.x+self.nearPlayerLocation.x,
-                y=Player.center.y+self.nearPlayerLocation.y,
-            }}
+            self:setNearPlayerMoveTarget()
             self:changeState('moveToPlayer')
             return false 
         end
         return true 
+    end,
+
+    setNearPlayerMoveTarget=function(self)
+        --choose an offset from the player's center point
+        local xRange=Player.allyReturnThreshold.x*0.5
+        local yRange=Player.allyReturnThreshold.y*0.5
+        self.nearPlayerLocation={x=rnd(-xRange,yRange),y=rnd(-yRange,yRange)}
+
+        --set moveTarget to Player position offset by nearPlayerLocation 
+        --needs to be a table with a center field to work with self:move()
+        self.moveTarget={center={
+            x=Player.center.x+self.nearPlayerLocation.x,
+            y=Player.center.y+self.nearPlayerLocation.y,
+        }}
     end,
 
     --Gets the closest attack target within LOS from the Player's nearbyEnemies table
@@ -175,12 +180,41 @@ behaviors.methods.enemy={
             y=self.center.y-(self.aggroRange.h*0.5),
             w=self.aggroRange.w,
             h=self.aggroRange.h,
-            filter=World.queryFilters.enemy
+            filter=World.queryFilters.ally
         }    
         local targets=World:queryRect(
             queryData.x,queryData.y,queryData.w,queryData.h,queryData.filter
         )
         return targets
+    end,
+
+    --projects in 8 directions around enemy to find possible locations free of
+    --solid obstructions, then sets one of those to moveTarget
+    setLocationMoveTarget=function(self)
+        local distance=rnd(self.w,self.w*10)
+        local locations={
+            {center={x=self.center.x,y=self.center.y-distance}},
+            {center={x=self.center.x+distance,y=self.center.y-distance}},
+            {center={x=self.center.x+distance,y=self.center.y}},
+            {center={x=self.center.x+distance,y=self.center.y+distance}},
+            {center={x=self.center.x,y=self.center.y+distance}},
+            {center={x=self.center.x-distance,y=self.center.y+distance}},
+            {center={x=self.center.x-distance,y=self.center.y}},
+            {center={x=self.center.x-distance,y=self.center.y-distance}},
+        }
+        local filter=World.queryFilters.solid
+        for i,l in ipairs(locations) do
+            local _,len=World:project(
+                self,self.x,self.y,self.w,self.h,l.center.x,l.center.y,filter
+            )
+            if len>0 then table.remove(locations,i) end
+        end
+        --of the remaining valid locations, choose a random one to set as moveTarget
+        if #locations>0 then 
+            self.moveTarget=locations[rnd(#locations)]
+        else --if no valid locations remain, clear moveTarget (moveTaget=self)
+            self:clearMoveTarget()
+        end
     end,
     
     --Gets the closest attack target within LOS
@@ -247,18 +281,44 @@ behaviors.states.common={
 }
 
 behaviors.states.ally={
-    idle=function(self)
+    idleMelee=function(self)
         self:updateAnimation()
         self:updatePosition()
         if self:remainNearPlayer()==false then return end
 
-        --if target is a living enemy and skeleton can attack or is out of 
-        --range, move toward the target in order to attack.
+        --if target is a living enemy and skeleton can attack,
+        --move toward the target in order to attack.
         if self.moveTarget~=self and self.moveTarget.state~='dead' then 
-            if self.canAttack.flag 
-            or getRectDistance(self,self.moveTarget)>self.attackRange 
-            then self:changeState('moveToTarget') end 
+            if self.canAttack.flag then self:changeState('moveToTarget') end 
             return --return to wait until attack is ready or target dies          
+        end
+    
+        --find and target the nearest enemy
+        if self.canQueryAttackTargets.flag then 
+            self.canQueryAttackTargets.setOnCooldown()
+            self.moveTarget=self:getNearestAllyAttackTarget()
+            if self.moveTarget~=self then 
+                self:changeState('moveToTarget') 
+                return 
+            end
+        end
+    end,
+
+    idleRanged=function(self)
+        self:updateAnimation()
+        self:updatePosition()
+        if self:remainNearPlayer()==false then return end
+
+        --if target is a living enemy, move toward target to attack if attack
+        --is off cooldown, otherwise relocate to another position near player.
+        if self.moveTarget~=self and self.moveTarget.state~='dead' then 
+            if self.canAttack.flag then 
+                self:changeState('moveToTarget')
+            else 
+                self:setNearPlayerMoveTarget()
+                self:changeState('moveToPlayer')        
+            end
+            return
         end
     
         --find and target the nearest enemy
@@ -312,7 +372,7 @@ behaviors.states.ally={
         end 
     
         --reached nearby player location  
-        if getDistance(self.moveTarget.center,self.center)<20 then 
+        if getDistance(self.moveTarget.center,self.center)<self.w then 
             self:clearMoveTarget()
             self:changeState('idle')
             return
@@ -320,7 +380,7 @@ behaviors.states.ally={
 
         --if an enemy is nearby, move to attack it only if skeleton
         --is within 70% of return threshold
-        if self.canQueryAttackTargets.flag then
+        if self.canQueryAttackTargets.flag and self.canAttack.flag then
             self.canQueryAttackTargets.setOnCooldown()
             local nearbyTarget=self:getNearestAllyAttackTarget()
             if nearbyTarget~=self 
@@ -388,17 +448,41 @@ behaviors.states.ally={
 }
 
 behaviors.states.enemy={
-    idle=function(self) 
+    idleMelee=function(self) 
         self:updateAnimation()
         self:updatePosition()
 
-        --if target is a living skeleton and enemy can attack or is out of 
-        --range, move toward the target in order to attack.
+        --if target is a living skeleton and enemy can attack,
+        --move toward the target in order to attack.
+        if self.moveTarget~=self and self.moveTarget.state~='dead' then 
+            if self.canAttack.flag then self:changeState('moveToTarget') end 
+            return --return to wait until attack is ready or target dies          
+        end
+        
+        --find and target the nearest skeleton/player
+        if self.canQueryAttackTargets.flag then
+            self.canQueryAttackTargets.setOnCooldown()
+            self.moveTarget=self:getNearestEnemyAttackTarget()
+            if self.moveTarget~=self then self:changeState('moveToTarget') end
+        end
+    end,
+
+    idleRanged=function(self) 
+        self:updateAnimation()
+        self:updatePosition()
+
+        --if target is a living skeleton, move toward target to attack if attack
+        --is off cooldown, otherwise relocate to a different position.
         if self.moveTarget~=self and self.moveTarget.state~='dead' then 
             if self.canAttack.flag 
-            or getRectDistance(self,self.moveTarget)>self.attackRange 
-            then self:changeState('moveToTarget') end 
-            return --return to wait until attack is ready or target dies          
+            and getRectDistance(self,self.moveTarget)>self.attackRange 
+            then 
+                self:changeState('moveToTarget') 
+            else 
+                self:setLocationMoveTarget()
+                self:changeState('moveToLocation') 
+            end
+            return         
         end
         
         --find and target the nearest skeleton/player
@@ -432,6 +516,31 @@ behaviors.states.enemy={
             if self.canAttack.flag then self:changeState('attack') return 
             else self:changeState('idle') return 
             end  
+        end
+
+        self:move()
+    end,
+
+    moveToLocation=function(self)
+        self:updateAnimation()
+        self:updatePosition()
+
+        --reached nearby location  
+        if getDistance(self.moveTarget.center,self.center)<self.w then 
+            self:clearMoveTarget()
+            self:changeState('idle')
+            return
+        end
+
+        --continue checking for targets if attack is off cooldown
+        if self.canQueryAttackTargets.flag and self.canAttack.flag then
+            self.canQueryAttackTargets.setOnCooldown()
+            local nearbyTarget=self:getNearestEnemyAttackTarget()
+            if nearbyTarget~=self then 
+                self.moveTarget=nearbyTarget 
+                self:changeState('moveToTarget')
+                return
+            end 
         end
 
         self:move()
@@ -484,7 +593,7 @@ behaviors.states.enemy={
 behaviors.AI={ --AI--------------------------------------------------------------------------------
     ['skeletonWarrior']={
         raise=behaviors.states.common.raise,
-        idle=behaviors.states.ally.idle,
+        idle=behaviors.states.ally.idleMelee,
         moveToPlayer=behaviors.states.ally.moveToPlayer,
         moveToTarget=behaviors.states.ally.moveToTarget,
         attack=behaviors.states.ally.lunge,
@@ -492,7 +601,7 @@ behaviors.AI={ --AI-------------------------------------------------------------
     },
     ['skeletonArcher']={
         raise=behaviors.states.common.raise,
-        idle=behaviors.states.ally.idle,
+        idle=behaviors.states.ally.idleRanged,
         moveToPlayer=behaviors.states.ally.moveToPlayer,
         moveToTarget=behaviors.states.ally.moveToTarget,
         attack=behaviors.states.common.shoot,
@@ -500,20 +609,21 @@ behaviors.AI={ --AI-------------------------------------------------------------
     },
     ['slime']={
         raise=behaviors.states.common.raise,
-        idle=behaviors.states.enemy.idle,
+        idle=behaviors.states.enemy.idleMelee,
         moveToTarget=behaviors.states.enemy.moveToTarget,
         attack=behaviors.states.enemy.lunge,
         dead=behaviors.states.common.dead,
     },
     ['pumpkin']={
-        idle=behaviors.states.enemy.idle,
+        idle=behaviors.states.enemy.idleMelee,
         moveToTarget=behaviors.states.enemy.moveToTarget,
         attack=behaviors.states.enemy.lunge,
         dead=behaviors.states.common.dead,
     },
     ['possessedArcher']={
-        idle=behaviors.states.enemy.idle,
+        idle=behaviors.states.enemy.idleRanged,
         moveToTarget=behaviors.states.enemy.moveToTarget,
+        moveToLocation=behaviors.states.enemy.moveToLocation,
         attack=behaviors.states.common.shoot,
         dead=behaviors.states.common.dead,
     },

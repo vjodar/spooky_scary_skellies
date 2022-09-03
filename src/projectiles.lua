@@ -85,9 +85,9 @@ local projectileDefinitions=function()
     }
 end
 
-local projectileSprites=function(defs)
+local projectileSprites=function()
     local sprites={}
-    for p,def in pairs(defs) do 
+    for p,def in pairs(projectileDefinitions()) do 
         local path='assets/projectiles/'..def.name..'.png'
         sprites[p]=love.graphics.newImage(path)
     end
@@ -338,53 +338,54 @@ local projectileDrawFunctions=function()
     return drawFunctions
 end
 
-local projectiles={}
-projectiles.definitions=projectileDefinitions()
-projectiles.sprites=projectileSprites(projectiles.definitions)
-projectiles.onHitFunctions=projectileOnHitFunctions()
-projectiles.updateFunctions=projectileUpdateFunctions()
-projectiles.drawFunctions=projectileDrawFunctions()
+--Module
+return {
+    definitions=projectileDefinitions(),
+    sprites=projectileSprites(),
+    onHitFunctions=projectileOnHitFunctions(),
+    updateFunctions=projectileUpdateFunctions(),
+    drawFunctions=projectileDrawFunctions(),
 
-function projectiles:new(args) --args={x,y,name,attackDamage,knockback,yOffset}
-    local def=self.definitions[args.name]
-    local p={name=def.name} --projectile
-
-    --Collider Data
-    p.x,p.y=args.x,args.y 
-    p.w,p.h=def.collider.w,def.collider.h
-    p.center=getCenter(p)
-    p.collisionClass=def.collider.class
-    p.filter=World.collisionFilters[p.collisionClass]
-
-    --General data
-    p.angle=args.angle
-    p.attackDamage=args.attackDamage
-    p.knockback=args.knockback
-    p.rotation=rnd()*pi
-    p.moveSpeed=def.moveSpeed
-    p.explosionRadius=def.explosionRadius or nil
-    p.remainingTravelTime=(200/def.moveSpeed)*4 --2sec per 100units/sec
-
-    --Draw data
-    p.sprite=self.sprites[def.name]
-    p.xOffset=p.w*0.5
-    p.yOffset=p.h*0.5+args.yOffset
-    p.xOrigin=p.sprite:getWidth()*0.5
-    p.yOrigin=p.sprite:getHeight()*0.5
-    p.shadow=Shadows:new(def.name,p.w,p.h)
-
-    --Methods (update and draw)
-    p.onHit=self.onHitFunctions[p.name] or self.onHitFunctions.base 
-    p.update=self.updateFunctions[p.name] or self.updateFunctions.base
-    p.draw=self.drawFunctions[p.name] or self.drawFunctions.base
-
-    --Set initial/launch velocity
-    p.vx=cos(p.angle)*p.moveSpeed 
-    p.vy=sin(p.angle)*p.moveSpeed
+    --constructor
+    new=function(self,args) --args={x,y,name,attackDamage,knockback,yOffset} 
+        local def=self.definitions[args.name]
+        local p={name=def.name} --projectile
     
-    World:addItem(p)
-    table.insert(Objects.table,p)
-    return p
-end
-
-return projectiles
+        --Collider Data
+        p.x,p.y=args.x,args.y 
+        p.w,p.h=def.collider.w,def.collider.h
+        p.center=getCenter(p)
+        p.collisionClass=def.collider.class
+        p.filter=World.collisionFilters[p.collisionClass]
+    
+        --General data
+        p.angle=args.angle
+        p.attackDamage=args.attackDamage
+        p.knockback=args.knockback
+        p.rotation=rnd()*pi
+        p.moveSpeed=def.moveSpeed
+        p.explosionRadius=def.explosionRadius or nil
+        p.remainingTravelTime=(200/def.moveSpeed)*4 --2sec per 100units/sec
+    
+        --Draw data
+        p.sprite=self.sprites[def.name]
+        p.xOffset=p.w*0.5
+        p.yOffset=p.h*0.5+args.yOffset
+        p.xOrigin=p.sprite:getWidth()*0.5
+        p.yOrigin=p.sprite:getHeight()*0.5
+        p.shadow=Shadows:new(def.name,p.w,p.h)
+    
+        --Methods (update and draw)
+        p.onHit=self.onHitFunctions[p.name] or self.onHitFunctions.base 
+        p.update=self.updateFunctions[p.name] or self.updateFunctions.base
+        p.draw=self.drawFunctions[p.name] or self.drawFunctions.base
+    
+        --Set initial/launch velocity
+        p.vx=cos(p.angle)*p.moveSpeed 
+        p.vy=sin(p.angle)*p.moveSpeed
+        
+        World:addItem(p)
+        table.insert(Objects.table,p)
+        return p
+    end,
+}

@@ -27,7 +27,7 @@ function love.load()
     Shadows=require 'src/shadows'
     Player=require 'src/player'
     Entities=require 'src/entities/entityClass'
-    Projectiles=require 'src/projectiles'    
+    Projectiles=require 'src/projectiles' 
     
     table.insert(gameStates,Controls) --controls first
     table.insert(gameStates,Timer) --timer second

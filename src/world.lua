@@ -36,14 +36,9 @@ world.collisionFilters={
 }
 
 world.queryFilters={
-   ally=function(item) 
-      local class=item.collisionClass 
-      if class=='enemy' then return true end 
-   end,
-   enemy=function(item) 
-      local class=item.collisionClass 
-      if class=='ally' then return true end
-   end,
+   ally=function(item) return item.collisionClass=='ally' end,
+   enemy=function(item) return item.collisionClass=='enemy' end,
+   solid=function(item) return item.collisionClass=='solid' end
 }
 
 return world

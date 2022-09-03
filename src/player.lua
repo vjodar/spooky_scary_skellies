@@ -156,7 +156,7 @@ function player:queryForEnemies()
         y=self.center.y-(self.aggroRange.h*0.5),
         w=self.aggroRange.w,
         h=self.aggroRange.h,
-        filter=World.queryFilters.ally 
+        filter=World.queryFilters.enemy 
     }    
     local targets=World:queryRect(
         queryData.x,queryData.y,queryData.w,queryData.h,queryData.filter

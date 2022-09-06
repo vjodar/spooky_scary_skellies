@@ -115,6 +115,10 @@ behaviors.methods.common={
     onFiringFrame=function(self)
         return self.animations.current.position==self.firingFrame
     end, 
+
+    onSpawnMinionFrame=function(self)
+        return self.animations.current.position==self.spawnMinionFrame
+    end,
 }
 
 behaviors.methods.ally={
@@ -588,6 +592,17 @@ behaviors.states.enemy={
             end  
         end
     end,
+
+    spawnMinion=function(self)
+        self:updatePosition()
+        local onLoop=self:updateAnimation()
+        if onLoop then self:changeState('idle') end 
+
+        if self.canAttack.flag and self:onSpawnMinionFrame() then
+            self.canAttack.setOnCooldown()
+            Entities:new(self.minion.name,self.center.x,self.center.y)
+        end        
+    end,
 }
 
 behaviors.AI={ --AI--------------------------------------------------------------------------------
@@ -627,6 +642,13 @@ behaviors.AI={ --AI-------------------------------------------------------------
         attack=behaviors.states.common.shoot,
         dead=behaviors.states.common.dead,
     },
+    ['slimeMatron']={
+        idle=behaviors.states.enemy.idleRanged,
+        moveToTarget=behaviors.states.enemy.moveToTarget,
+        moveToLocation=behaviors.states.enemy.moveToLocation,
+        attack=behaviors.states.enemy.spawnMinion,
+        dead=behaviors.states.common.dead,
+    }
 }
 --shared AI
 behaviors.AI['skeletonMageFire']=behaviors.AI.skeletonArcher
@@ -640,5 +662,6 @@ behaviors.AI['possessedKnight']=behaviors.AI.slime
 behaviors.AI['undeadMiner']=behaviors.AI.possessedArcher
 behaviors.AI['ent']=behaviors.AI.possessedArcher
 behaviors.AI['headlessHorseman']=behaviors.AI.possessedArcher
+behaviors.AI['vampire']=behaviors.AI.slimeMatron
 
 return behaviors 

@@ -183,9 +183,9 @@ local projectileOnHitFunctions=function()
                     y=self.y-self.explosionRadius*0.5,
                     w=self.explosionRadius,h=self.explosionRadius
                 }
-                local filter=World.queryFilters.ally
+                local filter=World.queryFilters.enemy
                 if self.collisionClass=='enemyProjectile' then 
-                    filter=World.queryFilters.enemy
+                    filter=World.queryFilters.ally
                 end
                 local targets=World:queryRect(
                     queryData.x,queryData.y,queryData.w,queryData.h,filter

@@ -20,6 +20,7 @@ local shadowNames={
     'undeadMiner',
     'ent',
     'headlessHorseman',
+    'vampire',
 
     --projectiles
     'arrow',
@@ -41,10 +42,11 @@ local sharedSprites={
 
     spider='pumpkin',
     zombie='skeletonWarrior',
+    undeadMiner='skeletonWarrior',
     possessedArcher='player',
     possessedKnight='player',
-    undeadMiner='skeletonWarrior',
-
+    vampire='player',
+    
     darkArrow='arrow',
 }
 

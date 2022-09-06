@@ -75,12 +75,13 @@ function entityClass:new(entity,x,y) --constructor
     e.health={current=def.health,max=def.health}
     e.moveSpeed=def.moveSpeed
     e.attackRange=def.attackRange
-    e.attackDamage=def.attackDamage
-    e.knockback=def.knockback
+    e.attackDamage=def.attackDamage or nil
+    e.knockback=def.knockback or nil
     e.kbResistance=def.kbResistance or 0
     e.lungeForce=def.lungeForce or nil
     e.projectile=def.projectile or nil
     e.projectilesPerShot=def.projectilesPerShot or 1
+    e.minion=def.minion or nil
     e.moveTarget=e
     e.angle=0
     e.aggroRange={w=1000,h=750}
@@ -98,6 +99,7 @@ function entityClass:new(entity,x,y) --constructor
     e.animSpeed={min=0.25,max=3,current=1}
     e.damagingFrames=def.animations.attack.damagingFrames or nil 
     e.firingFrame=def.animations.attack.firingFrame or nil
+    e.spawnMinionFrame=def.animations.attack.spawnMinionFrame or nil
 
     --Shadow
     e.shadow=Shadows:new(e.name,e.w,e.h)

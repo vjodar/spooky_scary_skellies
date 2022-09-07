@@ -246,6 +246,46 @@ behaviors.methods.enemy={
         end
         return closest.t
     end,
+
+    spawnMinions=function(self)
+        local spawnPoint=self.minion.spawnPoint or 'center'
+        local minionName=self.minion.name
+        local count=self.minion.count or 1
+        local minionDimensions=Entities.definitions[minionName].collider
+        local minionCenter={
+            x=minionDimensions.w*0.5,
+            y=minionDimensions.h*0.5
+        }
+        
+        --spawn minion in center of spawner (with small deviation for natural
+        --spread when multiple minions spawn at once)
+        if spawnPoint=='center' then 
+            local x=self.center.x-minionCenter.x
+            local y=self.center.y-minionCenter.y
+            for i=1,count do Entities:new(minionName,x+rnd()-0.5,y+rnd()-0.5) end
+            return 
+        end
+
+        --spawn minion toward direction spawner is facing
+        if spawnPoint=='facing' then 
+            local x=self.scaleX==1 and self.x+self.w-minionCenter.x or self.x-minionCenter.x
+            local y=self.center.y-minionDimensions.h*0.5
+            for i=1,count do Entities:new(minionName,x,y) end
+            return 
+        end
+
+        --spawn minion at a random point around the spawner
+        if spawnPoint=='random' then 
+            for i=1,count do 
+                local angle=rnd()*pi*2
+                local distance=rnd()*self.w*2 
+                local x=self.center.x+(cos(angle)*distance)
+                local y=self.center.y+(sin(angle)*distance)
+                Entities:new(minionName,x,y) 
+            end
+            return 
+        end
+    end,
 }
 
 behaviors.states={} --States-----------------------------------------------------------------------
@@ -497,6 +537,19 @@ behaviors.states.enemy={
         end
     end,
 
+    idleStationary=function(self)
+        self:updateAnimation()
+        self:updatePosition('noTurn')
+
+        if self.canQueryAttackTargets.flag then 
+            self.canQueryAttackTargets.setOnCooldown()
+            self.target=self:getNearestEnemyAttackTarget()
+            if self.target~=self 
+            and getRectDistance(self,self.target)<self.attackRange 
+            then self:changeState('attack') end 
+        end
+    end,
+
     moveToTarget=function(self) 
         self:updateAnimation()
         self:updatePosition()
@@ -597,11 +650,25 @@ behaviors.states.enemy={
         self:updatePosition()
         local onLoop=self:updateAnimation()
         if onLoop then self:changeState('idle') end 
-
+        
         if self.canAttack.flag and self:onSpawnMinionFrame() then
             self.canAttack.setOnCooldown()
-            Entities:new(self.minion.name,self.center.x,self.center.y)
+            self:spawnMinions()
         end        
+    end,
+
+    spawnSpiders=function(self)
+        self:updatePosition()
+        self:updateAnimation()
+        if self.attackTime==nil then 
+            self.attackTime=dt 
+        else 
+            self.attackTime=self.attackTime+dt 
+            if self.attackTime>2 then 
+                self:spawnMinions()
+                self:die()
+            end
+        end    
     end,
 }
 
@@ -648,7 +715,18 @@ behaviors.AI={ --AI-------------------------------------------------------------
         moveToLocation=behaviors.states.enemy.moveToLocation,
         attack=behaviors.states.enemy.spawnMinion,
         dead=behaviors.states.common.dead,
-    }
+    },
+    ['tombstone']={
+        raise=behaviors.states.common.raise,
+        idle=behaviors.states.enemy.idleStationary,
+        attack=behaviors.states.enemy.spawnMinion,
+        dead=behaviors.states.common.dead,
+    },
+    ['spiderEgg']={
+        idle=behaviors.states.enemy.idleStationary,
+        attack=behaviors.states.enemy.spawnSpiders,
+        dead=behaviors.states.common.dead,
+    },
 }
 --shared AI
 behaviors.AI['skeletonMageFire']=behaviors.AI.skeletonArcher

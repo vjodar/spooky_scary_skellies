@@ -94,7 +94,7 @@ function entityClass:new(entity,x,y) --constructor
     e.yOffset=(e.h-def.drawData.frameHeight)*0.5
     e.xOrigin=def.drawData.frameWidth*0.5
     e.yOrigin=def.drawData.frameHeight*0.5
-    e.scaleX=rndSign() --used to face right (1) or left (-1)
+    e.scaleX=def.drawData.scaleX or rndSign() --used to face right (1) or left (-1)
     e.animations=self.parseAnimations(self.grids[e.name],def.animations)
     e.animSpeed={min=0.25,max=3,current=1}
     e.damagingFrames=def.animations.attack.damagingFrames or nil 

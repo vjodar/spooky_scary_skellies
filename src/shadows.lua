@@ -21,6 +21,8 @@ local shadowNames={
     'ent',
     'headlessHorseman',
     'vampire',
+    'tombstone',
+    'spiderEgg',
 
     --projectiles
     'arrow',

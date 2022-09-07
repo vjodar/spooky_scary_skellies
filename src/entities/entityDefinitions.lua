@@ -682,7 +682,7 @@ return {
         moveSpeed=10*60,     
         attackRange=130,  
         attackPeriod=5, 
-        minion={name='slime'},
+        minion={name='slime',spawnPoint='facing'},
         health=5,
         collider={
             w=14,
@@ -717,7 +717,7 @@ return {
         moveSpeed=14*60,     
         attackRange=160,  
         attackPeriod=3, 
-        minion={name='bat'},
+        minion={name='bat',count=2,spawnPoint='facing'},
         health=5,
         collider={
             w=12,
@@ -744,6 +744,75 @@ return {
                 row=2,
                 duration={['1-8']=0.05,[9]=0.2,[10]=0.4,['11-18']=0.05},
                 spawnMinionFrame=10,
+            },
+        },
+    },
+    ['tombstone']={
+        name='tombstone',
+        moveSpeed=0,     
+        attackRange=100,  
+        attackPeriod=5, 
+        minion={name='zombie',spawnPoint='random'},
+        health=5,
+        kbResistance=100,
+        startState='raise',
+        collider={
+            w=19,
+            h=5,
+            class='enemy',
+        },
+        drawData={
+            altSpriteSheets={'tombstone_2','tombstone_3','tombstone_4'},
+            frameWidth=19,
+            frameHeight=20,
+            scaleX=1,
+        },
+        animations={
+            raise={
+                frames='1-7',
+                row=1,
+                duration=0.1,
+            },
+            idle={
+                frames=7,
+                row=1,
+                duration=10,
+            },
+            attack={
+                frames=7,
+                row=1,
+                duration=0.1,
+                spawnMinionFrame=1,
+            },
+        },
+    },
+    ['spiderEgg']={
+        name='spiderEgg',
+        moveSpeed=0,     
+        attackRange=120,  
+        attackPeriod=5, 
+        minion={name='spider',count=3},
+        health=5,
+        kbResistance=100,
+        collider={
+            w=20,
+            h=8,
+            class='enemy',
+        },
+        drawData={
+            frameWidth=20,
+            frameHeight=13,
+        },
+        animations={
+            idle={
+                frames=1,
+                row=1,
+                duration=10,
+            },
+            attack={
+                frames='1-8',
+                row=1,
+                duration=0.05,
             },
         },
     },

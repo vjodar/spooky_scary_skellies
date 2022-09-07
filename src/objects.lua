@@ -15,10 +15,10 @@ end
 
 function objects:draw() 
     for i=1, #self.table do 
+        --testing----------------------------------
+        World:drawItem(self.table[i])
+        --testing----------------------------------
         self.table[i]:draw() 
-        --testing----------------------------------
-        -- World:drawItem(self.table[i])
-        --testing----------------------------------
     end
 end
 

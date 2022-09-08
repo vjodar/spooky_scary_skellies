@@ -1,27 +1,22 @@
-local objects={}
-objects.table={} --holds all objects
-objects.ySort=function(obj1,obj2) return obj1.y<obj2.y end --sort function
+return {
+    table={}, --holds all objects
+    ySort=function(obj1,obj2) return obj1.y<obj2.y end, --sort function
+    update=function(self)
+        --sort objects by y-position to provide semi-3D perspective.
+        table.sort(self.table,self.ySort)
 
-function objects:update()     
-    --update object. If it returns false, remove it from table
-    for i,obj in ipairs(self.table) do 
-        if obj:update()==false then table.remove(self.table,i) end
-    end
-    
-    --sort objects by y-position to provide semi-3D perspective.
-    --sort after updating to preserve non-deterministic collision priority.
-    table.sort(self.table,self.ySort)
-end
-
-function objects:draw() 
-    for i=1, #self.table do 
-        --testing----------------------------------
-        World:drawItem(self.table[i])
-        --testing----------------------------------
-        self.table[i]:draw() 
-    end
-end
-
-function objects:clear() self.table={} end 
-
-return objects
+        --update object. If it returns false, remove it from table
+        for i,obj in ipairs(self.table) do 
+            if obj:update()==false then table.remove(self.table,i) end
+        end  
+    end,
+    draw=function(self)
+        for i=1, #self.table do 
+            --testing----------------------------------
+            World:drawItem(self.table[i])
+            --testing----------------------------------
+            self.table[i]:draw() 
+        end        
+    end,
+    clear=function(self) self.table={} end,
+}

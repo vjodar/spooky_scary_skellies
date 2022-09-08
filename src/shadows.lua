@@ -1,28 +1,31 @@
 local shadowNames={
     --player and skeletons
-    'player',
-    'skeletonWarrior',
-    'skeletonArcher',
+    'player',               --12x7
+    'skeletonWarrior',      --10x6
+    'skeletonArcher', 
     'skeletonMageFire',
     'skeletonMageIce',
     'skeletonMageElectric',
 
     --enemies
-    'slime',
-    'pumpkin',
-    'golem',
-    'spider',
-    'slimeMatron',
-    'bat',
+    'slime',                --11x5
+    'pumpkin',              
+    'golem',                --14x8
+    'spider',               
+    'slimeMatron',          --14x5
+    'bat',                  --6x4
     'zombie',
     'possessedArcher',
     'possessedKnight',
     'undeadMiner',
-    'ent',
-    'headlessHorseman',
+    'ent',                  --16x9
+    'headlessHorseman',     --25x10
     'vampire',
-    'tombstone',
-    'spiderEgg',
+    'tombstone',            --19x5
+    'spiderEgg',            --20x8
+    'imp',                  --9,6
+    'gnasherDemon',
+    'frankenstein',         --20x11
 
     --projectiles
     'arrow',
@@ -34,6 +37,7 @@ local shadowNames={
     'pickaxe',
     'apple',
     'jack-o-lantern',
+    'blueSpark',
 }
 
 local sharedSprites={
@@ -42,14 +46,17 @@ local sharedSprites={
     skeletonMageIce='skeletonWarrior',
     skeletonMageElectric='skeletonWarrior',
 
-    spider='pumpkin',
+    pumpkin='player',
+    spider='player',
     zombie='skeletonWarrior',
     undeadMiner='skeletonWarrior',
     possessedArcher='player',
     possessedKnight='player',
     vampire='player',
+    gnasherDemon='player',
     
     darkArrow='arrow',
+    blueSpark='spark',
 }
 
 local generateShadowSprites=function()

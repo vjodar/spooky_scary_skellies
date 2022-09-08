@@ -13,9 +13,15 @@ player.filter=World.collisionFilters[player.collisionClass]
 
 --General Data
 player.health={current=100,max=100}
+player.kbResistance=0
+player.attack={
+    period=0.5, 
+    damage=1,
+    knockback=400,
+    projectile={name='bone',yOffset=-10},    
+}
 player.nearbyEnemies={}
 player.aggroRange={w=600,h=450}
-player.attackPeriod=0.5
 player.allyReturnThreshold={x=220,y=150} --distance from player before skeletons run back
 
 --Draw data
@@ -41,7 +47,7 @@ player.scaleX=1 --used to flip sprites horizontally
 player.canTurn={flag=true,cooldownPeriod=0.2}
 Timer:giveCooldownCallbacks(player.canTurn)
 
-player.canAttack={flag=true,cooldownPeriod=player.attackPeriod}
+player.canAttack={flag=true,cooldownPeriod=player.attack.period}
 Timer:giveCooldownCallbacks(player.canAttack)
 
 player.canQueryAttackTargets={flag=true,cooldownPeriod=0.5}
@@ -165,10 +171,12 @@ function player:queryForEnemies()
 end
 
 function player:takeDamage(source)
-    local hp=self.health.current 
-    local damage=source.attackDamage or 0 
-    local knockback=source.knockback or 0
+    local damage=source.attack.damage  
+    local knockback=source.attack.knockback
+    knockback=knockback-knockback*(self.kbResistance/100)
+
     local kbAngle=getAngle(source.center,self.center)
+    local hp=self.health.current 
     
     hp=max(0,hp-damage)
     self.health.current=hp
@@ -184,8 +192,9 @@ function player:launchBone()
     local mouseX,mouseY=Controls.getMousePosition()
     Projectiles:new({
         x=self.center.x,y=self.center.y,name='bone',
-        attackDamage=1,knockback=500,
-        angle=getAngle(self.center,{x=mouseX,y=mouseY}),yOffset=-10
+        damage=self.attack.damage,knockback=self.attack.knockback,
+        angle=getAngle(self.center,{x=mouseX,y=mouseY}),
+        yOffset=self.attack.projectile.yOffset
     })
 
     --testing-----------------------------------------------

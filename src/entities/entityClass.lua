@@ -49,14 +49,25 @@ local chooseSpriteSheet=function(def)
     end
 end
 
+--returns a copy of a table complete with sub-tables
+local recursiveCopy=function(self,t)
+    local copy={}
+    for i,v in pairs(t) do 
+        if type(v)=='table' then copy[i]=self:recursiveCopy(v) 
+        else copy[i]=v 
+        end
+    end
+    return copy 
+end
+
 local entityClass={}
 entityClass.definitions=require 'src/entities/entityDefinitions'
 entityClass.behaviors=require 'src/entities/entityBehaviors'
 entityClass.spriteSheets,entityClass.grids=sheetsAndGrids(entityClass.definitions)
 entityClass.parseAnimations=parseAnimations 
 entityClass.chooseSpriteSheet=chooseSpriteSheet
-
-function entityClass:new(entity,x,y) --constructor
+entityClass.recursiveCopy=recursiveCopy
+entityClass.new=function(self,entity,x,y) --constructor
     local def=self.definitions[entity]    
     local e={name=def.name}
 
@@ -74,14 +85,8 @@ function entityClass:new(entity,x,y) --constructor
     --General data
     e.health={current=def.health,max=def.health}
     e.moveSpeed=def.moveSpeed
-    e.attackRange=def.attackRange
-    e.attackDamage=def.attackDamage or nil
-    e.knockback=def.knockback or nil
     e.kbResistance=def.kbResistance or 0
-    e.lungeForce=def.lungeForce or nil
-    e.projectile=def.projectile or nil
-    e.projectilesPerShot=def.projectilesPerShot or 1
-    e.minion=def.minion or nil
+    e.attack=self:recursiveCopy(def.attack)
     e.moveTarget=e
     e.angle=0
     e.aggroRange={w=1000,h=750}
@@ -105,7 +110,7 @@ function entityClass:new(entity,x,y) --constructor
     e.shadow=Shadows:new(e.name,e.w,e.h)
 
     --Cooldown flags, periods, and callbacks
-    e.canAttack={flag=true,cooldownPeriod=def.attackPeriod}
+    e.canAttack={flag=true,cooldownPeriod=def.attack.period}
     Timer:giveCooldownCallbacks(e.canAttack)
 
     e.canQueryAttackTargets={flag=true,cooldownPeriod=0.5}

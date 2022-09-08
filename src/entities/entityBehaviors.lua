@@ -79,9 +79,9 @@ behaviors.methods.common={
     end,
 
     takeDamage=function(self,source)
-        local damage=source.attackDamage or 0 
+        local damage=source.attack.damage
+        local knockback=source.attack.knockback
         local kbAngle=getAngle(source.center,self.center)
-        local knockback=source.knockback or 0
         knockback=knockback-knockback*(self.kbResistance/100)
         
         self.health.current=max(self.health.current-damage,0)
@@ -248,9 +248,9 @@ behaviors.methods.enemy={
     end,
 
     spawnMinions=function(self)
-        local spawnPoint=self.minion.spawnPoint or 'center'
-        local minionName=self.minion.name
-        local count=self.minion.count or 1
+        local spawnPoint=self.attack.minion.spawnPoint or 'center'
+        local minionName=self.attack.minion.name
+        local count=self.attack.minion.count or 1
         local minionDimensions=Entities.definitions[minionName].collider
         local minionCenter={
             x=minionDimensions.w*0.5,
@@ -308,15 +308,20 @@ behaviors.states.common={
         if self.canAttack.flag and self:onFiringFrame() then
             self.canAttack.setOnCooldown()
             local projectile={
-                name=self.projectile.name,
-                x=self.center.x+self.projectile.xOffset*self.scaleX,
-                y=self.center.y,yOffset=self.projectile.yOffset
+                name=self.attack.projectile.name,
+                x=self.center.x+self.attack.projectile.xOffset*self.scaleX,
+                y=self.center.y,yOffset=self.attack.projectile.yOffset
             }
-            local angleToTarget=getAngle(projectile,self.moveTarget.center)
-            for i=1,self.projectilesPerShot do
+            local count=self.attack.projectile.count or 1
+            local spread=self.attack.projectile.spread or 0
+            for i=1,count do
+                local angleToTarget=getAngle(projectile,self.moveTarget.center)
+                if spread~=0 then 
+                    angleToTarget=angleToTarget+(rnd()*spread-spread*0.5)
+                end
                 Projectiles:new({
                     x=projectile.x,y=projectile.y,name=projectile.name,
-                    attackDamage=self.attackDamage,knockback=self.knockback,
+                    damage=self.attack.damage,knockback=self.attack.knockback,
                     angle=angleToTarget,yOffset=projectile.yOffset
                 })
             end
@@ -395,7 +400,7 @@ behaviors.states.ally={
             if self.moveTarget==self then self:changeState('idle') return end
         end
     
-        if getRectDistance(self,self.moveTarget)<self.attackRange then             
+        if getRectDistance(self,self.moveTarget)<self.attack.range then             
             if self.canAttack.flag then self:changeState('attack') return 
             else self:changeState('idle') return
             end
@@ -458,8 +463,8 @@ behaviors.states.ally={
         if self:onDamagingFrames() then
             if self.canAttack.flag then 
                 self.canAttack.setOnCooldown()
-                local fx=cos(self.angle)*self.lungeForce
-                local fy=sin(self.angle)*self.lungeForce
+                local fx=cos(self.angle)*self.attack.lungeForce
+                local fy=sin(self.angle)*self.attack.lungeForce
                 self.vx=self.vx+fx
                 self.vy=self.vy+fy  
             end
@@ -519,7 +524,7 @@ behaviors.states.enemy={
         --is off cooldown, otherwise relocate to a different position.
         if self.moveTarget~=self and self.moveTarget.state~='dead' then 
             if self.canAttack.flag 
-            and getRectDistance(self,self.moveTarget)>self.attackRange 
+            and getRectDistance(self,self.moveTarget)>self.attack.range 
             then 
                 self:changeState('moveToTarget') 
             else 
@@ -545,7 +550,7 @@ behaviors.states.enemy={
             self.canQueryAttackTargets.setOnCooldown()
             self.target=self:getNearestEnemyAttackTarget()
             if self.target~=self 
-            and getRectDistance(self,self.target)<self.attackRange 
+            and getRectDistance(self,self.target)<self.attack.range 
             then self:changeState('attack') end 
         end
     end,
@@ -569,7 +574,7 @@ behaviors.states.enemy={
         end
         
         --if target is within attack range, attack. Otherwise move toward it
-        if getRectDistance(self,self.moveTarget)<self.attackRange then 
+        if getRectDistance(self,self.moveTarget)<self.attack.range then 
             if self.canAttack.flag then self:changeState('attack') return 
             else self:changeState('idle') return 
             end  
@@ -614,8 +619,8 @@ behaviors.states.enemy={
         if self:onDamagingFrames() then 
             if self.canAttack.flag then 
                 self.canAttack.setOnCooldown()
-                local fx=cos(self.angle)*self.lungeForce
-                local fy=sin(self.angle)*self.lungeForce
+                local fx=cos(self.angle)*self.attack.lungeForce
+                local fy=sin(self.angle)*self.attack.lungeForce
                 self.vx=self.vx+fx
                 self.vy=self.vy+fy        
             end 
@@ -741,5 +746,8 @@ behaviors.AI['undeadMiner']=behaviors.AI.possessedArcher
 behaviors.AI['ent']=behaviors.AI.possessedArcher
 behaviors.AI['headlessHorseman']=behaviors.AI.possessedArcher
 behaviors.AI['vampire']=behaviors.AI.slimeMatron
+behaviors.AI['imp']=behaviors.AI.pumpkin
+behaviors.AI['gnasherDemon']=behaviors.AI.pumpkin
+behaviors.AI['frankenstein']=behaviors.AI.possessedArcher
 
 return behaviors 

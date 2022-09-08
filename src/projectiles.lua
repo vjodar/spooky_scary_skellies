@@ -82,6 +82,15 @@ local projectileDefinitions=function()
                 class='enemyProjectile',
             },
         },
+        ['blueSpark']={
+            name='blueSpark',
+            moveSpeed=150,
+            collider={
+                w=3,
+                h=3,
+                class='enemyProjectile',
+            },
+        },
     }
 end
 
@@ -201,13 +210,14 @@ local projectileOnHitFunctions=function()
     }
 
     onHitFunctions['jack-o-lantern']=onHitFunctions.explode
+    onHitFunctions['blueSpark']=onHitFunctions.spark
 
     return onHitFunctions
 end
 
 --Defining how a projectile travels.
 local projectileUpdateFunctions=function()
-    return {
+    local updateFunctions={
 
         --Travel in a straight line until hitting an target, solid wall, or expiring.
         ['base']=function(self)
@@ -276,8 +286,11 @@ local projectileUpdateFunctions=function()
             --handle collisions
             for i=1,#cols do return self:onHit(cols[i].other,cols[i].touch) end
         end,
-
     }
+
+    updateFunctions['blueSpark']=updateFunctions.spark
+
+    return updateFunctions
 end
 
 --Defining how a projectile is drawn
@@ -334,6 +347,7 @@ local projectileDrawFunctions=function()
     }
     drawFunctions['pickaxe']=drawFunctions.bone
     drawFunctions['jack-o-lantern']=drawFunctions.apple
+    drawFunctions['blueSpark']=drawFunctions.spark 
 
     return drawFunctions
 end
@@ -347,7 +361,7 @@ return {
     drawFunctions=projectileDrawFunctions(),
 
     --constructor
-    new=function(self,args) --args={x,y,name,attackDamage,knockback,yOffset} 
+    new=function(self,args) --args={x,y,name,damage,knockback,yOffset} 
         local def=self.definitions[args.name]
         local p={name=def.name} --projectile
     
@@ -360,10 +374,12 @@ return {
     
         --General data
         p.angle=args.angle
-        p.attackDamage=args.attackDamage
-        p.knockback=args.knockback
         p.rotation=rnd()*pi
         p.moveSpeed=def.moveSpeed
+        p.attack={
+            damage=args.damage,
+            knockback=args.knockback
+        } 
         p.explosionRadius=def.explosionRadius or nil
         p.remainingTravelTime=(200/def.moveSpeed)*4 --2sec per 100units/sec
     

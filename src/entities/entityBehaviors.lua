@@ -41,7 +41,7 @@ behaviors.methods.common={
     updatePosition=function(self)
         local goalX=self.x+self.vx*dt 
         local goalY=self.y+self.vy*dt 
-        local realX,realY,cols,len=World:move(self,goalX,goalY,self.filter)
+        local realX,realY,cols,len=World:move(self,goalX,goalY,self.moveFilter)
         self.x,self.y=realX,realY 
         self.center=getCenter(self)
 
@@ -78,10 +78,10 @@ behaviors.methods.common={
         return self.animations.current:update(dt*self.animSpeed.current)
     end,
 
-    takeDamage=function(self,source)
+    takeDamage=function(self,source,angle)
         local damage=source.attack.damage
         local knockback=source.attack.knockback
-        local kbAngle=getAngle(source.center,self.center)
+        local kbAngle=angle or getAngle(source.center,self.center)
         knockback=knockback-knockback*(self.kbResistance/100)
         
         self.health.current=max(self.health.current-damage,0)
@@ -93,9 +93,9 @@ behaviors.methods.common={
         if self.health.current==0 then self:die() end
     end,
 
-    dealDamage=function(self,target)
+    dealDamage=function(self,target,angle)
         if target.state=='dead' then return end
-        target:takeDamage(self)
+        target:takeDamage(self,angle)
     end,
 
     die=function(self)
@@ -152,18 +152,21 @@ behaviors.methods.ally={
     --Gets the closest attack target within LOS from the Player's nearbyEnemies table
     getNearestAllyAttackTarget=function(self)
         local nearbyEnemies=Player.nearbyEnemies
-        if #nearbyEnemies==0 then return self end --nothing nearby, reset moveTarget
-
-        -- --filter out any targets blocked from LOS
-        -- local LOSblockers={'solid'}
-        -- for i=1, #nearbyEnemies do 
-        --     if #World:queryLine(
-        --         self.x,self.y,nearbyEnemies[i].x,
-        --         nearbyEnemies[i].y,LOSblockers
-        --     )>0 then 
-        --         table.remove(nearbyEnemies,i)
-        --     end
-        -- end
+        
+        --filter out any targets blocked from LOS
+        for i=1, #nearbyEnemies do 
+            local e=nearbyEnemies[i]
+            if e==nil then 
+                table.remove(nearbyEnemies,i)
+            else
+                local _,len = World:querySegment(
+                    self.center.x,self.center.y,
+                    e.center.x,e.center.y,self.losFilter
+                )
+                if len>0 then table.remove(nearbyEnemies,i) end
+            end
+        end        
+        if #nearbyEnemies==0 then return self end --nothing nearby in LOS
         
         local closest=nil --find and return the closest target
         for i=1, #nearbyEnemies do 
@@ -215,7 +218,7 @@ behaviors.methods.enemy={
         end
         --of the remaining valid locations, choose a random one to set as moveTarget
         if #locations>0 then 
-            self.moveTarget=locations[rnd(#locations)]
+            self.moveTarget=rndElement(locations)
         else --if no valid locations remain, clear moveTarget (moveTaget=self)
             self:clearMoveTarget()
         end
@@ -224,18 +227,21 @@ behaviors.methods.enemy={
     --Gets the closest attack target within LOS
     getNearestEnemyAttackTarget=function(self)
         local nearbyAttackTargets=self:queryForEnemyAttackTargets()
-        if #nearbyAttackTargets==0 then return self end --nothing nearby, reset moveTarget
-
-        -- --filter out any targets blocked from LOS
-        -- local LOSblockers={'solid'}
-        -- for i=1, #nearbyAttackTargets do 
-        --     if #World:queryLine(
-        --         self.x,self.y,nearbyAttackTargets[i].x,
-        --         nearbyAttackTargets[i].y,LOSblockers
-        --     )>0 then 
-        --         table.remove(nearbyAttackTargets,i)
-        --     end
-        -- end
+        
+        --filter out any targets blocked from LOS
+        for i=1, #nearbyAttackTargets do 
+            local e=nearbyAttackTargets[i]
+            if e==nil then 
+                table.remove(nearbyAttackTargets,i)
+            else
+                local _,len = World:querySegment(
+                    self.center.x,self.center.y,
+                    e.center.x,e.center.y,self.losFilter
+                )
+                if len>0 then table.remove(nearbyAttackTargets,i) end
+            end
+        end        
+        if #nearbyAttackTargets==0 then return self end --nothing nearby in LOS
         
         local closest=nil --find and return the closest target
         for i=1, #nearbyAttackTargets do
@@ -504,7 +510,9 @@ behaviors.states.enemy={
         --if target is a living skeleton and enemy can attack,
         --move toward the target in order to attack.
         if self.moveTarget~=self and self.moveTarget.state~='dead' then 
-            if self.canAttack.flag then self:changeState('moveToTarget') end 
+            if self.canAttack.flag 
+            or getRectDistance(self,self.moveTarget)>self.attack.range 
+            then self:changeState('moveToTarget') end 
             return --return to wait until attack is ready or target dies          
         end
         
@@ -513,6 +521,7 @@ behaviors.states.enemy={
             self.canQueryAttackTargets.setOnCooldown()
             self.moveTarget=self:getNearestEnemyAttackTarget()
             if self.moveTarget~=self then self:changeState('moveToTarget') end
+            return
         end
     end,
 
@@ -544,7 +553,7 @@ behaviors.states.enemy={
 
     idleStationary=function(self)
         self:updateAnimation()
-        self:updatePosition('noTurn')
+        self:updatePosition()
 
         if self.canQueryAttackTargets.flag then 
             self.canQueryAttackTargets.setOnCooldown()
@@ -608,7 +617,7 @@ behaviors.states.enemy={
         self:move()
     end,
     
-    lunge=function(self) 
+    lunge=function(self) --lunges toward target, deals damage and bounces away
         local onLoop=self:updateAnimation()
         if onLoop then
             self.targetsAlreadyAttacked={}
@@ -642,6 +651,41 @@ behaviors.states.enemy={
                     --bounce self away from target, losing some momentum
                     self.vx=cos(angle)*magnitude*self.restitution
                     self.vy=sin(angle)*magnitude*self.restitution
+
+                    --damage target, add to targetsAlreadyAttacked
+                    self:dealDamage(other)
+                    table.insert(self.targetsAlreadyAttacked,other)
+                end
+            end  
+        end
+    end,
+    
+    roll=function(self) --lunges toward target, deals damage and rolls through
+        local onLoop=self:updateAnimation()
+        if onLoop then
+            self.targetsAlreadyAttacked={}
+            self:changeState('idle')
+        end
+
+        local collisions=self:updatePosition()    
+        if self:onDamagingFrames() then 
+            if self.canAttack.flag then 
+                self.canAttack.setOnCooldown()
+                local fx=cos(self.angle)*self.attack.lungeForce
+                local fy=sin(self.angle)*self.attack.lungeForce
+                self.vx=self.vx+fx
+                self.vy=self.vy+fy        
+            end 
+    
+            --handle collisions
+            for i=1,#collisions do
+                local other=collisions[i].other --other collider
+                
+                if other.collisionClass=='ally' then 
+                    --Only hurt targets once per attack
+                    for i=1,#self.targetsAlreadyAttacked do 
+                        if other==self.targetsAlreadyAttacked[i] then return end
+                    end
 
                     --damage target, add to targetsAlreadyAttacked
                     self:dealDamage(other)
@@ -732,16 +776,21 @@ behaviors.AI={ --AI-------------------------------------------------------------
         attack=behaviors.states.enemy.spawnSpiders,
         dead=behaviors.states.common.dead,
     },
+    ['golem']={
+        idle=behaviors.states.enemy.idleMelee,
+        moveToTarget=behaviors.states.enemy.moveToTarget,
+        attack=behaviors.states.enemy.roll,
+        dead=behaviors.states.common.dead,
+    }
 }
 --shared AI
 behaviors.AI['skeletonMageFire']=behaviors.AI.skeletonArcher
 behaviors.AI['skeletonMageIce']=behaviors.AI.skeletonArcher
 behaviors.AI['skeletonMageElectric']=behaviors.AI.skeletonArcher
-behaviors.AI['golem']=behaviors.AI.pumpkin
 behaviors.AI['spider']=behaviors.AI.pumpkin
 behaviors.AI['bat']=behaviors.AI.pumpkin
 behaviors.AI['zombie']=behaviors.AI.slime
-behaviors.AI['possessedKnight']=behaviors.AI.slime
+behaviors.AI['possessedKnight']=behaviors.AI.golem
 behaviors.AI['undeadMiner']=behaviors.AI.possessedArcher
 behaviors.AI['ent']=behaviors.AI.possessedArcher
 behaviors.AI['headlessHorseman']=behaviors.AI.possessedArcher

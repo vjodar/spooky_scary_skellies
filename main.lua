@@ -1,11 +1,9 @@
 function love.load()
     dt=0 --delta time global
     acceptInput=false --flag to restrict inputs to one state at a time
-    paletteBlack={53/255,53/255,64/255} --black in our palette
     gameStates={} --state stack
 
     love.graphics.setDefaultFilter('nearest','nearest') --set pixelated look
-    love.graphics.setBackgroundColor(paletteBlack) --set background color
 
     --common math functions
     generateCommonMaths()
@@ -28,6 +26,7 @@ function love.load()
     Player=require 'src/player'
     Entities=require 'src/entities/entityClass'
     Projectiles=require 'src/projectiles' 
+    LevelManager=require 'src/levelManager'
     
     table.insert(gameStates,Controls) --controls first
     table.insert(gameStates,Timer) --timer second
@@ -61,6 +60,7 @@ function generateCommonMaths()
     min,max,rnd=math.min,math.max,love.math.random
     pi,cos,sin,atan2=math.pi,math.cos,math.sin,math.atan2
     rndSign=function() local t={-1,1} return t[rnd(2)] end
+    rndElement=function(t) return t[rnd(#t)] end
     getSign=function(n) if n>0 then return 1 else return -1 end end 
     getAngle=function(s,t) return atan2((t.y-s.y),(t.x-s.x)) end
     getDistance=function(a,b) return ((abs(b.x-a.x))^2+(abs(b.y-a.y))^2)^0.5 end

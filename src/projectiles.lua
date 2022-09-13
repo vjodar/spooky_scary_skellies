@@ -257,7 +257,7 @@ local projectileUpdateFunctions=function()
                     table.insert(self.angles,-(i*0.01*pi))
                     table.insert(self.angles,(i*0.01*pi))
                 end
-                self.angle=self.angle+(self.angles[rnd(#self.angles)])
+                self.angle=self.angle+(rndElement(self.angles))
                     
                 --update direction
                 local magnitude=getMagnitude(self.vy,self.vx)
@@ -267,7 +267,7 @@ local projectileUpdateFunctions=function()
                 self.changeDirectionTime=self.changeDirectionTime-dt 
                 if self.changeDirectionTime<0 then 
                     self.changeDirectionTime=rnd()*0.5
-                    self.angle=self.angle+(self.angles[rnd(#self.angles)])
+                    self.angle=self.angle+(rndElement(self.angles))
                     
                     --update direction
                     local magnitude=getMagnitude(self.vy,self.vx)

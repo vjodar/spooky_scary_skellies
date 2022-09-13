@@ -14,6 +14,9 @@ local function defaultKeyMappings() --default keyboard mappings
         dirDown={'s','down'},
         dirLeft={'a','left'},
         dirRight={'d','right'},
+        btn1={'1'},
+        btn2={'2'},
+        btn3={'3'},
     }
 end
 
@@ -25,38 +28,37 @@ end
 
 love.mouse.setCursor(love.mouse.getSystemCursor('hand')) --set cursor
 
-local controlState={}
-controlState.down=defaultInputs()
-controlState.pressed=defaultInputs()
-controlState.released=defaultInputs()
-controlState.keyMappings=defaultKeyMappings()
-controlState.mouseMappings=defaultMouseMappings()
-
---Reads input to determine what inputs are down, pressed, and released this frame
-function controlState:update()
-    for input,key in pairs(self.keyMappings) do
-        if love.keyboard.isDown(key) and not self.released[input] then 
-            self.pressed[input]=not self.down[input]
-            self.down[input]=true 
-        else 
-            self.released[input]=self.down[input]
-            self.down[input]=false
-            self.pressed[input]=false
+--The Module
+return {
+    down=defaultInputs(),
+    pressed=defaultInputs(),
+    released=defaultInputs(),
+    keyMappings=defaultKeyMappings(),
+    mouseMappings=defaultMouseMappings(),
+    getMousePosition=function() return Camera:mousePosition() end,
+    
+    --Reads input to determine what inputs are down, pressed, and released this frame
+    update=function(self)
+        for input,key in pairs(self.keyMappings) do
+            if love.keyboard.isDown(key) and not self.released[input] then 
+                self.pressed[input]=not self.down[input]
+                self.down[input]=true 
+            else 
+                self.released[input]=self.down[input]
+                self.down[input]=false
+                self.pressed[input]=false
+            end
+        end
+    
+        for input,mouseBtn in pairs(self.mouseMappings) do 
+            if love.mouse.isDown(mouseBtn) and not self.released[input] then 
+                self.pressed[input]=not self.down[input]
+                self.down[input]=true 
+            else 
+                self.released[input]=self.down[input]
+                self.down[input]=false
+                self.pressed[input]=false
+            end
         end
     end
-
-    for input,mouseBtn in pairs(self.mouseMappings) do 
-        if love.mouse.isDown(mouseBtn) and not self.released[input] then 
-            self.pressed[input]=not self.down[input]
-            self.down[input]=true 
-        else 
-            self.released[input]=self.down[input]
-            self.down[input]=false
-            self.pressed[input]=false
-        end
-    end
-end
-
-function controlState.getMousePosition() return Camera:mousePosition() end
-
-return controlState
+}

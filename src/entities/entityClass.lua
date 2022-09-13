@@ -42,22 +42,11 @@ local chooseSpriteSheet=function(def)
         for i=1,#def.drawData.altSpriteSheets do 
             table.insert(selections,def.drawData.altSpriteSheets[i])
         end
-        return selections[rnd(#selections)]
+        return rndElement(selections)
 
     else --no alternates, just choose the main spriteSheet
         return def.name 
     end
-end
-
---returns a copy of a table complete with sub-tables
-local recursiveCopy=function(self,t)
-    local copy={}
-    for i,v in pairs(t) do 
-        if type(v)=='table' then copy[i]=self:recursiveCopy(v) 
-        else copy[i]=v 
-        end
-    end
-    return copy 
 end
 
 local entityClass={}
@@ -66,9 +55,10 @@ entityClass.behaviors=require 'src/entities/entityBehaviors'
 entityClass.spriteSheets,entityClass.grids=sheetsAndGrids(entityClass.definitions)
 entityClass.parseAnimations=parseAnimations 
 entityClass.chooseSpriteSheet=chooseSpriteSheet
-entityClass.recursiveCopy=recursiveCopy
 entityClass.new=function(self,entity,x,y) --constructor
-    local def=self.definitions[entity]    
+    local def=self.definitions[entity]
+    local moveFilter=def.collider.moveFilter or def.collider.class
+    local losFilter=def.collider.losFilter or 'pitOrSolid'
     local e={name=def.name}
 
     --Collider data
@@ -78,15 +68,16 @@ entityClass.new=function(self,entity,x,y) --constructor
     e.vx,e.vy=0,0
     e.linearDamping=def.collider.linearDamping or 10
     e.restitution=def.collider.restitution or 0.5
-    e.stopThreshold=3*60 --at 60fps, stop moving when speed<=3
+    e.stopThreshold=3*60 --at 60fps, stop moving when speed<3
     e.collisionClass=def.collider.class 
-    e.filter=World.collisionFilters[e.collisionClass]
+    e.moveFilter=World.collisionFilters[moveFilter]
+    e.losFilter=World.queryFilters[losFilter]
 
     --General data
     e.health={current=def.health,max=def.health}
     e.moveSpeed=def.moveSpeed
     e.kbResistance=def.kbResistance or 0
-    e.attack=self:recursiveCopy(def.attack)
+    e.attack=def.attack 
     e.moveTarget=e
     e.angle=0
     e.aggroRange={w=1000,h=750}

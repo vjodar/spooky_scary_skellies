@@ -9,7 +9,7 @@ player.moveSpeed=17*60 --17units/sec at 60fps
 player.linearDamping=10
 player.stopThreshold=3*60 --speed slow enough to consider stopped (at 60FPS)
 player.collisionClass='ally'
-player.filter=World.collisionFilters[player.collisionClass]
+player.moveFilter=World.collisionFilters[player.collisionClass]
 
 --General Data
 player.health={current=100,max=100}
@@ -50,6 +50,9 @@ Timer:giveCooldownCallbacks(player.canTurn)
 player.canAttack={flag=true,cooldownPeriod=player.attack.period}
 Timer:giveCooldownCallbacks(player.canAttack)
 
+player.canSummon={flag=true,cooldownPeriod=0.2}
+Timer:giveCooldownCallbacks(player.canSummon)
+
 player.canQueryAttackTargets={flag=true,cooldownPeriod=0.5}
 Timer:giveCooldownCallbacks(player.canQueryAttackTargets)
 
@@ -71,6 +74,11 @@ function player:update()
             self:launchBone() 
             self.canAttack.setOnCooldown()
         end
+        if self.canSummon.flag then 
+            if Controls.down.btn1 then self:summon('skeletonWarrior') end 
+            if Controls.down.btn2 then self:summon('skeletonArcher') end 
+            if Controls.down.btn3 then self:summon('skeletonMage') end 
+        end
     end
 end
 
@@ -91,7 +99,7 @@ end
 function player:updatePosition()
     local goalX=self.x+self.vx*dt 
     local goalY=self.y+self.vy*dt 
-    local realX,realY,cols,len=World:move(self,goalX,goalY,self.filter)
+    local realX,realY,cols,len=World:move(self,goalX,goalY,self.moveFilter)
     self.x,self.y=realX,realY 
     self.center=getCenter(self)
 
@@ -170,12 +178,12 @@ function player:queryForEnemies()
     return targets
 end
 
-function player:takeDamage(source)
+function player:takeDamage(source,angle)
     local damage=source.attack.damage  
     local knockback=source.attack.knockback
     knockback=knockback-knockback*(self.kbResistance/100)
 
-    local kbAngle=getAngle(source.center,self.center)
+    local kbAngle=angle or getAngle(source.center,self.center)
     local hp=self.health.current 
     
     hp=max(0,hp-damage)
@@ -197,17 +205,32 @@ function player:launchBone()
         yOffset=self.attack.projectile.yOffset
     })
 
-    --testing-----------------------------------------------
-    -- self.collisionClass='enemy'
-    -- Projectiles:new({
-    --     x=mouseX,y=mouseY,name='bone',attackDamage=1,knockback=200,
-    --     angle=getAngle({x=mouseX,y=mouseY},getCenter(Player)),yOffset=-10
-    -- })
-    --testing-----------------------------------------------
-
     --face target direction, lock turning
     self.scaleX=(mouseX>self.center.x and 1 or -1)
     self.canTurn.setOnCooldown()
+end
+
+function player:summon(name)
+    
+    for i=1,10 do   
+        if name=='skeletonMage' then 
+            local elements={'Fire','Ice','Electric'}
+            name=name..(rndElement(elements))
+        end
+
+        --spawn directly under player
+        local skelly=Entities:new(name,self.x,self.y)
+
+        --move skeleton using world collision to a point around player
+        local angle=rnd()*2*pi 
+        local distance=rnd()*50
+        local goalX=self.x+cos(angle)*distance
+        local goalY=self.y+sin(angle)*distance
+        local realX,realY,cols=World:move(skelly,goalX,goalY,skelly.moveFilter)
+        skelly.x,skelly.y=realX,realY
+    end
+
+    self.canSummon.setOnCooldown()
 end
 
 World:addItem(player)

@@ -65,6 +65,7 @@ return {
             w=10,
             h=6,
             class='ally',
+            losFilter='solid',
         },
         drawData={
             frameWidth=38,
@@ -115,6 +116,7 @@ return {
             w=10,
             h=6,
             class='ally',
+            losFilter='solid',
         },
         drawData={
             frameWidth=24,
@@ -165,6 +167,7 @@ return {
             w=10,
             h=6,
             class='ally',
+            losFilter='solid',
         },
         drawData={
             frameWidth=24,
@@ -215,6 +218,7 @@ return {
             w=10,
             h=6,
             class='ally',
+            losFilter='solid',
         },
         drawData={
             frameWidth=24,
@@ -349,8 +353,8 @@ return {
             range=70,        
             period=3,
             damage=1,
-            knockback=400,
-            lungeForce=800,
+            knockback=800,
+            lungeForce=1000,
         },
         collider={
             w=14,
@@ -442,6 +446,8 @@ return {
             w=6,
             h=4,
             class='enemy',
+            moveFilter='enemyFlying',
+            losFilter='solid',
         },
         drawData={
             frameWidth=16,
@@ -490,7 +496,7 @@ return {
         },
         animations={
             raise={
-                frames='1-13',
+                frames='1-8',
                 row=1,
                 duration=0.1,
             },
@@ -527,6 +533,7 @@ return {
             w=12,
             h=7,
             class='enemy',
+            losFilter='solid',
         },
         drawData={
             frameWidth=34,
@@ -559,7 +566,7 @@ return {
             range=40,        
             period=1.5,
             damage=1,
-            knockback=100,
+            knockback=500,
             lungeForce=700,
         },
         collider={
@@ -606,6 +613,7 @@ return {
             w=10,
             h=6,
             class='enemy',
+            losFilter='solid',
         },
         drawData={
             frameWidth=20,
@@ -645,6 +653,7 @@ return {
             w=16,
             h=9,
             class='enemy',
+            losFilter='solid',
         },
         drawData={
             frameWidth=23,
@@ -684,6 +693,7 @@ return {
             w=27,
             h=10,
             class='enemy',
+            losFilter='solid',
         },
         drawData={
             frameWidth=33,
@@ -758,6 +768,8 @@ return {
             w=12,
             h=7,
             class='enemy',
+            moveFilter='enemyFlying',
+            losFilter='solid',
         },
         drawData={
             frameWidth=28,
@@ -950,6 +962,7 @@ return {
             w=20,
             h=11,
             class='enemy',
+            losFilter='solid',
         },
         drawData={
             frameWidth=22,

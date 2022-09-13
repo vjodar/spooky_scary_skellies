@@ -11,14 +11,28 @@ world.collisionFilters={
       local class=other.collisionClass
       if class=='enemy' then return 'bounce'
       elseif class=='ally' then return 'cross' 
-      elseif class=='solid' then return 'slide' 
+      elseif class=='solid' or class=='pit' or class=='boundary' then return 'slide' 
+      end 
+   end,
+   allyFlying=function(item,other)
+      local class=other.collisionClass
+      if class=='enemy' then return 'bounce'
+      elseif class=='ally' then return 'cross' 
+      elseif class=='solid' or class=='boundary' then return 'slide' 
       end 
    end,
    enemy=function(item,other)
       local class=other.collisionClass 
       if class=='ally' then return 'bounce'
       elseif class=='enemy' then return 'cross'
-      elseif class=='solid' then return 'slide'
+      elseif class=='solid' or class=='pit' or class=='boundary' then return 'slide' 
+      end
+   end,
+   enemyFlying=function(item,other)
+      local class=other.collisionClass 
+      if class=='ally' then return 'bounce'
+      elseif class=='enemy' then return 'cross'
+      elseif class=='solid' or class=='boundary' then return 'slide'
       end
    end,
    allyProjectile=function(item,other)
@@ -38,7 +52,11 @@ world.collisionFilters={
 world.queryFilters={
    ally=function(item) return item.collisionClass=='ally' end,
    enemy=function(item) return item.collisionClass=='enemy' end,
-   solid=function(item) return item.collisionClass=='solid' end
+   solid=function(item) return item.collisionClass=='solid' end,
+   pitOrSolid=function(item) 
+      local class=item.collisionClass
+      return class=='pit' or class=='solid'
+   end,
 }
 
 return world

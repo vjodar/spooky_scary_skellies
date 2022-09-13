@@ -9,7 +9,7 @@ player.moveSpeed=17*60 --17units/sec at 60fps
 player.linearDamping=10
 player.stopThreshold=3*60 --speed slow enough to consider stopped (at 60FPS)
 player.collisionClass='ally'
-player.moveFilter=World.collisionFilters[player.collisionClass]
+player.collisionFilter=World.collisionFilters[player.collisionClass]
 
 --General Data
 player.health={current=100,max=100}
@@ -99,7 +99,7 @@ end
 function player:updatePosition()
     local goalX=self.x+self.vx*dt 
     local goalY=self.y+self.vy*dt 
-    local realX,realY,cols,len=World:move(self,goalX,goalY,self.moveFilter)
+    local realX,realY,cols,len=World:move(self,goalX,goalY,self.collisionFilter)
     self.x,self.y=realX,realY 
     self.center=getCenter(self)
 
@@ -211,7 +211,7 @@ function player:launchBone()
 end
 
 function player:summon(name)
-    
+
     for i=1,10 do   
         if name=='skeletonMage' then 
             local elements={'Fire','Ice','Electric'}
@@ -226,7 +226,7 @@ function player:summon(name)
         local distance=rnd()*50
         local goalX=self.x+cos(angle)*distance
         local goalY=self.y+sin(angle)*distance
-        local realX,realY,cols=World:move(skelly,goalX,goalY,skelly.moveFilter)
+        local realX,realY,cols=World:move(skelly,goalX,goalY,skelly.collisionFilter)
         skelly.x,skelly.y=realX,realY
     end
 

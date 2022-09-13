@@ -28,7 +28,7 @@ function love.keyreleased(k)
         -- for i=1,1 do Entities:new('skeletonMageElectric',Controls.getMousePosition()) end 
     end
     if k=='p' then 
-        for i=1,1 do Entities:new('bat',Controls.getMousePosition()) end
+        for i=1,1 do Entities:new('headlessHorseman',Controls.getMousePosition()) end
         -- for i=1,1 do Entities:new('spider',Controls.getMousePosition()) end
         -- for i=1,1 do Entities:new('bat',Controls.getMousePosition()) end
         -- for i=1,1 do Entities:new('headlessHorseman',Controls.getMousePosition()) end

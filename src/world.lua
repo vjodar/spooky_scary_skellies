@@ -5,7 +5,7 @@ function world:drawItem(item)
    love.graphics.rectangle('line',item.x,item.y,item.w,item.h)
 end
 
---collision filters
+--collision filters that specify how an entity collides with another
 world.collisionFilters={
    ally=function(item,other)
       local class=other.collisionClass
@@ -49,6 +49,7 @@ world.collisionFilters={
    end,
 }
 
+--used for segment queries to check LOS of an attack target or moveTarget
 world.queryFilters={
    ally=function(item) return item.collisionClass=='ally' end,
    enemy=function(item) return item.collisionClass=='enemy' end,
@@ -56,6 +57,10 @@ world.queryFilters={
    pitOrSolid=function(item) 
       local class=item.collisionClass
       return class=='pit' or class=='solid'
+   end,
+   pitOrSolidOrBoundary=function(item) 
+      local class=item.collisionClass
+      return class=='pit' or class=='solid' or class=='boundary'
    end,
 }
 

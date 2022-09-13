@@ -13,6 +13,9 @@ behaviors.methods.common={
             self.spriteSheet,self.x+self.xOffset,self.y+self.yOffset,
             nil,self.scaleX,1,self.xOrigin,self.yOrigin
         )
+        -- --testing------------------------
+        -- love.graphics.circle('line',self.moveTarget.center.x,self.moveTarget.center.y,3)
+        -- --testing------------------------
     end,
 
     changeState=function(self,newState)
@@ -41,7 +44,7 @@ behaviors.methods.common={
     updatePosition=function(self)
         local goalX=self.x+self.vx*dt 
         local goalY=self.y+self.vy*dt 
-        local realX,realY,cols,len=World:move(self,goalX,goalY,self.moveFilter)
+        local realX,realY,cols,len=World:move(self,goalX,goalY,self.collisionFilter)
         self.x,self.y=realX,realY 
         self.center=getCenter(self)
 
@@ -154,25 +157,22 @@ behaviors.methods.ally={
         local nearbyEnemies=Player.nearbyEnemies
         
         --filter out any targets blocked from LOS
+        local validTargets={}
         for i=1, #nearbyEnemies do 
             local e=nearbyEnemies[i]
-            if e==nil then 
-                table.remove(nearbyEnemies,i)
-            else
-                local _,len = World:querySegment(
-                    self.center.x,self.center.y,
-                    e.center.x,e.center.y,self.losFilter
-                )
-                if len>0 then table.remove(nearbyEnemies,i) end
-            end
+            local _,len = World:querySegment(
+                self.center.x,self.center.y,
+                e.center.x,e.center.y,self.losFilter
+            )
+            if len==0 then table.insert(validTargets,e) end
         end        
-        if #nearbyEnemies==0 then return self end --nothing nearby in LOS
+        if #validTargets==0 then return self end --nothing nearby in LOS
         
         local closest=nil --find and return the closest target
-        for i=1, #nearbyEnemies do 
-            local dist=getDistance(self,nearbyEnemies[i])
+        for i=1, #validTargets do 
+            local dist=getDistance(self,validTargets[i])
             if closest==nil or closest.d>dist then 
-                closest={t=nearbyEnemies[i],d=dist} 
+                closest={t=validTargets[i],d=dist} 
             end
         end
         return closest.t
@@ -198,7 +198,7 @@ behaviors.methods.enemy={
     --projects in 8 directions around enemy to find possible locations free of
     --solid obstructions, then sets one of those to moveTarget
     setLocationMoveTarget=function(self)
-        local distance=rnd(self.w,self.w*10)
+        local distance=rnd(self.moveSpeed*dt*2,self.moveSpeed*dt*6)
         local locations={
             {center={x=self.center.x,y=self.center.y-distance}},
             {center={x=self.center.x+distance,y=self.center.y-distance}},
@@ -209,16 +209,17 @@ behaviors.methods.enemy={
             {center={x=self.center.x-distance,y=self.center.y}},
             {center={x=self.center.x-distance,y=self.center.y-distance}},
         }
-        local filter=World.queryFilters.solid
-        for i,l in ipairs(locations) do
-            local _,len=World:project(
-                self,self.x,self.y,self.w,self.h,l.center.x,l.center.y,filter
+        local validLocations={}
+        for i=1,8 do
+            local l=locations[i]
+            local _,len=World:querySegment(
+                self.center.x,self.center.y,l.center.x,l.center.y,self.moveFilter
             )
-            if len>0 then table.remove(locations,i) end
+            if len==0 then table.insert(validLocations,l) end
         end
         --of the remaining valid locations, choose a random one to set as moveTarget
-        if #locations>0 then 
-            self.moveTarget=rndElement(locations)
+        if #validLocations>0 then
+            self.moveTarget=rndElement(validLocations)
         else --if no valid locations remain, clear moveTarget (moveTaget=self)
             self:clearMoveTarget()
         end
@@ -229,25 +230,22 @@ behaviors.methods.enemy={
         local nearbyAttackTargets=self:queryForEnemyAttackTargets()
         
         --filter out any targets blocked from LOS
+        local validTargets={}
         for i=1, #nearbyAttackTargets do 
             local e=nearbyAttackTargets[i]
-            if e==nil then 
-                table.remove(nearbyAttackTargets,i)
-            else
-                local _,len = World:querySegment(
-                    self.center.x,self.center.y,
-                    e.center.x,e.center.y,self.losFilter
-                )
-                if len>0 then table.remove(nearbyAttackTargets,i) end
-            end
+            local _,len = World:querySegment(
+                self.center.x,self.center.y,
+                e.center.x,e.center.y,self.losFilter
+            )
+            if len==0 then table.insert(validTargets,e) end
         end        
-        if #nearbyAttackTargets==0 then return self end --nothing nearby in LOS
+        if #validTargets==0 then return self end --nothing nearby in LOS
         
         local closest=nil --find and return the closest target
-        for i=1, #nearbyAttackTargets do
-            local dist=getDistance(self,nearbyAttackTargets[i])
+        for i=1, #validTargets do
+            local dist=getDistance(self,validTargets[i])
             if closest==nil or closest.d>dist then 
-                closest={t=nearbyAttackTargets[i],d=dist} 
+                closest={t=validTargets[i],d=dist} 
             end
         end
         return closest.t

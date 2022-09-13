@@ -57,10 +57,8 @@ entityClass.parseAnimations=parseAnimations
 entityClass.chooseSpriteSheet=chooseSpriteSheet
 entityClass.new=function(self,entity,x,y) --constructor
     local def=self.definitions[entity]
-    local moveFilter=def.collider.moveFilter or def.collider.class
-    local losFilter=def.collider.losFilter or 'pitOrSolid'
     local e={name=def.name}
-
+    
     --Collider data
     e.x,e.y=x,y 
     e.w,e.h=def.collider.w,def.collider.h
@@ -70,7 +68,11 @@ entityClass.new=function(self,entity,x,y) --constructor
     e.restitution=def.collider.restitution or 0.5
     e.stopThreshold=3*60 --at 60fps, stop moving when speed<3
     e.collisionClass=def.collider.class 
-    e.moveFilter=World.collisionFilters[moveFilter]
+    local collisionFilter=def.collider.collisionFilter or def.collider.class
+    local moveFilter=def.collider.moveFilter or 'pitOrSolidOrBoundary'
+    local losFilter=def.collider.losFilter or 'pitOrSolid'
+    e.collisionFilter=World.collisionFilters[collisionFilter]
+    e.moveFilter=World.queryFilters[moveFilter]
     e.losFilter=World.queryFilters[losFilter]
 
     --General data

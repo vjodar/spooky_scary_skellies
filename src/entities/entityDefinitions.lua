@@ -446,7 +446,7 @@ return {
             w=6,
             h=4,
             class='enemy',
-            moveFilter='enemyFlying',
+            collisionFilter='enemyFlying',
             losFilter='solid',
         },
         drawData={
@@ -768,7 +768,7 @@ return {
             w=12,
             h=7,
             class='enemy',
-            moveFilter='enemyFlying',
+            collisionFilter='enemyFlying',
             losFilter='solid',
         },
         drawData={

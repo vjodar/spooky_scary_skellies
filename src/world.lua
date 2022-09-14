@@ -58,6 +58,14 @@ world.queryFilters={
       local class=item.collisionClass
       return class=='pit' or class=='solid'
    end,
+   pitOrBoundary=function(item) 
+      local class=item.collisionClass
+      return class=='pit' or class=='boundary'
+   end,
+   solidOrBoundary=function(item) 
+      local class=item.collisionClass
+      return class=='solid' or class=='boundary'
+   end,
    pitOrSolidOrBoundary=function(item) 
       local class=item.collisionClass
       return class=='pit' or class=='solid' or class=='boundary'

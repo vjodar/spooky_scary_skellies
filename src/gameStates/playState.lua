@@ -25,17 +25,17 @@ function love.keyreleased(k)
         -- for i=1,1 do Entities:new('skeletonArcher',Controls.getMousePosition()) end 
         -- for i=1,1 do Entities:new('skeletonMageFire',Controls.getMousePosition()) end 
         -- for i=1,1 do Entities:new('skeletonMageIce',Controls.getMousePosition()) end 
-        -- for i=1,1 do Entities:new('skeletonMageElectric',Controls.getMousePosition()) end 
-        Terrain:new('rockCaveL1',Controls.getMousePosition())
+        -- for i=1,1 do Entities:new('skeletonMageElectric',Controls.getMousePosition()) end
+        Terrain:new('pitLava'..1,Controls.getMousePosition())
     end
     if k=='p' then 
-        for i=1,1 do Entities:new('frankenstein',Controls.getMousePosition()) end
+        for i=1,1 do Entities:new('slime',Controls.getMousePosition()) end
         -- for i=1,1 do Entities:new('spider',Controls.getMousePosition()) end
         -- for i=1,1 do Entities:new('bat',Controls.getMousePosition()) end
         -- for i=1,1 do Entities:new('headlessHorseman',Controls.getMousePosition()) end
     end
     if k=='l' then 
-        for i=1,50 do Entities:new('slimeMatron',rnd(100,800),rnd(100,600)) end
+        for i=1,50 do Entities:new('tombstone',rnd(100,800),rnd(100,600)) end
         -- for i=1,50 do Entities:new('gnasherDemon',rnd(0,400),rnd(0,300)) end
     end
     if k=='j' then 

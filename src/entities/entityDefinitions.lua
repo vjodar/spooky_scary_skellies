@@ -448,6 +448,7 @@ return {
             class='enemy',
             collisionFilter='enemyFlying',
             losFilter='solid',
+            moveFilter='solidOrBoundary',
         },
         drawData={
             frameWidth=16,
@@ -731,6 +732,7 @@ return {
             w=14,
             h=5,
             class='enemy',
+            losFilter='solid',
         },
         drawData={
             frameWidth=14,
@@ -770,6 +772,7 @@ return {
             class='enemy',
             collisionFilter='enemyFlying',
             losFilter='solid',
+            moveFilter='solidOrBoundary',
         },
         drawData={
             frameWidth=28,
@@ -809,6 +812,7 @@ return {
             w=19,
             h=5,
             class='enemy',
+            losFilter='solid',
         },
         drawData={
             altSpriteSheets={'tombstone_2','tombstone_3','tombstone_4'},
@@ -849,6 +853,7 @@ return {
             w=20,
             h=8,
             class='enemy',
+            losFilter='solid',
         },
         drawData={
             frameWidth=20,

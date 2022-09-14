@@ -36,6 +36,37 @@ local definitions={
     treeMedium={w=12,h=8,yOffset=17,},
     treePine={w=12,h=8,yOffset=13,},
     treeSmall={w=10,h=6,yOffset=15,},
+
+    pitWater1={
+        w=32, h=32,
+        class='pit',
+        animation='pit1',
+    },
+    pitWater2={
+        w=48, h=48,
+        class='pit',
+        animation='pit2',
+    },
+    pitWater3={
+        w=64, h=64,
+        class='pit',
+        animation='pit3',
+    },
+    pitLava1={
+        w=32, h=32,
+        class='pit',
+        animation='pit1',
+    },
+    pitLava2={
+        w=48, h=48,
+        class='pit',
+        animation='pit2',
+    },
+    pitLava3={
+        w=64, h=64,
+        class='pit',
+        animation='pit3',
+    },
 }
 
 local generateSprites=function(defs)
@@ -48,11 +79,34 @@ local generateSprites=function(defs)
 end
 local sprites=generateSprites(definitions)
 
+local generateAnimations=function(defs)
+    local grids={
+        pit1=anim8.newGrid(32,32,128,32),
+        pit2=anim8.newGrid(48,48,192,48),
+        pit3=anim8.newGrid(64,64,256,64),
+    }
+    local baseAnims={
+        pit1=anim8.newAnimation(grids.pit1('1-4',1),0.25),
+        pit2=anim8.newAnimation(grids.pit2('1-4',1),0.25),
+        pit3=anim8.newAnimation(grids.pit3('1-4',1),0.25),
+    }
+
+    local anims={}
+    for name,def in pairs(defs) do 
+        if def.animation then anims[name]=baseAnims[def.animation] end
+    end
+
+    return anims 
+end
+local animations=generateAnimations(definitions)
+
 return { --The Module
     definitions=definitions,
     sprites=sprites,
+    animations=animations,
 
     terrainUpdateFunction=function(self)
+        if self.anim then self.anim:update(dt) end
         if self.state=='dead' then 
             World:remove(self)
             return false
@@ -60,6 +114,10 @@ return { --The Module
     end,
 
     terrainDrawFunction=function(self)
+        if self.anim then 
+            self.anim:draw(self.sprite,self.x-self.xOffset,self.y-self.yOffset)
+            return
+        end 
         love.graphics.draw(self.sprite,self.x-self.xOffset,self.y-self.yOffset)
     end,
 
@@ -67,12 +125,14 @@ return { --The Module
 
     new=function(self,name,x,y) --constructor
         local def=self.definitions[name]
+        local anim=def.animation and self.animations[name]:clone() or nil
         local t={
             name=name,
             sprite=self.sprites[name],
+            anim=anim,
             x=x, y=y, w=def.w, h=def.h,
             xOffset=def.xOffset or 0, 
-            yOffset=def.yOffset,
+            yOffset=def.yOffset or 0,
             collisionClass=def.class or 'solid',
             state='idle',
             update=self.terrainUpdateFunction,

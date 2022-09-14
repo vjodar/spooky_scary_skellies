@@ -195,10 +195,12 @@ behaviors.methods.enemy={
         return targets
     end,
 
-    --projects in 8 directions around enemy to find possible locations free of
-    --solid obstructions, then sets one of those to moveTarget
+    --queries in 8 directions around enemy to find possible locations free of
+    --entity specific obstructions, then sets one of those to moveTarget.
     setLocationMoveTarget=function(self)
-        local distance=rnd(self.moveSpeed*dt*2,self.moveSpeed*dt*6)
+        --distance is 10 to 200 units at moveSpeed=10
+        local unit=10/(self.moveSpeed/60)
+        local distance=rnd(unit*10,unit*200)
         local locations={
             {center={x=self.center.x,y=self.center.y-distance}},
             {center={x=self.center.x+distance,y=self.center.y-distance}},
@@ -364,6 +366,15 @@ behaviors.states.ally={
                 return 
             end
         end
+
+        --if idling for too long, wander around near player
+        self.idleTime=self.idleTime+dt 
+        if self.idleTime>self.maxIdleTime then 
+            self.idleTime=rnd()
+            self:setNearPlayerMoveTarget()
+            self:changeState('moveToPlayer')
+            return 
+        end
     end,
 
     idleRanged=function(self)
@@ -391,6 +402,15 @@ behaviors.states.ally={
                 self:changeState('moveToTarget') 
                 return 
             end
+        end
+
+        --if idling for too long, wander around near player
+        self.idleTime=self.idleTime+dt 
+        if self.idleTime>self.maxIdleTime then 
+            self.idleTime=rnd()
+            self:setNearPlayerMoveTarget()
+            self:changeState('moveToPlayer')
+            return 
         end
     end,
 
@@ -438,6 +458,14 @@ behaviors.states.ally={
             self:clearMoveTarget()
             self:changeState('idle')
             return
+        end        
+
+        --if moving for too long, pick another location (possibly stuck)
+        self.idleTime=self.idleTime+dt 
+        if self.idleTime>self.maxIdleTime then 
+            self.idleTime=rnd()
+            self:setNearPlayerMoveTarget()
+            return 
         end
 
         --if an enemy is nearby, move to attack it only if skeleton
@@ -454,7 +482,6 @@ behaviors.states.ally={
                 return
             end 
         end
-
         
         --update moveTarget to be same nearby location relative to Player
         self.moveTarget={center={
@@ -530,6 +557,15 @@ behaviors.states.enemy={
             if self.moveTarget~=self then self:changeState('moveToTarget') end
             return
         end
+
+        --if idling for too long, wander around
+        self.idleTime=self.idleTime+dt 
+        if self.idleTime>self.maxIdleTime then 
+            self.idleTime=rnd()
+            self:setLocationMoveTarget()
+            self:changeState('moveToLocation') 
+            return 
+        end
     end,
 
     idleRanged=function(self) 
@@ -555,6 +591,15 @@ behaviors.states.enemy={
             self.canQueryAttackTargets.setOnCooldown()
             self.moveTarget=self:getNearestEnemyAttackTarget()
             if self.moveTarget~=self then self:changeState('moveToTarget') end
+        end
+
+        --if idling for too long, wander around
+        self.idleTime=self.idleTime+dt 
+        if self.idleTime>self.maxIdleTime then 
+            self.idleTime=rnd()
+            self:setLocationMoveTarget()
+            self:changeState('moveToLocation') 
+            return 
         end
     end,
 
@@ -608,6 +653,14 @@ behaviors.states.enemy={
             self:clearMoveTarget()
             self:changeState('idle')
             return
+        end
+
+        --if moving for too long, pick another location (possibly stuck)
+        self.idleTime=self.idleTime+dt 
+        if self.idleTime>self.maxIdleTime then 
+            self.idleTime=rnd()
+            self:setLocationMoveTarget()
+            return 
         end
 
         --continue checking for targets if attack is off cooldown
@@ -749,12 +802,14 @@ behaviors.AI={ --AI-------------------------------------------------------------
         raise=behaviors.states.common.raise,
         idle=behaviors.states.enemy.idleMelee,
         moveToTarget=behaviors.states.enemy.moveToTarget,
+        moveToLocation=behaviors.states.enemy.moveToLocation,
         attack=behaviors.states.enemy.lunge,
         dead=behaviors.states.common.dead,
     },
     ['pumpkin']={
         idle=behaviors.states.enemy.idleMelee,
         moveToTarget=behaviors.states.enemy.moveToTarget,
+        moveToLocation=behaviors.states.enemy.moveToLocation,
         attack=behaviors.states.enemy.lunge,
         dead=behaviors.states.common.dead,
     },
@@ -786,6 +841,7 @@ behaviors.AI={ --AI-------------------------------------------------------------
     ['golem']={
         idle=behaviors.states.enemy.idleMelee,
         moveToTarget=behaviors.states.enemy.moveToTarget,
+        moveToLocation=behaviors.states.enemy.moveToLocation,
         attack=behaviors.states.enemy.roll,
         dead=behaviors.states.common.dead,
     }

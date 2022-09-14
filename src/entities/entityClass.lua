@@ -85,6 +85,8 @@ entityClass.new=function(self,entity,x,y) --constructor
     e.aggroRange={w=1000,h=750}
     e.nearbyAttackTargets={}
     e.targetsAlreadyAttacked={} --only damage a given target once per attack
+    e.idleTime=rnd()*3
+    e.maxIdleTime=3 --3s of idle until entity wanders around
 
     --Draw data
     e.spriteSheet=self.spriteSheets[self.chooseSpriteSheet(def)]

@@ -13,7 +13,7 @@ return {
     draw=function(self)
         for i=1, #self.table do 
             --testing----------------------------------
-            World:drawItem(self.table[i])
+            -- World:drawItem(self.table[i])
             --testing----------------------------------
             self.table[i]:draw() 
         end        

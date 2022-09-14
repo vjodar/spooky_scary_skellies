@@ -66,6 +66,7 @@ return { --The Module
     spriteSheets=spriteSheets,
     animations=animations,
     generateLevelBoundaries=generateLevelBoundaries,
+    currentMap={},
     
     update=function(self) self.currentMap.anim:update(dt) end,    
     draw=function(self) self.currentMap.anim:draw(self.currentMap.spriteSheet,0,0) end,

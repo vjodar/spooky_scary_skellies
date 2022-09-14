@@ -255,37 +255,46 @@ behaviors.methods.enemy={
         local spawnPoint=self.attack.minion.spawnPoint or 'center'
         local minionName=self.attack.minion.name
         local count=self.attack.minion.count or 1
-        local minionDimensions=Entities.definitions[minionName].collider
-        local minionCenter={
-            x=minionDimensions.w*0.5,
-            y=minionDimensions.h*0.5
-        }
         
         --spawn minion in center of spawner (with small deviation for natural
         --spread when multiple minions spawn at once)
         if spawnPoint=='center' then 
-            local x=self.center.x-minionCenter.x
-            local y=self.center.y-minionCenter.y
-            for i=1,count do Entities:new(minionName,x+rnd()-0.5,y+rnd()-0.5) end
+            local goalX,goalY=self.x,self.y
+            for i=1,count do 
+                local minion=Entities:new(minionName,goalX,goalY)
+                local realX,realY=World:move(
+                    minion,goalX+rnd()-0.5,goalY+rnd()-0.5,
+                    minion.collisionFilter
+                )
+                minion.x,minion.y=realX,realY
+            end
             return 
         end
 
         --spawn minion toward direction spawner is facing
         if spawnPoint=='facing' then 
-            local x=self.scaleX==1 and self.x+self.w-minionCenter.x or self.x-minionCenter.x
-            local y=self.center.y-minionDimensions.h*0.5
-            for i=1,count do Entities:new(minionName,x,y) end
+            local minionDimensions=Entities.definitions[minionName].collider
+            local minionCenter={x=minionDimensions.w*0.5,y=minionDimensions.h*0.5}
+            local goalX=self.scaleX==1 and self.x+self.w-minionCenter.x or self.x-minionCenter.x
+            local goalY=self.center.y-minionCenter.y
+            for i=1,count do 
+                local minion=Entities:new(minionName,self.x,self.y)
+                local realX,realY=World:move(minion,goalX,goalY,minion.collisionFilter)
+                minion.x,minion.y=realX,realY
+            end
             return 
         end
 
         --spawn minion at a random point around the spawner
         if spawnPoint=='random' then 
             for i=1,count do 
+                local minion=Entities:new(minionName,self.x,self.y) 
                 local angle=rnd()*pi*2
                 local distance=rnd()*self.w*2 
-                local x=self.center.x+(cos(angle)*distance)
-                local y=self.center.y+(sin(angle)*distance)
-                Entities:new(minionName,x,y) 
+                local goalX=self.x+(cos(angle)*distance)
+                local goalY=self.y+(sin(angle)*distance)
+                local realX,realY=World:move(minion,goalX,goalY,minion.collisionFilter)
+                minion.x,minion.y=realX,realY
             end
             return 
         end

@@ -93,6 +93,7 @@ function player:draw()
     -- love.graphics.print(self.vy,self.x-10,self.y)
     love.graphics.print(love.timer.getFPS(),self.x-10,self.y-30)
     love.graphics.print(#Objects.table,self.x-10,self.y-60)
+    -- love.graphics.print(World:countItems(),self.x-10,self.y-90)
     -- --testing------------------------------------------
 end
 
@@ -226,7 +227,7 @@ function player:summon(name)
         local distance=rnd()*50
         local goalX=self.x+cos(angle)*distance
         local goalY=self.y+sin(angle)*distance
-        local realX,realY,cols=World:move(skelly,goalX,goalY,skelly.collisionFilter)
+        local realX,realY=World:move(skelly,goalX,goalY,skelly.collisionFilter)
         skelly.x,skelly.y=realX,realY
     end
 

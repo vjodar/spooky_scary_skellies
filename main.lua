@@ -26,8 +26,7 @@ function love.load()
     Player=require 'src/player'
     Entities=require 'src/entities/entityClass'
     Projectiles=require 'src/projectiles' 
-    Terrain=require 'src/terrain'
-    LevelManager=require 'src/levelManager'
+    LevelManager=require 'src/levels/levelManager'
     
     table.insert(gameStates,Controls) --controls first
     table.insert(gameStates,Timer) --timer second

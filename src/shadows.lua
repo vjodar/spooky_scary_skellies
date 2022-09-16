@@ -21,7 +21,7 @@ local shadowNames={
     'ent',                  --16x9
     'headlessHorseman',     --25x10
     'vampire',
-    'tombstone',            --19x5
+    'tombstone',            --19x7
     'spiderEgg',            --20x8
     'imp',                  --9,6
     'gnasherDemon',

@@ -102,7 +102,6 @@ behaviors.methods.common={
     end,
 
     die=function(self)
-        World:remove(self) 
         self:changeState('dead')
     end,
 

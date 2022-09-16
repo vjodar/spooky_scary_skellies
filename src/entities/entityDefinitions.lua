@@ -810,7 +810,7 @@ return {
         startState='raise',
         collider={
             w=19,
-            h=5,
+            h=7,
             class='enemy',
             losFilter='solid',
         },

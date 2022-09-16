@@ -109,27 +109,20 @@ local projectileOnHitFunctions=function()
     
         --damages targets, destroys upon hitting solids
         ['base']=function(self,target,touch)
-            if target.collisionClass=='solid' then 
-                World:remove(self)
-                return false
-            end
+            if target.collisionClass=='solid' then return false end
 
             if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
             or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
             then 
                 if target.state=='dead' then return end  
                 target:takeDamage(self) 
-                World:remove(self)
                 return false
             end 
         end,
     
         --damages and sets targets on fire, destroys upon hitting solids
         ['flame']=function(self,target,touch)
-            if target.collisionClass=='solid' then 
-                World:remove(self)
-                return false
-            end
+            if target.collisionClass=='solid' then return false end
 
             if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
             or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
@@ -137,17 +130,13 @@ local projectileOnHitFunctions=function()
                 if target.state=='dead' then return end  
                 target:takeDamage(self)
                 --TODO: set target on fire
-                World:remove(self)
                 return false
             end 
         end,
     
         --damages and freezes targets, destroys upon hitting solids
         ['icicle']=function(self,target,touch)
-            if target.collisionClass=='solid' then 
-                World:remove(self)
-                return false
-            end
+            if target.collisionClass=='solid' then return false end
                
             if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
             or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
@@ -155,7 +144,6 @@ local projectileOnHitFunctions=function()
                 if target.state=='dead' then return end  
                 target:takeDamage(self)
                 --TODO: freeze target
-                World:remove(self)
                 return false
             end 
         end,
@@ -176,7 +164,6 @@ local projectileOnHitFunctions=function()
                 if target.state=='dead' then return end  
                 target:takeDamage(self)
                 --TODO: freeze target
-                World:remove(self)
                 return false
             end 
         end,
@@ -202,7 +189,6 @@ local projectileOnHitFunctions=function()
                 for i=1,#targets do 
                     if targets[i].state~='dead' then targets[i]:takeDamage(self) end
                 end
-                World:remove(self)
                 return false
             end 
         end,
@@ -225,7 +211,6 @@ local projectileUpdateFunctions=function()
             if self.remainingTravelTime<0
             or getDistance(self.center,Camera.target.center)>600 
             then 
-                World:remove(self)
                 return false
             end
     
@@ -246,7 +231,6 @@ local projectileUpdateFunctions=function()
             if self.remainingTravelTime<0 
             or getDistance(self,Camera.target)>400 
             then
-                World:remove(self)
                 return false
             end
     

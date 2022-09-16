@@ -21,12 +21,8 @@ end
 function love.keyreleased(k) 
     if k=='escape' then love.event.quit() end 
     if k=='o' then 
-        -- for i=1,1 do Entities:new('skeletonWarrior',Controls.getMousePosition()) end
-        -- for i=1,1 do Entities:new('skeletonArcher',Controls.getMousePosition()) end 
-        -- for i=1,1 do Entities:new('skeletonMageFire',Controls.getMousePosition()) end 
-        -- for i=1,1 do Entities:new('skeletonMageIce',Controls.getMousePosition()) end 
-        -- for i=1,1 do Entities:new('skeletonMageElectric',Controls.getMousePosition()) end
-        Terrain:new('pitLava'..1,Controls.getMousePosition())
+        LevelManager:destroyLevel()
+        LevelManager:buildLevel(1)
     end
     if k=='p' then 
         for i=1,1 do Entities:new('slime',Controls.getMousePosition()) end

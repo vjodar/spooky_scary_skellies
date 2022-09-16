@@ -7,7 +7,10 @@ return {
 
         --update object. If it returns false, remove it from table
         for i,obj in ipairs(self.table) do 
-            if obj:update()==false then table.remove(self.table,i) end
+            if obj:update()==false then 
+                World:remove(obj)
+                table.remove(self.table,i) 
+            end
         end  
     end,
     draw=function(self)
@@ -18,5 +21,9 @@ return {
             self.table[i]:draw() 
         end        
     end,
-    clear=function(self) self.table={} end,
+    clear=function(self) 
+        for i=1,#self.table do World:remove(self.table[i]) end
+        World:addItem(Player)
+        self.table={Player} 
+    end,
 }

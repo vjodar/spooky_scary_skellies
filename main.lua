@@ -145,4 +145,13 @@ function generateCommonMaths()
 
         return getDistance(closestPointA,closestPointB)
     end
+    alignRectCenters=function(small,big)
+        --returns the x,y of small after aligning its center with that of big
+        local smallCenter,bigCenter=getCenter(small),getCenter(big)
+        local centerDifference={
+            x=bigCenter.x-smallCenter.x,
+            y=bigCenter.y-smallCenter.y
+        }
+        return small.x+centerDifference.x, small.y+centerDifference.y
+    end
 end

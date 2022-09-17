@@ -1,6 +1,6 @@
 local levelDefinitions={
-    { --level 1
-        map='forest1',
+    test={
+        map='swamp1',
         wave1={
             pumpkin=5,            
         },
@@ -20,8 +20,8 @@ local bgColors={
 }
 
 local mapDefinitions={
-    forest1={
-        name='forest1',
+    swamp1={
+        name='swamp1',
         frameWidth=928,
         frameHeight=800,
         sheetWidth=3712,
@@ -34,16 +34,22 @@ local mapDefinitions={
             {x=857,y=100,w=71,h=593},
         },
         spawnArea={x=80,y=112,w=768,h=576},
-        -- playerStartPos={x=432,y=368}, --testing-- center spawn --testing--
-        playerStartPos={x=80,y=672}, 
+        playerStartPos={x=432,y=368}, --testing-- center spawn --testing--
+        -- playerStartPos={x=80,y=672}, 
         terrain={
-            treeSmall=10,
-            treeMedium=10,
-            treeLarge=10,
-            treePine=10,
+            -- rockCaveLarge=30,
+            treeMedium=20,
+            treeLarge=20,
+            treePine=20,
             pitWater1=8,
             pitWater2=6,
             pitWater3=4,
+            -- mushroomBig=30,
+            mushroomSwamp=40,
+        },
+        decorations={
+            swampSmall=200,
+            swampBig=10,
         },
     },
 }
@@ -78,28 +84,39 @@ end
 return { --The Module
     terrainClass=require 'src/levels/terrain',
     gridClass=require 'src/levels/grid',
+    decorationsClass=require 'src/levels/decorations',
     levelDefinitions=levelDefinitions,
     mapDefinitions=mapDefinitions,
     spriteSheets=spriteSheets,
     animations=animations,
-    currentMap={},
+    currentLevel={},
     generateLevelBoundaries=generateLevelBoundaries,
     
     update=function(self) 
-        self.currentMap.anim:update(dt) 
+        self.currentLevel.anim:update(dt) 
         --testing-----------------------------
-        if dt>0.1 then self:destroyLevel() end
+        if love.timer.getAverageDelta()>0.1 then self:destroyLevel() end
         --testing-----------------------------
     end,    
 
     draw=function(self) 
-        self.currentMap.anim:draw(self.currentMap.spriteSheet,0,0) 
+        self.currentLevel.anim:draw(self.currentLevel.spriteSheet,0,0) 
+        for i=1,#self.currentLevel.decorations do --draw ground decorations
+            self.currentLevel.decorations[i]:draw()
+        end
         --testing------------------------------------------------------
-        -- for i=1,#self.currentMap.grid do 
-        --     for j=1,#self.currentMap.grid[i] do
-        --         local tile=self.currentMap.grid[i][j] 
-        --         if not tile.taken then 
+        -- for i=1,#self.currentLevel.grid do 
+        --     for j=1,#self.currentLevel.grid[i] do
+        --         local tile=self.currentLevel.grid[i][j] 
+        --         if #tile.occupiedBy>0 then 
+        --             local o=tile.occupiedBy[1]
+        --             if o=='playerSpawn' then love.graphics.setColor(1,0,0)
+        --             elseif o=='terrain' then love.graphics.setColor(0,1,0)
+        --             elseif o=='border' then love.graphics.setColor(0,0,1)
+        --             elseif o=='decoration' then love.graphics.setColor(0,1,1)
+        --             end
         --             love.graphics.rectangle('line',tile.x,tile.y,16,16)
+        --             love.graphics.setColor(1,1,1,1)
         --         end
         --     end
         -- end
@@ -123,20 +140,27 @@ return { --The Module
         --spawn map terrain, using gridClass to ensure no overlap
         self.gridClass:generateTerrain(map.terrain,self.terrainClass,grid)
 
-        self.currentMap={
+        --spawn ground decorations, using gridClass to ensure no overlap
+        local decorations=self.gridClass:generateDecorations(
+            map.decorations,self.decorationsClass,grid
+        )
+
+        self.currentLevel={
+            name=lvl,
             spriteSheet=self.spriteSheets[map.name],
             anim=self.animations[map.name],
             levelBoundaries=self.generateLevelBoundaries(map.boundaries),
+            decorations=decorations,
             grid=grid,
         }
     end,
 
     destroyLevel=function(self)
-        for i=1,#self.currentMap.levelBoundaries do 
-            local b=self.currentMap.levelBoundaries[i]
+        for i=1,#self.currentLevel.levelBoundaries do 
+            local b=self.currentLevel.levelBoundaries[i]
             World:remove(b)
         end
-        self.currentMap.levelBoundaries={}
+        self.currentLevel.levelBoundaries={}
         Objects:clear()
     end,
 }

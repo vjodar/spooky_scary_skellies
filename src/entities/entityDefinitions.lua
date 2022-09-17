@@ -353,8 +353,8 @@ return {
             range=70,        
             period=3,
             damage=1,
-            knockback=800,
-            lungeForce=1000,
+            knockback=700,
+            lungeForce=800,
         },
         collider={
             w=14,

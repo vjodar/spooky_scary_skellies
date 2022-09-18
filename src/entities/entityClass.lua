@@ -67,7 +67,7 @@ entityClass.new=function(self,entity,x,y) --constructor
     e.linearDamping=def.collider.linearDamping or 10
     e.restitution=def.collider.restitution or 0.5
     e.stopThreshold=3*60 --at 60fps, stop moving when speed<3
-    e.collisionClass=def.collider.class 
+    e.collisionClass=def.collider.class
     local collisionFilter=def.collider.collisionFilter or def.collider.class
     local moveFilter=def.collider.moveFilter or 'pitOrSolidOrBoundary'
     local losFilter=def.collider.losFilter or 'pitOrSolid'
@@ -123,6 +123,8 @@ entityClass.new=function(self,entity,x,y) --constructor
 
     World:addItem(e)
     table.insert(Objects.table,e)
+    LevelManager:increaseEntityCount(e.collisionClass)
+
     return e
 end
 

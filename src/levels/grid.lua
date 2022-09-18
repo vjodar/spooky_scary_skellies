@@ -115,15 +115,23 @@ local centerInTiles=function(self,terrainDef,x,y)
     return alignRectCenters(smallRect,bigRect)
 end
 
+local throughoutTiles=function(self,def,x,y,tileSize)
+    local smallRect={w=def.w,h=def.h}
+    local bigRect={w=tileSize.w*self.tileSize,h=tileSize.h*self.tileSize}
+    local maxX=(bigRect.w-smallRect.w) 
+    local maxY=(bigRect.h-smallRect.h)
+    return x+rnd()*maxX, y+rnd()*maxY
+end
+
 --spawns the map terrain, using getAvailableTiles() to ensure terrain 
 --objects never spawn on top of one another.
 local generateTerrain=function(self,mapTerrain,terrainClass,grid)
-    for name,count in pairs(mapTerrain) do 
+    for name,maxCount in pairs(mapTerrain) do 
         --terrain has a 1-tile size surrounding border
         local terrainTileSize=self:getBorderedTileSize(terrainClass.definitions[name])
         local availableTiles=self:getAvailableTiles(grid,terrainTileSize,'terrain')    
 
-        for i=1,count do 
+        for i=1,rnd(maxCount) do 
             if #availableTiles>0 then
                 --select a tile at which to spawn the terrain object
                 local selectedIndex=rnd(#availableTiles)
@@ -151,7 +159,7 @@ local generateTerrain=function(self,mapTerrain,terrainClass,grid)
                         table.insert(grid[tileX+j][tileY+k].occupiedBy,'terrain') 
                     end
                 end
-                if i<count then --don't rebuild after last of a certain terrain
+                if i<maxCount then --don't rebuild after last of a certain terrain
                     availableTiles=self:getAvailableTiles(
                         grid,terrainTileSize,'terrain'
                     )
@@ -167,11 +175,11 @@ end
 local generateDecorations=function(self,mapDecorations,decorationsClass,grid)
     local decorations={}
 
-    for name,count in pairs(mapDecorations) do 
+    for name,maxCount in pairs(mapDecorations) do 
         local decorTileSize=self:getTileSize(decorationsClass.definitions[name])
         local availableTiles=self:getAvailableTiles(grid,decorTileSize,'decoration')    
 
-        for i=1,count do 
+        for i=1,rnd(maxCount) do 
             if #availableTiles>0 then
                 --select a tile at which to spawn the decoration object
                 local selectedIndex=rnd(#availableTiles)
@@ -196,7 +204,7 @@ local generateDecorations=function(self,mapDecorations,decorationsClass,grid)
                             table.insert(grid[tileX+j][tileY+k].occupiedBy,'decoration')
                         end
                     end
-                    if i<count then --don't rebuild after last of a certain decoration
+                    if i<maxCount then --don't rebuild after last of a certain decoration
                         availableTiles=self:getAvailableTiles(grid,decorTileSize,'decoration')
                     end
                 end
@@ -210,6 +218,27 @@ local generateDecorations=function(self,mapDecorations,decorationsClass,grid)
     return decorations
 end
 
+local generateEnemies=function(self,enemyWave,entitiesClass,grid)
+    for name,count in pairs(enemyWave) do 
+        local enemyColliderDef=entitiesClass.definitions[name].collider
+        local enemyTileSize=self:getTileSize(enemyColliderDef)
+        local availableTiles=self:getAvailableTiles(grid,enemyTileSize,'enemy')
+
+        for i=1,count do 
+            if #availableTiles>0 then
+                --select a tile at which to spawn the decoration object
+                local selectedIndex=rnd(#availableTiles)
+                local selectedTile=availableTiles[selectedIndex]
+                local tileX,tileY=self:getTileCoords(selectedTile)
+                local spawnX,spawnY=self:throughoutTiles(
+                    enemyColliderDef,selectedTile.x,selectedTile.y,enemyTileSize
+                )
+                entitiesClass:new(name,spawnX,spawnY)
+            else print('no available tiles for '..name) break end
+        end
+    end
+end
+
 return { --The Module  
     tileSize=16,
     spawnArea={},
@@ -221,6 +250,8 @@ return { --The Module
     tileOccupiedKey=tileOccupiedKey,
     isOccupied=isOccupied,
     centerInTiles=centerInTiles,
+    throughoutTiles=throughoutTiles,
     generateTerrain=generateTerrain,
     generateDecorations=generateDecorations,
+    generateEnemies=generateEnemies,
 }

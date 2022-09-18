@@ -1,15 +1,25 @@
 local levelDefinitions={
     test={
         map='swamp1',
-        wave1={
-            pumpkin=5,            
-        },
-        wave2={
-            zombie=5,            
-        },
-        wave3={
-            ent=5,            
-        },
+        waves={
+            {
+                pumpkin=10,        
+                zombie=10,        
+            },
+            {
+                zombie=10,            
+                tombstone=5,            
+            },
+            {
+                spider=10,            
+                spiderEgg=10,            
+            },
+            {
+                pumpkin=10,       
+                ent=5,  
+                headlessHorseman=1,     
+            },
+        }
     },
 }
 
@@ -45,7 +55,7 @@ local mapDefinitions={
             pitWater2=6,
             pitWater3=4,
             -- mushroomBig=30,
-            mushroomSwamp=40,
+            mushroomSwamp=50,
         },
         decorations={
             swampSmall=200,
@@ -61,7 +71,9 @@ local generateDrawData=function(defs)
         local path='assets/maps/'..name..'.png'
         sheets[name]=love.graphics.newImage(path)
 
-        local grid=anim8.newGrid(def.frameWidth,def.frameHeight,def.sheetWidth,def.sheetHeight)
+        local grid=anim8.newGrid(
+            def.frameWidth,def.frameHeight,def.sheetWidth,def.sheetHeight
+        )
         anims[name]=anim8.newAnimation(grid('1-4',1), 0.25)
     end
 
@@ -81,6 +93,14 @@ local generateLevelBoundaries=function(boundaries)
     return levelBoundaries
 end
 
+local increaseEntityCount=function(self,class)
+    self.currentLevel[class..'Count']=self.currentLevel[class..'Count']+1
+end
+
+local decreaseEntityCount=function(self,class)
+    self.currentLevel[class..'Count']=self.currentLevel[class..'Count']-1
+end
+
 return { --The Module
     terrainClass=require 'src/levels/terrain',
     gridClass=require 'src/levels/grid',
@@ -91,12 +111,35 @@ return { --The Module
     animations=animations,
     currentLevel={},
     generateLevelBoundaries=generateLevelBoundaries,
+    increaseEntityCount=increaseEntityCount,
+    decreaseEntityCount=decreaseEntityCount,
     
     update=function(self) 
-        self.currentLevel.anim:update(dt) 
+        local level=self.currentLevel 
+        level.anim:update(dt) 
         --testing-----------------------------
         if love.timer.getAverageDelta()>0.1 then self:destroyLevel() end
         --testing-----------------------------
+
+        if level.complete then
+            return 
+        end
+
+        if level.enemyCount==0 then --current wave of enemies defeated
+
+            --no more waves, proceed to next level
+            if level.currentWave==#level.definition.waves then 
+                level.complete=true 
+                print('level complete!')
+                return 
+            end
+
+            --spawn the next wave of enemies
+            level.currentWave=level.currentWave+1
+            self.gridClass:generateEnemies(
+                level.definition.waves[level.currentWave],Entities,level.grid
+            )
+        end
     end,    
 
     draw=function(self) 
@@ -124,8 +167,8 @@ return { --The Module
     end,
     
     buildLevel=function(self,lvl)
-        local level=self.levelDefinitions[lvl]
-        local map=self.mapDefinitions[level.map]
+        local levelDef=self.levelDefinitions[lvl]
+        local map=self.mapDefinitions[levelDef.map]
         local startPos=map.playerStartPos
 
         love.graphics.setBackgroundColor(map.bgColor)
@@ -147,11 +190,16 @@ return { --The Module
 
         self.currentLevel={
             name=lvl,
+            definition=levelDef,
             spriteSheet=self.spriteSheets[map.name],
             anim=self.animations[map.name],
             levelBoundaries=self.generateLevelBoundaries(map.boundaries),
             decorations=decorations,
             grid=grid,
+            allyCount=0,
+            enemyCount=0,
+            currentWave=0,
+            complete=false,
         }
     end,
 
@@ -161,6 +209,8 @@ return { --The Module
             World:remove(b)
         end
         self.currentLevel.levelBoundaries={}
+        self.currentLevel.allyCount=0
+        self.currentLevel.enemyCount=0
         Objects:clear()
     end,
 }

@@ -102,7 +102,8 @@ behaviors.methods.common={
     end,
 
     die=function(self)
-        self:changeState('dead')
+        self:changeState('dead')        
+        LevelManager:decreaseEntityCount(self.collisionClass)
     end,
 
     clearMoveTarget=function(self)

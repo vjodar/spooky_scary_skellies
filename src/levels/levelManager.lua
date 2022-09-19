@@ -3,23 +3,23 @@ local levelDefinitions={
         map='swamp1',
         waves={
             {
-                pumpkin=10,        
-                zombie=10,        
+                slimeMatron=3,
             },
             {
-                zombie=10,            
-                tombstone=5,            
+                zombie=20,            
+                tombstone=10,            
             },
             {
-                spider=10,            
-                spiderEgg=10,            
+                spider=20,            
+                spiderEgg=20,            
             },
             {
                 pumpkin=10,       
-                ent=5,  
-                headlessHorseman=1,     
+                ent=10,  
+                headlessHorseman=4,     
             },
-        }
+        },
+        maxEnemies=10, --used to limit summoner enemies' minion spawns
     },
 }
 
@@ -44,21 +44,25 @@ local mapDefinitions={
             {x=857,y=100,w=71,h=593},
         },
         spawnArea={x=80,y=112,w=768,h=576},
-        playerStartPos={x=432,y=368}, --testing-- center spawn --testing--
-        -- playerStartPos={x=80,y=672}, 
+        playerStartPos={x=432,y=368},
         terrain={
-            -- rockCaveLarge=30,
+            -- rockCaveLarge=40,
+            rockSwampSmall=10,
+            rockSwampMedium=10,
+            treeSmall=20,
             treeMedium=20,
             treeLarge=20,
             treePine=20,
             pitWater1=8,
             pitWater2=6,
             pitWater3=4,
+            signPost1=2,
+            signPost2=2,
             -- mushroomBig=30,
             mushroomSwamp=50,
         },
         decorations={
-            swampSmall=200,
+            swampSmall=300,
             swampBig=10,
         },
     },
@@ -101,6 +105,10 @@ local decreaseEntityCount=function(self,class)
     self.currentLevel[class..'Count']=self.currentLevel[class..'Count']-1
 end
 
+local maxEnemiesReached=function(self)
+    return self.currentLevel.enemyCount>=self.currentLevel.definition.maxEnemies
+end
+
 return { --The Module
     terrainClass=require 'src/levels/terrain',
     gridClass=require 'src/levels/grid',
@@ -113,17 +121,16 @@ return { --The Module
     generateLevelBoundaries=generateLevelBoundaries,
     increaseEntityCount=increaseEntityCount,
     decreaseEntityCount=decreaseEntityCount,
+    maxEnemiesReached=maxEnemiesReached,
     
     update=function(self) 
         local level=self.currentLevel 
         level.anim:update(dt) 
         --testing-----------------------------
-        if love.timer.getAverageDelta()>0.1 then self:destroyLevel() end
+        -- if love.timer.getAverageDelta()>0.1 then self:destroyLevel() end
         --testing-----------------------------
 
-        if level.complete then
-            return 
-        end
+        if level.complete then return end
 
         if level.enemyCount==0 then --current wave of enemies defeated
 
@@ -151,9 +158,10 @@ return { --The Module
         -- for i=1,#self.currentLevel.grid do 
         --     for j=1,#self.currentLevel.grid[i] do
         --         local tile=self.currentLevel.grid[i][j] 
+        --         love.graphics.rectangle('line',tile.x,tile.y,16,16)
         --         if #tile.occupiedBy>0 then 
         --             local o=tile.occupiedBy[1]
-        --             if o=='playerSpawn' then love.graphics.setColor(1,0,0)
+        --             if o=='player' then love.graphics.setColor(1,0,0)
         --             elseif o=='terrain' then love.graphics.setColor(0,1,0)
         --             elseif o=='border' then love.graphics.setColor(0,0,1)
         --             elseif o=='decoration' then love.graphics.setColor(0,1,1)

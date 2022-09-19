@@ -24,12 +24,12 @@ function love.load()
     Objects=require 'src/objects'
     Shadows=require 'src/shadows'
     Player=require 'src/player'
+    LevelManager=require 'src/levels/levelManager'
     Entities=require 'src/entities/entityClass'
     Projectiles=require 'src/projectiles' 
-    LevelManager=require 'src/levels/levelManager'
     
-    table.insert(gameStates,Controls) --controls first
-    table.insert(gameStates,Timer) --timer second
+    table.insert(gameStates,Timer) --timer first
+    table.insert(gameStates,Controls) --controls second
     table.insert(gameStates,PlayState) --initial game state
     
     PlayState:startGame() --start the game

@@ -759,6 +759,12 @@ behaviors.states.enemy={
         self:updatePosition()
         local onLoop=self:updateAnimation()
         if onLoop then self:changeState('idle') end 
+
+        if LevelManager:maxEnemiesReached() then --don't exceed entity limit
+            self.canAttack.setOnCooldown()
+            self.animations.current:gotoFrame(1)
+            self:changeState('idle')
+        end
         
         if self.canAttack.flag and self:onSpawnMinionFrame() then
             self.canAttack.setOnCooldown()

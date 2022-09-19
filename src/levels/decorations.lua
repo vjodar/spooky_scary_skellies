@@ -10,6 +10,10 @@ local definitions={
             'swampSmall6',
             'swampSmall7',
             'swampSmall8',
+            'swampSmall9',
+            'swampSmall10',
+            'swampSmall11',
+            'swampSmall12',
         },
     },
     swampBig={
@@ -27,6 +31,10 @@ local definitions={
             'caveSmall6',
             'caveSmall7',
             'caveSmall8',
+            'caveSmall9',
+            'caveSmall10',
+            'caveSmall11',
+            'caveSmall12',
         },
     },
     caveBig={
@@ -60,11 +68,8 @@ return { --The Module
     decorDrawFunction=decorDrawFunction, 
     new=function(self,name,x,y) --constructor
         local def=self.definitions[name]
-        local spriteName=rndElement(def.sprites)
-        return {
-            x=x, y=y, w=def.w, h=def.h,
-            sprite=self.sprites[spriteName],
-            draw=self.decorDrawFunction
-        }
+        local w,h=def.w,def.h
+        local sprite=self.sprites[rndElement(def.sprites)]
+        return {x=x,y=y,w=w,h=h,sprite=sprite,draw=self.decorDrawFunction}
     end
 }

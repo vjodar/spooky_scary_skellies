@@ -15,26 +15,42 @@ local generate=function(self,spawnArea,startPos)
         end
     end
 
-    --flag tiles surrounding startPos as taken
-    local tileX,tileY=self:getTileCoords(startPos)
-    local distanceFromStartPos=3
-    for x=-distanceFromStartPos,distanceFromStartPos do
-        if grid[tileX+x] then 
-            for y=-distanceFromStartPos,distanceFromStartPos do 
-                if grid[tileX+x][tileY+y] then 
-                    table.insert(grid[tileX+x][tileY+y].occupiedBy,'playerSpawn')
-                end 
-            end
-        end
-    end
+    self:markPlayerTiles(grid,1) --occupy tiles surrounding player
 
     return grid 
 end
 
 local getTileCoords=function(self,pos) 
-    local tileX=((pos.x-self.spawnArea.x)/self.tileSize)+1 
-    local tileY=((pos.y-self.spawnArea.y)/self.tileSize)+1
+    local tileX=floor(((pos.x-self.spawnArea.x)/self.tileSize)+1)
+    local tileY=floor(((pos.y-self.spawnArea.y)/self.tileSize)+1)
     return tileX,tileY
+end
+
+local markPlayerTiles=function(self,grid,radius)
+    local tileX,tileY=self:getTileCoords(Player)
+    local distanceFromPlayer=radius
+    for x=-distanceFromPlayer,distanceFromPlayer do
+        if grid[tileX+x] then 
+            for y=-distanceFromPlayer,distanceFromPlayer do 
+                if grid[tileX+x][tileY+y] then 
+                    table.insert(grid[tileX+x][tileY+y].occupiedBy,'player')
+                end 
+            end
+        end
+    end
+end
+
+local clearPlayerTiles=function(grid)
+    for row=1,#grid do 
+        for col=1,#grid[row] do 
+            for i=1,#grid[row][col].occupiedBy do 
+                local occupier=grid[row][col].occupiedBy[i]
+                if occupier=='player' then
+                    table.remove(grid[row][col].occupiedBy,i)
+                end
+            end
+        end
+    end
 end
 
 --returns the tileSize of an object
@@ -80,9 +96,9 @@ end
 
 --[key] cannot occupy a tile already taken by any of the types in its table.
 local tileOccupiedKey={
-    terrain={'playerSpawn','terrain','border','decoration'},
+    terrain={'player','terrain','border','decoration'},
     decoration={'terrain','decoration'},
-    enemy={'playerSpawn','terrain'}
+    enemy={'player','terrain'}
 }
 
 --checks if any element of key is in tile.occupiedBy
@@ -97,26 +113,8 @@ local isOccupied=function(tile,key)
     return res
 end
 
-local centerInTiles=function(self,terrainDef,x,y)
-    local objectTileSize=self:getTileSize(terrainDef)
-    local cw,ch=terrainDef.w,terrainDef.h
-
-    --terrain takes up entirety of its tiles, no need to center
-    if cw==(objectTileSize.w*self.tileSize)
-    and ch==(objectTileSize.h*self.tileSize)
-    then return x,y end 
-
-    local smallRect={x=x,y=y,w=cw,h=ch}
-    local bigRect={
-        x=x,y=y,
-        w=objectTileSize.w*self.tileSize,
-        h=objectTileSize.h*self.tileSize
-    }
-    return alignRectCenters(smallRect,bigRect)
-end
-
-local throughoutTiles=function(self,def,x,y,tileSize)
-    local smallRect={w=def.w,h=def.h}
+local throughoutTiles=function(self,x,y,w,h,tileSize)
+    local smallRect={w=w,h=h}
     local bigRect={w=tileSize.w*self.tileSize,h=tileSize.h*self.tileSize}
     local maxX=(bigRect.w-smallRect.w) 
     local maxY=(bigRect.h-smallRect.h)
@@ -128,7 +126,8 @@ end
 local generateTerrain=function(self,mapTerrain,terrainClass,grid)
     for name,maxCount in pairs(mapTerrain) do 
         --terrain has a 1-tile size surrounding border
-        local terrainTileSize=self:getBorderedTileSize(terrainClass.definitions[name])
+        local terrainDef=terrainClass.definitions[name]
+        local terrainTileSize=self:getBorderedTileSize(terrainDef)
         local availableTiles=self:getAvailableTiles(grid,terrainTileSize,'terrain')    
 
         for i=1,rnd(maxCount) do 
@@ -138,12 +137,11 @@ local generateTerrain=function(self,mapTerrain,terrainClass,grid)
                 local selectedTile=availableTiles[selectedIndex]
                 local tileX,tileY=self:getTileCoords(selectedTile)
 
-                --spawn the terrain object centered in it's tile(s), 
+                --spawn the terrain object somewhere throughout its tiles, 
                 --taking into account the 1-tile surrounding border
-                local spawnX,spawnY=self:centerInTiles(
-                    terrainClass.definitions[name],
-                    selectedTile.x+self.tileSize,
-                    selectedTile.y+self.tileSize
+                local spawnX,spawnY=self:throughoutTiles(                    
+                    selectedTile.x+self.tileSize,selectedTile.y+self.tileSize,
+                    terrainDef.w,terrainDef.h,self:getTileSize(terrainDef)
                 )
                 terrainClass:new(name,spawnX,spawnY)
     
@@ -185,8 +183,7 @@ local generateDecorations=function(self,mapDecorations,decorationsClass,grid)
                 local selectedIndex=rnd(#availableTiles)
                 local selectedTile=availableTiles[selectedIndex]
                 local tileX,tileY=self:getTileCoords(selectedTile)
-                table.insert(
-                    decorations,
+                table.insert( decorations,
                     decorationsClass:new(
                         name,selectedTile.x,selectedTile.y
                     )
@@ -209,7 +206,7 @@ local generateDecorations=function(self,mapDecorations,decorationsClass,grid)
                     end
                 end
             else 
-                print('no more tiles available to spawn '..name) 
+                print('no more tiles available to spawn '..selectedDecor) 
                 break
             end
         end
@@ -219,6 +216,10 @@ local generateDecorations=function(self,mapDecorations,decorationsClass,grid)
 end
 
 local generateEnemies=function(self,enemyWave,entitiesClass,grid)
+    --update grid with the tile currently occupied by player
+    self.clearPlayerTiles(grid)
+    self:markPlayerTiles(grid,3)
+
     for name,count in pairs(enemyWave) do 
         local enemyColliderDef=entitiesClass.definitions[name].collider
         local enemyTileSize=self:getTileSize(enemyColliderDef)
@@ -231,7 +232,8 @@ local generateEnemies=function(self,enemyWave,entitiesClass,grid)
                 local selectedTile=availableTiles[selectedIndex]
                 local tileX,tileY=self:getTileCoords(selectedTile)
                 local spawnX,spawnY=self:throughoutTiles(
-                    enemyColliderDef,selectedTile.x,selectedTile.y,enemyTileSize
+                    selectedTile.x,selectedTile.y,
+                    enemyColliderDef.w,enemyColliderDef.h,enemyTileSize
                 )
                 entitiesClass:new(name,spawnX,spawnY)
             else print('no available tiles for '..name) break end
@@ -245,11 +247,12 @@ return { --The Module
     generate=generate,
     getTileCoords=getTileCoords,
     getTileSize=getTileSize,
+    markPlayerTiles=markPlayerTiles,
+    clearPlayerTiles=clearPlayerTiles,
     getBorderedTileSize=getBorderedTileSize,
     getAvailableTiles=getAvailableTiles,
     tileOccupiedKey=tileOccupiedKey,
     isOccupied=isOccupied,
-    centerInTiles=centerInTiles,
     throughoutTiles=throughoutTiles,
     generateTerrain=generateTerrain,
     generateDecorations=generateDecorations,

@@ -12,6 +12,8 @@ local definitions={
             'mushroomBig8',
             'mushroomBig9',
             'mushroomBig10',
+            'mushroomBig11',
+            'mushroomBig12',
         },
     },
     mushroomSwamp={
@@ -28,6 +30,8 @@ local definitions={
             'mushroomSwamp8',
             'mushroomSwamp9',
             'mushroomSwamp10',
+            'mushroomSwamp11',
+            'mushroomSwamp12',
         },
     },
     mushroomCave={
@@ -44,6 +48,8 @@ local definitions={
             'mushroomCave8',
             'mushroomCave9',
             'mushroomCave10',
+            'mushroomCave11',
+            'mushroomCave12',
         },
     },
     rockCaveLarge={

@@ -735,8 +735,8 @@ return {
             losFilter='solid',
         },
         drawData={
-            frameWidth=14,
-            frameHeight=15,
+            frameWidth=16,
+            frameHeight=16,
         },
         animations={
             idle={
@@ -745,13 +745,13 @@ return {
                 duration=0.1,
             },
             move={
-                frames='1-4',
-                row=1,
+                frames='1-5',
+                row=2,
                 duration=0.1,
             },
             attack={
                 frames='1-13',
-                row=2,
+                row=3,
                 duration=0.1,
                 spawnMinionFrame=7,
             },

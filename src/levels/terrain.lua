@@ -84,40 +84,104 @@ local definitions={
     treePine={w=12,h=8,yOffset=13,},
     treeSmall={w=10,h=6,yOffset=15,},
 
+    pitSwampSmall={
+        w=24,h=23,class='pit',
+        sprites={
+            'pitSwamp1',
+            'pitSwamp2',
+            'pitSwamp3',
+            'pitSwamp4',
+        }
+    },
+    pitSwampLarge={
+        w=40,h=39,class='pit',
+        sprites={
+            'pitSwamp5',
+            'pitSwamp6',
+        }
+    },
     pitWater1={
-        w=32, h=32,
+        w=24, h=23,
         class='pit',
-        animation='pit1',
+        animation={frames='1-4',duration=0.25},
     },
     pitWater2={
-        w=48, h=48,
+        w=40, h=39,
         class='pit',
-        animation='pit2',
+        animation={frames='1-4',duration=0.25},
     },
     pitWater3={
-        w=64, h=64,
+        w=56, h=54,
         class='pit',
-        animation='pit3',
+        animation={frames='1-4',duration=0.25},
+    },
+    moundSwampSmall={
+        w=34,h=37,class='solid',
+        sprites={
+            'moundSwamp1',
+            'moundSwamp2',
+            'moundSwamp3',
+            'moundSwamp4',
+        }
+    },
+    moundSwampLarge={
+        w=50,h=53,class='solid',
+        sprites={
+            'moundSwamp5',
+            'moundSwamp6',
+            'moundSwamp7',
+        }
+    },
+
+    pitCaveSmall={
+        w=26,h=26,class='pit',
+        sprites={
+            'pitCave1',
+            'pitCave2',
+            'pitCave3',
+            'pitCave4',
+        }
+    },
+    pitCaveLarge={
+        w=42,h=42,class='pit',
+        sprites={
+            'pitCave5',
+            'pitCave6',
+            'pitCave7',
+            'pitCave8',
+        }
+    },
+    moundCaveSmall={
+        w=34,h=37,class='solid',
+        sprites={
+            'moundCave1',
+        }
+    },
+    moundCaveLarge={
+        w=50,h=53,class='solid',
+        sprites={
+            'moundCave5',
+        }
     },
     pitLava1={
-        w=32, h=32,
+        w=26, h=26,
         class='pit',
-        animation='pit1',
+        animation={frames='1-4',duration=0.25},
     },
     pitLava2={
-        w=48, h=48,
+        w=42, h=42,
         class='pit',
-        animation='pit2',
+        animation={frames='1-4',duration=0.25},
     },
     pitLava3={
-        w=64, h=64,
+        w=58, h=58,
         class='pit',
-        animation='pit3',
+        animation={frames='1-4',duration=0.25},
     },
 }
 
-local generateSprites=function(defs)
-    local sprites={}
+local generateDrawData=function(defs)
+    local sprites,anims={},{}
 
     local addSprite=function(name)        
         local path='assets/terrain/'..name..'.png'
@@ -130,32 +194,21 @@ local generateSprites=function(defs)
         else --only one sprite
             addSprite(name)
         end
+
+        if def.animation then 
+            local grid=anim8.newGrid(
+                def.w,def.h,sprites[name]:getWidth(),def.h
+            )
+            local animDef=def.animation
+            anims[name]=anim8.newAnimation(
+                grid(animDef.frames,1),animDef.duration
+            )
+        end
     end
 
-    return sprites 
+    return sprites,anims
 end
-local sprites=generateSprites(definitions)
-
-local generateAnimations=function(defs)
-    local grids={
-        pit1=anim8.newGrid(32,32,128,32),
-        pit2=anim8.newGrid(48,48,192,48),
-        pit3=anim8.newGrid(64,64,256,64),
-    }
-    local baseAnims={
-        pit1=anim8.newAnimation(grids.pit1('1-4',1),0.25),
-        pit2=anim8.newAnimation(grids.pit2('1-4',1),0.25),
-        pit3=anim8.newAnimation(grids.pit3('1-4',1),0.25),
-    }
-
-    local anims={}
-    for name,def in pairs(defs) do 
-        if def.animation then anims[name]=baseAnims[def.animation] end
-    end
-
-    return anims 
-end
-local animations=generateAnimations(definitions)
+local sprites,animations=generateDrawData(definitions)
 
 local terrainUpdateFunction=function(self)
     if self.anim then self.anim:update(dt) end

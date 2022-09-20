@@ -1,9 +1,9 @@
 local levelDefinitions={
     test={
-        map='swamp1',
+        map='cave2',
         waves={
             {
-                slimeMatron=3,
+                vampire=3,
             },
             {
                 zombie=20,            
@@ -24,18 +24,24 @@ local levelDefinitions={
 }
 
 local bgColors={
-    water={92/255,105/255,159/255},
     black={53/255,53/255,64/255},
+    swamp={68/255,99/255,80/255},
+    cave={126/255,103/255,76/255},
+    water={92/255,105/255,159/255},
     lava={229/255,111/255,75/255},
 }
 
 local mapDefinitions={
     swamp1={
         name='swamp1',
-        frameWidth=928,
-        frameHeight=800,
-        sheetWidth=3712,
-        sheetHeight=800,
+        animation={
+            frameWidth=928,
+            frameHeight=800,
+            sheetWidth=3712,
+            sheetHeight=800,
+            frames='1-4',
+            duration=0.25,
+        },
         bgColor=bgColors.water,
         boundaries={
             {x=0,y=0,w=928,h=100}, 
@@ -53,37 +59,147 @@ local mapDefinitions={
             treeMedium=20,
             treeLarge=20,
             treePine=20,
-            pitWater1=8,
-            pitWater2=6,
-            pitWater3=4,
-            signPost1=2,
-            signPost2=2,
+            pitWater1=5,
+            pitWater2=5,
+            pitWater3=3,
+            -- signPost1=2,
+            -- signPost2=2,
             -- mushroomBig=30,
-            mushroomSwamp=50,
+            mushroomSwamp=20,
+            pitSwampSmall=5,
+            pitSwampLarge=2,
+            moundSwampSmall=5,
+            moundSwampLarge=2,
         },
         decorations={
             swampSmall=300,
-            swampBig=10,
+            swampBig=20,
+        },
+    },
+    swamp2={
+        name='swamp2',
+        bgColor=bgColors.swamp,
+        boundaries={
+            {x=0,y=0,w=928,h=108}, 
+            {x=0,y=697,w=928,h=103},
+            {x=0,y=108,w=71,h=589}, 
+            {x=857,y=108,w=71,h=589},
+        },
+        spawnArea={x=80,y=112,w=768,h=576},
+        playerStartPos={x=432,y=368},
+        terrain={
+            -- rockCaveLarge=40,
+            rockSwampSmall=10,
+            rockSwampMedium=10,
+            treeSmall=20,
+            treeMedium=20,
+            treeLarge=20,
+            treePine=20,
+            pitWater1=5,
+            pitWater2=5,
+            pitWater3=3,
+            -- signPost1=2,
+            -- signPost2=2,
+            -- mushroomBig=30,
+            mushroomSwamp=20,
+            pitSwampSmall=5,
+            pitSwampLarge=2,
+            moundSwampSmall=5,
+            moundSwampLarge=2,
+        },
+        decorations={
+            swampSmall=300,
+            swampBig=20,
+        },
+    },
+    cave1={
+        name='cave1',
+        animation={            
+            frameWidth=928,
+            frameHeight=800,
+            sheetWidth=3712,
+            sheetHeight=800,
+            frames='1-4',
+            duration=0.25,
+        },
+        bgColor=bgColors.lava,
+        boundaries={
+            {x=0,y=0,w=928,h=112}, 
+            {x=0,y=688,w=928,h=112},
+            {x=0,y=112,w=80,h=576}, 
+            {x=848,y=112,w=80,h=576},
+        },
+        spawnArea={x=80,y=112,w=768,h=576},
+        playerStartPos={x=432,y=368},
+        terrain={
+            rockCaveLarge=10,
+            rockCaveSmall=10,
+            rockCaveMedium=10,
+            rockGem=10,
+            pitLava1=5,
+            pitLava2=5,
+            pitLava3=3,
+            mushroomBig=30,
+            mushroomCave=50,
+        },
+        decorations={
+            caveSmall=300,
+            caveBig=10,
+        },
+    },
+    cave2={
+        name='cave2',
+        bgColor=bgColors.cave,
+        boundaries={
+            {x=0,y=0,w=928,h=108}, 
+            {x=0,y=697,w=928,h=103},
+            {x=0,y=108,w=71,h=589}, 
+            {x=857,y=108,w=71,h=589},
+        },
+        spawnArea={x=80,y=112,w=768,h=576},
+        playerStartPos={x=432,y=368},
+        terrain={
+            rockCaveLarge=10,
+            rockCaveSmall=10,
+            rockCaveMedium=10,
+            rockGem=10,
+            pitLava1=5,
+            pitLava2=5,
+            pitLava3=3,
+            mushroomBig=30,
+            mushroomCave=30,
+            pitCaveSmall=5,
+            pitCaveLarge=2,
+            moundCaveSmall=5,
+            moundCaveLarge=2,
+        },
+        decorations={
+            caveSmall=300,
+            caveBig=10,
         },
     },
 }
 
 local generateDrawData=function(defs)
-    local sheets,anims={},{}
+    local sprites,anims={},{}
 
     for name,def in pairs(defs) do 
         local path='assets/maps/'..name..'.png'
-        sheets[name]=love.graphics.newImage(path)
+        sprites[name]=love.graphics.newImage(path)
 
-        local grid=anim8.newGrid(
-            def.frameWidth,def.frameHeight,def.sheetWidth,def.sheetHeight
-        )
-        anims[name]=anim8.newAnimation(grid('1-4',1), 0.25)
+        if def.animation then    
+            animDef=def.animation         
+            local grid=anim8.newGrid(
+                animDef.frameWidth,animDef.frameHeight,
+                animDef.sheetWidth,animDef.sheetHeight
+            )
+            anims[name]=anim8.newAnimation(grid(animDef.frames,1), animDef.duration)
+        end
     end
 
-    return sheets,anims 
+    return sprites,anims 
 end
-local spriteSheets,animations=generateDrawData(mapDefinitions)
+local sprites,animations=generateDrawData(mapDefinitions)
 
 --creates the physical level boundaries that no entity can go
 local generateLevelBoundaries=function(boundaries)
@@ -115,7 +231,7 @@ return { --The Module
     decorationsClass=require 'src/levels/decorations',
     levelDefinitions=levelDefinitions,
     mapDefinitions=mapDefinitions,
-    spriteSheets=spriteSheets,
+    sprites=sprites,
     animations=animations,
     currentLevel={},
     generateLevelBoundaries=generateLevelBoundaries,
@@ -125,7 +241,7 @@ return { --The Module
     
     update=function(self) 
         local level=self.currentLevel 
-        level.anim:update(dt) 
+        if level.anim then level.anim:update(dt) end
         --testing-----------------------------
         -- if love.timer.getAverageDelta()>0.1 then self:destroyLevel() end
         --testing-----------------------------
@@ -150,7 +266,13 @@ return { --The Module
     end,    
 
     draw=function(self) 
-        self.currentLevel.anim:draw(self.currentLevel.spriteSheet,0,0) 
+        local level=self.currentLevel
+        if level.anim then 
+            level.anim:draw(self.currentLevel.sprite,0,0) 
+        else
+            love.graphics.draw(level.sprite,0,0)
+        end
+
         for i=1,#self.currentLevel.decorations do --draw ground decorations
             self.currentLevel.decorations[i]:draw()
         end
@@ -199,9 +321,9 @@ return { --The Module
         self.currentLevel={
             name=lvl,
             definition=levelDef,
-            spriteSheet=self.spriteSheets[map.name],
-            anim=self.animations[map.name],
-            levelBoundaries=self.generateLevelBoundaries(map.boundaries),
+            sprite=self.sprites[map.name],
+            anim=self.animations[map.name] or nil,
+            boundaries=self.generateLevelBoundaries(map.boundaries),
             decorations=decorations,
             grid=grid,
             allyCount=0,
@@ -212,11 +334,11 @@ return { --The Module
     end,
 
     destroyLevel=function(self)
-        for i=1,#self.currentLevel.levelBoundaries do 
-            local b=self.currentLevel.levelBoundaries[i]
+        for i=1,#self.currentLevel.boundaries do 
+            local b=self.currentLevel.boundaries[i]
             World:remove(b)
         end
-        self.currentLevel.levelBoundaries={}
+        self.currentLevel.boundaries={}
         self.currentLevel.allyCount=0
         self.currentLevel.enemyCount=0
         Objects:clear()

@@ -26,6 +26,8 @@ local shadowNames={
     'imp',                  --9,6
     'gnasherDemon',
     'frankenstein',         --20x11
+    'werebear',             --30x11
+    'werewolf',             --18x8
 
     --projectiles
     'arrow',

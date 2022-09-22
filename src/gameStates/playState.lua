@@ -15,6 +15,7 @@ end
 function PlayState:draw()
     LevelManager:draw()
     Objects:draw()
+    LevelManager:drawForeground()
 end
 
 --testing-------------------
@@ -25,7 +26,7 @@ function love.keyreleased(k)
         LevelManager:buildLevel(LevelManager.currentLevel.name)
     end
     if k=='p' then 
-        for i=1,1 do Entities:new('headlessHorseman',Controls.getMousePosition()) end
+        for i=1,1 do Entities:new('werebear',Controls.getMousePosition()) end
         -- for i=1,1 do Entities:new('spider',Controls.getMousePosition()) end
         -- for i=1,1 do Entities:new('bat',Controls.getMousePosition()) end
         -- for i=1,1 do Entities:new('headlessHorseman',Controls.getMousePosition()) end

@@ -1,9 +1,9 @@
 local levelDefinitions={
     test={
-        map='cave2',
+        map='dungeon6',
         waves={
             {
-                vampire=3,
+                werebear=30,
             },
             {
                 zombie=20,            
@@ -32,7 +32,7 @@ local bgColors={
 }
 
 local mapDefinitions={
-    swamp1={
+    swamp1={ --island in water
         name='swamp1',
         animation={
             frameWidth=928,
@@ -44,10 +44,10 @@ local mapDefinitions={
         },
         bgColor=bgColors.water,
         boundaries={
-            {x=0,y=0,w=928,h=100}, 
-            {x=0,y=693,w=928,h=107},
-            {x=0,y=100,w=71,h=593}, 
-            {x=857,y=100,w=71,h=593},
+            t={{x=0,y=100,w=928,},},
+            b={{x=0,y=693,w=928,},},
+            l={{x=71,y=0,h=800,},},
+            r={{x=856,y=0,h=800,},},
         },
         spawnArea={x=80,y=112,w=768,h=576},
         playerStartPos={x=432,y=368},
@@ -76,16 +76,17 @@ local mapDefinitions={
             swampBig=20,
         },
     },
-    swamp2={
+    swamp2={ --enclosed
         name='swamp2',
         bgColor=bgColors.swamp,
         boundaries={
-            {x=0,y=0,w=928,h=108}, 
-            {x=0,y=697,w=928,h=103},
-            {x=0,y=108,w=71,h=589}, 
-            {x=857,y=108,w=71,h=589},
+            t={{x=0,y=61,w=800,class='solid'},}, 
+            b={{x=0,y=655,w=800,class='solid'},},
+            l={{x=8,y=0,h=656,class='solid'},},
+            r={{x=791,y=0,h=656,class='solid'},},
         },
-        spawnArea={x=80,y=112,w=768,h=576},
+        foreground='swamp',
+        spawnArea={x=16,y=64,w=768,h=576},
         playerStartPos={x=432,y=368},
         terrain={
             -- rockCaveLarge=40,
@@ -112,9 +113,9 @@ local mapDefinitions={
             swampBig=20,
         },
     },
-    cave1={
+    cave1={ --island in lava
         name='cave1',
-        animation={            
+        animation={
             frameWidth=928,
             frameHeight=800,
             sheetWidth=3712,
@@ -124,10 +125,10 @@ local mapDefinitions={
         },
         bgColor=bgColors.lava,
         boundaries={
-            {x=0,y=0,w=928,h=112}, 
-            {x=0,y=688,w=928,h=112},
-            {x=0,y=112,w=80,h=576}, 
-            {x=848,y=112,w=80,h=576},
+            t={{x=0,y=100,w=928,},},
+            b={{x=0,y=693,w=928,},},
+            l={{x=71,y=0,h=800,},},
+            r={{x=856,y=0,h=800,},},
         },
         spawnArea={x=80,y=112,w=768,h=576},
         playerStartPos={x=432,y=368},
@@ -147,16 +148,17 @@ local mapDefinitions={
             caveBig=10,
         },
     },
-    cave2={
+    cave2={ --enclosed
         name='cave2',
         bgColor=bgColors.cave,
         boundaries={
-            {x=0,y=0,w=928,h=108}, 
-            {x=0,y=697,w=928,h=103},
-            {x=0,y=108,w=71,h=589}, 
-            {x=857,y=108,w=71,h=589},
+            t={{x=0,y=61,w=800,class='solid'},}, 
+            b={{x=0,y=655,w=800,class='solid'},},
+            l={{x=8,y=0,h=656,class='solid'},},
+            r={{x=791,y=0,h=656,class='solid'},},
         },
-        spawnArea={x=80,y=112,w=768,h=576},
+        foreground='cave',
+        spawnArea={x=16,y=64,w=768,h=576},
         playerStartPos={x=432,y=368},
         terrain={
             rockCaveLarge=10,
@@ -178,10 +180,178 @@ local mapDefinitions={
             caveBig=10,
         },
     },
+    dungeon1={ --green carpet
+        name='dungeon1',
+        bgColor=bgColors.black,
+        foreground='dungeon',
+        boundaries={
+            t={{x=0,y=26,w=544,class='solid'},},
+            b={{x=0,y=390,w=544,class='solid'},},
+            l={{x=10,y=0,h=400,class='solid'},},
+            r={{x=533,y=0,h=400,class='solid'},},
+        },
+        spawnArea={x=16,y=32,w=496,h=336},
+        playerStartPos={x=332,y=268},
+        terrain={
+            tableSmall=3,
+            tableVertical=3,
+            tableLarge=3,
+            crateSmall=5,
+            crateLarge=5,
+        }
+    },
+    dungeon2={ --red carpet
+        name='dungeon2',
+        bgColor=bgColors.black,
+        foreground='dungeon',
+        boundaries={
+            t={{x=0,y=26,w=544,class='solid'},},
+            b={{x=0,y=390,w=544,class='solid'},},
+            l={{x=10,y=0,h=400,class='solid'},},
+            r={{x=533,y=0,h=400,class='solid'},},
+        },
+        spawnArea={x=16,y=32,w=496,h=336},
+        playerStartPos={x=332,y=268},
+        terrain={
+            tableSmall=3,
+            tableVertical=3,
+            tableLarge=3,
+            crateSmall=5,
+            crateLarge=5,
+        }
+    },
+    dungeon3={ --blue carpet
+        name='dungeon3',
+        bgColor=bgColors.black,
+        foreground='dungeon',
+        boundaries={
+            t={{x=0,y=26,w=544,class='solid'},},
+            b={{x=0,y=390,w=544,class='solid'},},
+            l={{x=10,y=0,h=400,class='solid'},},
+            r={{x=533,y=0,h=400,class='solid'},},
+        },
+        spawnArea={x=16,y=32,w=496,h=336},
+        playerStartPos={x=332,y=268},
+        terrain={
+            tableSmall=3,
+            tableVertical=3,
+            tableLarge=3,
+            crateSmall=5,
+            crateLarge=5,
+        }
+    },
+    dungeon4={ --surrounded by water
+        name='dungeon4',
+        animation={
+            frameWidth=544,
+            frameHeight=400,
+            sheetWidth=2176,
+            sheetHeight=400,
+            frames='1-4',
+            duration=0.25,
+        },
+        bgColor=bgColors.black,
+        foreground='dungeon',
+        boundaries={
+            t={
+                {x=0,y=26,w=544,class='solid'},
+                {x=0,y=53,w=544,class='pit'},
+            },
+            b={
+                {x=0,y=390,w=544,class='solid'},
+                {x=0,y=361,w=544,class='pit'},
+            },
+            l={
+                {x=10,y=0,h=400,class='solid'},
+                {x=38,y=0,h=400,class='pit'},
+            },
+            r={
+                {x=533,y=0,h=400,class='solid'},
+                {x=505,y=0,h=400,class='pit'},
+            },
+        },
+        spawnArea={x=48,y=64,w=448,h=288},
+        playerStartPos={x=100,y=100},
+        terrain={
+            pitDungeonWaterSmall=3,
+        },
+    },
+    dungeon5={ --surrounded by lava
+        name='dungeon5',
+        animation={
+            frameWidth=544,
+            frameHeight=400,
+            sheetWidth=2176,
+            sheetHeight=400,
+            frames='1-4',
+            duration=0.25,
+        },
+        bgColor=bgColors.black,
+        foreground='dungeon',
+        boundaries={
+            t={
+                {x=0,y=26,w=544,class='solid'},
+                {x=0,y=69,w=544,class='pit'},
+            },
+            b={
+                {x=0,y=390,w=544,class='solid'},
+                {x=0,y=344,w=544,class='pit'},
+            },
+            l={
+                {x=10,y=0,h=400,class='solid'},
+                {x=54,y=0,h=400,class='pit'},
+            },
+            r={
+                {x=533,y=0,h=400,class='solid'},
+                {x=489,y=0,h=400,class='pit'},
+            },
+        },
+        spawnArea={x=64,y=80,w=416,h=256},
+        playerStartPos={x=100,y=100},
+        terrain={
+            pitDungeonLavaSmall=3,
+        },
+    },
+    dungeon6={ --surrounded by acid
+        name='dungeon6',
+        animation={
+            frameWidth=544,
+            frameHeight=400,
+            sheetWidth=2176,
+            sheetHeight=400,
+            frames='1-4',
+            duration=0.25,
+        },
+        bgColor=bgColors.black,
+        foreground='dungeon',
+        boundaries={
+            t={
+                {x=0,y=26,w=544,class='solid'},
+                {x=0,y=85,w=544,class='pit'},
+            },
+            b={
+                {x=0,y=390,w=544,class='solid'},
+                {x=0,y=328,w=544,class='pit'},
+            },
+            l={
+                {x=10,y=0,h=400,class='solid'},
+                {x=70,y=0,h=400,class='pit'},
+            },
+            r={
+                {x=533,y=0,h=400,class='solid'},
+                {x=473,y=0,h=400,class='pit'},
+            },
+        },
+        spawnArea={x=80,y=96,w=384,h=224},
+        playerStartPos={x=100,y=100},
+        terrain={
+            pitDungeonAcidSmall=3,
+        },
+    },
 }
 
 local generateDrawData=function(defs)
-    local sprites,anims={},{}
+    local sprites,anims,foregrounds={},{},{}
 
     for name,def in pairs(defs) do 
         local path='assets/maps/'..name..'.png'
@@ -195,20 +365,60 @@ local generateDrawData=function(defs)
             )
             anims[name]=anim8.newAnimation(grid(animDef.frames,1), animDef.duration)
         end
-    end
 
-    return sprites,anims 
+        if def.foreground then 
+            local foregroundPath='assets/maps/foreground/'..def.foreground..'.png'
+            foregrounds[name]=love.graphics.newImage(foregroundPath)
+        end
+    end 
+
+    return sprites,anims,foregrounds
 end
-local sprites,animations=generateDrawData(mapDefinitions)
+local sprites,animations,foregrounds=generateDrawData(mapDefinitions)
 
 --creates the physical level boundaries that no entity can go
 local generateLevelBoundaries=function(boundaries)
+    local boundaryThickness=64
     local levelBoundaries={}
-    for i=1,#boundaries do 
-        local b=boundaries[i]
-        b.collisionClass='boundary'
-        World:addItem(b)
-        table.insert(levelBoundaries,b)
+    for i=1,#boundaries.t do 
+        local b=boundaries.t[i]
+        local boundary={
+            x=b.x,y=b.y-boundaryThickness,
+            w=b.w,h=boundaryThickness,
+            collisionClass=b.class or 'boundary'
+        }
+        World:addItem(boundary)
+        table.insert(levelBoundaries,boundary)
+    end
+    for i=1,#boundaries.b do         
+        local b=boundaries.b[i]
+        local boundary={
+            x=b.x,y=b.y,
+            w=b.w,h=boundaryThickness,
+            collisionClass=b.class or 'boundary'
+        }
+        World:addItem(boundary)
+        table.insert(levelBoundaries,boundary)
+    end
+    for i=1,#boundaries.l do 
+        local b=boundaries.l[i]
+        local boundary={
+            x=b.x-boundaryThickness,y=b.y,
+            w=boundaryThickness,h=b.h,
+            collisionClass=b.class or 'boundary'
+        }
+        World:addItem(boundary)
+        table.insert(levelBoundaries,boundary)
+    end
+    for i=1,#boundaries.r do 
+        local b=boundaries.r[i]
+        local boundary={
+            x=b.x,y=b.y,
+            w=boundaryThickness,h=b.h,
+            collisionClass=b.class or 'boundary'
+        }
+        World:addItem(boundary)
+        table.insert(levelBoundaries,boundary)
     end
     return levelBoundaries
 end
@@ -225,6 +435,12 @@ local maxEnemiesReached=function(self)
     return self.currentLevel.enemyCount>=self.currentLevel.definition.maxEnemies
 end
 
+local drawForeground=function(self)
+    if self.currentLevel.foreground then 
+        love.graphics.draw(self.currentLevel.foreground,0,0) 
+    end
+end
+
 return { --The Module
     terrainClass=require 'src/levels/terrain',
     gridClass=require 'src/levels/grid',
@@ -233,11 +449,13 @@ return { --The Module
     mapDefinitions=mapDefinitions,
     sprites=sprites,
     animations=animations,
+    foregrounds=foregrounds,
     currentLevel={},
     generateLevelBoundaries=generateLevelBoundaries,
     increaseEntityCount=increaseEntityCount,
     decreaseEntityCount=decreaseEntityCount,
     maxEnemiesReached=maxEnemiesReached,
+    drawForeground=drawForeground,
     
     update=function(self) 
         local level=self.currentLevel 
@@ -293,6 +511,10 @@ return { --The Module
         --         end
         --     end
         -- end
+        for i=1,#level.boundaries do 
+            local b=level.boundaries[i]
+            love.graphics.rectangle('line',b.x,b.y,b.w,b.h)
+        end
         --testing------------------------------------------------------
     end,
     
@@ -309,20 +531,27 @@ return { --The Module
 
         --divide the map's spawnArea into a grid, reserving tiles for startPos
         local grid=self.gridClass:generate(map.spawnArea,startPos) 
+        local decorations={}
+        
+        --spawn randomly generated map terrain, using gridClass to ensure no overlap
+        if map.terrain then 
+            self.gridClass:generateTerrain(map.terrain,self.terrainClass,grid)
+        end
 
-        --spawn map terrain, using gridClass to ensure no overlap
-        self.gridClass:generateTerrain(map.terrain,self.terrainClass,grid)
-
-        --spawn ground decorations, using gridClass to ensure no overlap
-        local decorations=self.gridClass:generateDecorations(
-            map.decorations,self.decorationsClass,grid
-        )
+        --spawn randomly generate ground decorations, using gridClass to ensure no overlap
+        if map.decorations then 
+            local decor=self.gridClass:generateDecorations(
+                map.decorations,self.decorationsClass,grid
+            )
+            for i=1,#decor do table.insert(decorations,decor[i]) end
+        end
 
         self.currentLevel={
             name=lvl,
             definition=levelDef,
             sprite=self.sprites[map.name],
             anim=self.animations[map.name] or nil,
+            foreground=self.foregrounds[map.name] or nil,
             boundaries=self.generateLevelBoundaries(map.boundaries),
             decorations=decorations,
             grid=grid,

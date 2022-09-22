@@ -1,24 +1,7 @@
 local definitions={
-    mushroomBig={
-        w=14,h=10,yOffset=18,
-        sprites={
-            'mushroomBig1',
-            'mushroomBig2',
-            'mushroomBig3',
-            'mushroomBig4',
-            'mushroomBig5',
-            'mushroomBig6',
-            'mushroomBig7',
-            'mushroomBig8',
-            'mushroomBig9',
-            'mushroomBig10',
-            'mushroomBig11',
-            'mushroomBig12',
-        },
-    },
+    -- swamp terrain-----------------------------------------------------------
     mushroomSwamp={
-        w=6,h=4,yOffset=5,
-        class='pit',
+        w=6,h=4,yOffset=5, class='pit',
         sprites={
             'mushroomSwamp1',
             'mushroomSwamp2',
@@ -33,39 +16,6 @@ local definitions={
             'mushroomSwamp11',
             'mushroomSwamp12',
         },
-    },
-    mushroomCave={
-        w=6,h=4,yOffset=5,
-        class='pit',
-        sprites={
-            'mushroomCave1',
-            'mushroomCave2',
-            'mushroomCave3',
-            'mushroomCave4',
-            'mushroomCave5',
-            'mushroomCave6',
-            'mushroomCave7',
-            'mushroomCave8',
-            'mushroomCave9',
-            'mushroomCave10',
-            'mushroomCave11',
-            'mushroomCave12',
-        },
-    },
-    rockCaveLarge={
-        w=22,h=18,yOffset=8,
-        sprites={'rockCaveL1','rockCaveL2'},
-    },
-    rockCaveMedium={
-        w=14,h=10,yOffset=5,class='pit',
-        sprites={'rockCaveM1','rockCaveM2'},
-    },
-    rockCaveSmall={
-        w=12,h=8,yOffset=4,class='pit',sprites={'rockCaveS'},
-    },
-    rockGem={
-        w=12,h=8,yOffset=4,class='pit',
-        sprites={'rockGem1','rockGem2','rockGem3','rockGem4'},
     },
     rockSwampMedium={
         w=14,h=10,yOffset=5,class='pit',
@@ -101,18 +51,15 @@ local definitions={
         }
     },
     pitWater1={
-        w=24, h=23,
-        class='pit',
+        w=24, h=23, class='pit',
         animation={frames='1-4',duration=0.25},
     },
     pitWater2={
-        w=40, h=39,
-        class='pit',
+        w=40, h=39, class='pit',
         animation={frames='1-4',duration=0.25},
     },
     pitWater3={
-        w=56, h=54,
-        class='pit',
+        w=56, h=54, class='pit',
         animation={frames='1-4',duration=0.25},
     },
     moundSwampSmall={
@@ -131,6 +78,57 @@ local definitions={
             'moundSwamp6',
             'moundSwamp7',
         }
+    },
+
+    --cave terrrain------------------------------------------------------------
+    mushroomBig={
+        w=14,h=10,yOffset=18,
+        sprites={
+            'mushroomBig1',
+            'mushroomBig2',
+            'mushroomBig3',
+            'mushroomBig4',
+            'mushroomBig5',
+            'mushroomBig6',
+            'mushroomBig7',
+            'mushroomBig8',
+            'mushroomBig9',
+            'mushroomBig10',
+            'mushroomBig11',
+            'mushroomBig12',
+        },
+    },
+    mushroomCave={
+        w=6,h=4,yOffset=5, class='pit',
+        sprites={
+            'mushroomCave1',
+            'mushroomCave2',
+            'mushroomCave3',
+            'mushroomCave4',
+            'mushroomCave5',
+            'mushroomCave6',
+            'mushroomCave7',
+            'mushroomCave8',
+            'mushroomCave9',
+            'mushroomCave10',
+            'mushroomCave11',
+            'mushroomCave12',
+        },
+    },
+    rockCaveLarge={
+        w=22,h=18,yOffset=8,
+        sprites={'rockCaveL1','rockCaveL2'},
+    },
+    rockCaveMedium={
+        w=14,h=10,yOffset=5,class='pit',
+        sprites={'rockCaveM1','rockCaveM2'},
+    },
+    rockCaveSmall={
+        w=12,h=8,yOffset=4,class='pit',sprites={'rockCaveS'},
+    },
+    rockGem={
+        w=12,h=8,yOffset=4,class='pit',
+        sprites={'rockGem1','rockGem2','rockGem3','rockGem4'},
     },
 
     pitCaveSmall={
@@ -164,18 +162,64 @@ local definitions={
         }
     },
     pitLava1={
-        w=26, h=26,
-        class='pit',
+        w=26, h=26, class='pit',
         animation={frames='1-4',duration=0.25},
     },
     pitLava2={
-        w=42, h=42,
-        class='pit',
+        w=42, h=42, class='pit',
         animation={frames='1-4',duration=0.25},
     },
     pitLava3={
-        w=58, h=58,
-        class='pit',
+        w=58, h=58, class='pit',
+        animation={frames='1-4',duration=0.25},
+    },
+
+    --dungeon terrain---------------------------------------------
+    tableSmall={
+        w=30, h=29, class='pit',
+        sprites={
+            'tableSmall1',
+        },
+    },
+    tableVertical={
+        w=30, h=29, class='pit',        
+        sprites={
+            'tableVertical1',
+        },
+    },
+    tableLarge={
+        w=60, h=28, class='pit',
+        sprites={
+            'tableLarge1',
+        },
+    },
+    crateLarge={
+        w=24, h=16, yOffset=6,
+        sprites={
+            'crateLarge1',
+            'crateLarge2',
+            'crateLarge3',
+        }
+    },
+    crateSmall={
+        w=10, h=8, yOffset=6, class='pit',
+        sprites={
+            'crateSmall1',
+            'crateSmall2',
+            'crateSmall3',
+            'crateSmall4',
+        }
+    },
+    pitDungeonWaterSmall={
+        w=30, h=28, class='pit',
+        animation={frames='1-4',duration=0.25},
+    },
+    pitDungeonLavaSmall={
+        w=30, h=28, class='pit',
+        animation={frames='1-4',duration=0.25},
+    },
+    pitDungeonAcidSmall={
+        w=30, h=28, class='pit',
         animation={frames='1-4',duration=0.25},
     },
 }

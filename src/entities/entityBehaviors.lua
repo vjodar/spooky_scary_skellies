@@ -804,7 +804,7 @@ behaviors.AI={ --AI-------------------------------------------------------------
         attack=behaviors.states.common.shoot,
         dead=behaviors.states.common.dead,
     },
-    ['slime']={
+    ['slime']={ --standard melee, has spawn animation
         raise=behaviors.states.common.raise,
         idle=behaviors.states.enemy.idleMelee,
         moveToTarget=behaviors.states.enemy.moveToTarget,
@@ -812,39 +812,39 @@ behaviors.AI={ --AI-------------------------------------------------------------
         attack=behaviors.states.enemy.lunge,
         dead=behaviors.states.common.dead,
     },
-    ['pumpkin']={
+    ['pumpkin']={ --standard melee
         idle=behaviors.states.enemy.idleMelee,
         moveToTarget=behaviors.states.enemy.moveToTarget,
         moveToLocation=behaviors.states.enemy.moveToLocation,
         attack=behaviors.states.enemy.lunge,
         dead=behaviors.states.common.dead,
     },
-    ['possessedArcher']={
+    ['possessedArcher']={ --standard ranged
         idle=behaviors.states.enemy.idleRanged,
         moveToTarget=behaviors.states.enemy.moveToTarget,
         moveToLocation=behaviors.states.enemy.moveToLocation,
         attack=behaviors.states.common.shoot,
         dead=behaviors.states.common.dead,
     },
-    ['slimeMatron']={
+    ['slimeMatron']={ --'facing' moving summoner
         idle=behaviors.states.enemy.idleRanged,
         moveToTarget=behaviors.states.enemy.moveToTarget,
         moveToLocation=behaviors.states.enemy.moveToLocation,
         attack=behaviors.states.enemy.spawnMinion,
         dead=behaviors.states.common.dead,
     },
-    ['tombstone']={
+    ['tombstone']={ --'random' idle summoner
         raise=behaviors.states.common.raise,
         idle=behaviors.states.enemy.idleStationary,
         attack=behaviors.states.enemy.spawnMinion,
         dead=behaviors.states.common.dead,
     },
-    ['spiderEgg']={
+    ['spiderEgg']={ --idle summoner, dies upon spawning minions
         idle=behaviors.states.enemy.idleStationary,
         attack=behaviors.states.enemy.spawnSpiders,
         dead=behaviors.states.common.dead,
     },
-    ['golem']={
+    ['golem']={ --'roll through' melee
         idle=behaviors.states.enemy.idleMelee,
         moveToTarget=behaviors.states.enemy.moveToTarget,
         moveToLocation=behaviors.states.enemy.moveToLocation,
@@ -867,5 +867,7 @@ behaviors.AI['vampire']=behaviors.AI.slimeMatron
 behaviors.AI['imp']=behaviors.AI.pumpkin
 behaviors.AI['gnasherDemon']=behaviors.AI.pumpkin
 behaviors.AI['frankenstein']=behaviors.AI.possessedArcher
+behaviors.AI['werebear']=behaviors.AI.golem
+behaviors.AI['werewolf']=behaviors.AI.pumpkin
 
 return behaviors 

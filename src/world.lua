@@ -11,40 +11,40 @@ world.collisionFilters={
       local class=other.collisionClass
       if class=='enemy' then return 'bounce'
       elseif class=='ally' then return 'cross' 
-      elseif class=='solid' or class=='pit' or class=='boundary' then return 'slide' 
+      elseif class=='solid' or class=='pit' or class=='boundary' or class=='exit' then return 'slide'
       end 
    end,
    allyFlying=function(item,other)
       local class=other.collisionClass
       if class=='enemy' then return 'bounce'
       elseif class=='ally' then return 'cross' 
-      elseif class=='solid' or class=='boundary' then return 'slide' 
+      elseif class=='solid' or class=='boundary' or class=='exit' then return 'slide' 
       end 
    end,
    enemy=function(item,other)
       local class=other.collisionClass 
       if class=='ally' then return 'bounce'
       elseif class=='enemy' then return 'cross'
-      elseif class=='solid' or class=='pit' or class=='boundary' then return 'slide' 
+      elseif class=='solid' or class=='pit' or class=='boundary' or class=='exit' then return 'slide' 
       end
    end,
    enemyFlying=function(item,other)
       local class=other.collisionClass 
       if class=='ally' then return 'bounce'
       elseif class=='enemy' then return 'cross'
-      elseif class=='solid' or class=='boundary' then return 'slide'
+      elseif class=='solid' or class=='boundary' or class=='exit' then return 'slide'
       end
    end,
    allyProjectile=function(item,other)
       local class=other.collisionClass
       if class=='enemy' then return 'touch'
-      elseif class=='solid' then return 'bounce'
+      elseif class=='solid' or class=='exit' then return 'bounce'
       end
    end,
    enemyProjectile=function(item,other)
       local class=other.collisionClass
       if class=='ally' then return 'touch'
-      elseif class=='solid' then return 'bounce'
+      elseif class=='solid' or class=='exit' then return 'bounce'
       end
    end,
 }

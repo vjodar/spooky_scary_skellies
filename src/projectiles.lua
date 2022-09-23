@@ -47,7 +47,7 @@ local projectileDefinitions=function()
         },
         ['darkArrow']={
             name='darkArrow',
-            moveSpeed=300,
+            moveSpeed=250,
             collider={
                 w=3,
                 h=3,
@@ -90,6 +90,18 @@ local projectileDefinitions=function()
                 h=3,
                 class='enemyProjectile',
             },
+        },
+        ['mug']={
+            name='mug', moveSpeed=130,
+            collider={w=3, h=3, class='enemyProjectile'}
+        },
+        ['bottle']={
+            name='bottle', moveSpeed=130,
+            collider={w=3, h=3, class='enemyProjectile'}
+        },
+        ['candle']={
+            name='candle', moveSpeed=130,
+            collider={w=3, h=3, class='enemyProjectile'}
         },
     }
 end
@@ -332,6 +344,9 @@ local projectileDrawFunctions=function()
     drawFunctions['pickaxe']=drawFunctions.bone
     drawFunctions['jack-o-lantern']=drawFunctions.apple
     drawFunctions['blueSpark']=drawFunctions.spark 
+    drawFunctions['mug']=drawFunctions.bone 
+    drawFunctions['bottle']=drawFunctions.bone 
+    drawFunctions['candle']=drawFunctions.bone 
 
     return drawFunctions
 end

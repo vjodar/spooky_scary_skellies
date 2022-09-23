@@ -1,23 +1,23 @@
 local levelDefinitions={
     test={
-        map='dungeon6',
+        map='dungeon1',
         waves={
             {
-                werebear=30,
+                slime=1,
             },
-            {
-                zombie=20,            
-                tombstone=10,            
-            },
-            {
-                spider=20,            
-                spiderEgg=20,            
-            },
-            {
-                pumpkin=10,       
-                ent=10,  
-                headlessHorseman=4,     
-            },
+            -- {
+            --     zombie=20,            
+            --     tombstone=10,            
+            -- },
+            -- {
+            --     spider=20,            
+            --     spiderEgg=20,            
+            -- },
+            -- {
+            --     pumpkin=10,       
+            --     ent=10,  
+            --     headlessHorseman=4,     
+            -- },
         },
         maxEnemies=10, --used to limit summoner enemies' minion spawns
     },
@@ -198,7 +198,8 @@ local mapDefinitions={
             tableLarge=3,
             crateSmall=5,
             crateLarge=5,
-        }
+        },
+        exit={name='dungeonStairs'},
     },
     dungeon2={ --red carpet
         name='dungeon2',
@@ -445,6 +446,7 @@ return { --The Module
     terrainClass=require 'src/levels/terrain',
     gridClass=require 'src/levels/grid',
     decorationsClass=require 'src/levels/decorations',
+    exitsClass=require 'src/levels/exits',
     levelDefinitions=levelDefinitions,
     mapDefinitions=mapDefinitions,
     sprites=sprites,
@@ -470,7 +472,18 @@ return { --The Module
 
             --no more waves, proceed to next level
             if level.currentWave==#level.definition.waves then 
-                level.complete=true 
+                level.complete=true
+
+                if level.exit.pos then --if exit pos is specified, spawn it there
+                    self.exitsClass:new(
+                        level.exit.name,level.exit.pos.x,level.exit.pos.y
+                    )
+                else --otherwise use the gridClass to spawn it randomly
+                    self.gridClass:spawnExit(
+                        level.exit.name,self.exitsClass,level.grid
+                    )
+                end
+
                 print('level complete!')
                 return 
             end
@@ -559,6 +572,7 @@ return { --The Module
             enemyCount=0,
             currentWave=0,
             complete=false,
+            exit=map.exit,
         }
     end,
 

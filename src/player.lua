@@ -120,6 +120,8 @@ function player:updatePosition()
             other.vx=other.vx+cos(angle)*self.moveSpeed*2*dt
             other.vy=other.vy+sin(angle)*self.moveSpeed*2*dt
         end
+
+        if other.collisionClass=='exit' then other:activateExit() end
     end
 end
 

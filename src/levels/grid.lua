@@ -98,7 +98,8 @@ end
 local tileOccupiedKey={
     terrain={'player','terrain','border','decoration'},
     decoration={'terrain','decoration'},
-    enemy={'player','terrain'}
+    enemy={'player','terrain'},
+    exit={'player','terrain','border'},
 }
 
 --checks if any element of key is in tile.occupiedBy
@@ -230,7 +231,6 @@ local generateEnemies=function(self,enemyWave,entitiesClass,grid)
                 --select a tile at which to spawn the decoration object
                 local selectedIndex=rnd(#availableTiles)
                 local selectedTile=availableTiles[selectedIndex]
-                local tileX,tileY=self:getTileCoords(selectedTile)
                 local spawnX,spawnY=self:throughoutTiles(
                     selectedTile.x,selectedTile.y,
                     enemyColliderDef.w,enemyColliderDef.h,enemyTileSize
@@ -239,6 +239,20 @@ local generateEnemies=function(self,enemyWave,entitiesClass,grid)
             else print('no available tiles for '..name) break end
         end
     end
+end
+
+local spawnExit=function(self,exitName,exitsClass,grid)
+    self.clearPlayerTiles(grid)
+    self:markPlayerTiles(grid,2)    
+    local exitColliderDef=exitsClass.definitions[exitName]
+    local exitTileSize=self:getTileSize(exitColliderDef)
+    local availableTiles=self:getAvailableTiles(grid,exitTileSize,'exit')
+    local selectedTile=rndElement(availableTiles)
+    local spawnX,spawnY=self:throughoutTiles(
+        selectedTile.x,selectedTile.y,
+        exitColliderDef.w,exitColliderDef.h,exitTileSize
+    )
+    exitsClass:new(exitName,spawnX,spawnY)
 end
 
 return { --The Module  
@@ -257,4 +271,5 @@ return { --The Module
     generateTerrain=generateTerrain,
     generateDecorations=generateDecorations,
     generateEnemies=generateEnemies,
+    spawnExit=spawnExit,
 }

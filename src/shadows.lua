@@ -28,6 +28,8 @@ local shadowNames={
     'frankenstein',         --20x11
     'werebear',             --30x11
     'werewolf',             --18x8
+    'ghost',                --10x7
+    'poltergeist',
 
     --projectiles
     'arrow',
@@ -40,6 +42,9 @@ local shadowNames={
     'apple',
     'jack-o-lantern',
     'blueSpark',
+    'mug',
+    'bottle',
+    'candle',
 }
 
 local sharedSprites={
@@ -56,6 +61,7 @@ local sharedSprites={
     possessedKnight='player',
     vampire='player',
     gnasherDemon='player',
+    poltergeist='ghost',
     
     darkArrow='arrow',
     blueSpark='spark',

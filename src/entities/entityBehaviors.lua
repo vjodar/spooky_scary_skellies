@@ -27,6 +27,7 @@ behaviors.methods.common={
             moveToPlayer='move',
             moveToTarget='move',
             moveToLocation='move',
+            teleport='teleport',
         }
         if self.animations[associatedAnimation[newState]] then 
             self.animations.current=self.animations[associatedAnimation[newState]]
@@ -785,6 +786,99 @@ behaviors.states.enemy={
             end
         end    
     end,
+    
+    lungeAndTeleport=function(self) --normal lunge, then roll for a chance to teleport
+        local onLoop=self:updateAnimation()
+        if onLoop then
+            self.targetsAlreadyAttacked={}
+            local nextState=rnd(2)>1 and 'teleport' or 'idle' --50% chance            
+            self:changeState(nextState)
+        end
+
+        local collisions=self:updatePosition()    
+        if self:onDamagingFrames() then 
+            if self.canAttack.flag then 
+                self.canAttack.setOnCooldown()
+                local fx=cos(self.angle)*self.attack.lungeForce
+                local fy=sin(self.angle)*self.attack.lungeForce
+                self.vx=self.vx+fx
+                self.vy=self.vy+fy        
+            end 
+    
+            --handle collisions
+            for i=1,#collisions do
+                local other=collisions[i].other --other collider
+                
+                if other.collisionClass=='ally' then 
+                    --Only hurt targets once per attack
+                    for i=1,#self.targetsAlreadyAttacked do 
+                        if other==self.targetsAlreadyAttacked[i] then return end
+                    end
+
+                    local touch=collisions[i].touch --point of collision     
+                    local magnitude=getMagnitude(self.vx,self.vy)         
+                    local angle=getAngle(touch,self)
+
+                    --bounce self away from target, losing some momentum
+                    self.vx=cos(angle)*magnitude*self.restitution
+                    self.vy=sin(angle)*magnitude*self.restitution
+
+                    --damage target, add to targetsAlreadyAttacked
+                    self:dealDamage(other)
+                    table.insert(self.targetsAlreadyAttacked,other)
+                end
+            end  
+        end
+    end, 
+
+    shootAndTeleport=function(self)
+        self:updatePosition()
+        local onLoop=self:updateAnimation()
+        if onLoop then 
+            local nextState=rnd(4)>1 and 'teleport' or 'idle' --75% chance
+            self:changeState(nextState)
+        end 
+
+        if self.canAttack.flag and self:onFiringFrame() then
+            self.canAttack.setOnCooldown()
+            local projectile={
+                name=rndElement(self.attack.projectile.name),
+                x=self.center.x+self.attack.projectile.xOffset*self.scaleX,
+                y=self.center.y,yOffset=self.attack.projectile.yOffset
+            }
+            local count=self.attack.projectile.count or 1
+            local spread=self.attack.projectile.spread or 0
+            for i=1,count do
+                local angleToTarget=getAngle(projectile,self.moveTarget.center)
+                if spread~=0 then 
+                    angleToTarget=angleToTarget+(rnd()*spread-spread*0.5)
+                end
+                Projectiles:new({
+                    x=projectile.x,y=projectile.y,name=projectile.name,
+                    damage=self.attack.damage,knockback=self.attack.knockback,
+                    angle=angleToTarget,yOffset=projectile.yOffset
+                })
+            end
+        end
+    end,
+
+    teleport=function(self)
+        local onLoop=self:updateAnimation()
+        self:updatePosition()
+
+        if onLoop then 
+            local distance=rnd(20,400)
+            local angle=rnd()*2*pi 
+
+            local goalX=self.x+cos(angle)*distance 
+            local goalY=self.y+sin(angle)*distance
+            local realX,realY=World:move(self,goalX,goalY,self.collisionFilter)
+            self.x,self.y=realX,realY 
+            self.center=getCenter(self)
+
+            self:changeState('raise') 
+        end
+    end,
 }
 
 behaviors.AI={ --AI--------------------------------------------------------------------------------
@@ -850,7 +944,25 @@ behaviors.AI={ --AI-------------------------------------------------------------
         moveToLocation=behaviors.states.enemy.moveToLocation,
         attack=behaviors.states.enemy.roll,
         dead=behaviors.states.common.dead,
-    }
+    },
+    ['ghost']={ --standard melee, then chance to teleport around
+        raise=behaviors.states.common.raise,
+        idle=behaviors.states.enemy.idleMelee,
+        moveToTarget=behaviors.states.enemy.moveToTarget,
+        moveToLocation=behaviors.states.enemy.moveToLocation,
+        attack=behaviors.states.enemy.lungeAndTeleport,
+        teleport=behaviors.states.enemy.teleport,
+        dead=behaviors.states.common.dead,
+    },
+    ['poltergeist']={ --standard ranged, then chance to teleport around
+        raise=behaviors.states.common.raise,
+        idle=behaviors.states.enemy.idleRanged,
+        moveToTarget=behaviors.states.enemy.moveToTarget,
+        moveToLocation=behaviors.states.enemy.moveToLocation,
+        attack=behaviors.states.enemy.shootAndTeleport,
+        teleport=behaviors.states.enemy.teleport,
+        dead=behaviors.states.common.dead,
+    },
 }
 --shared AI
 behaviors.AI['skeletonMageFire']=behaviors.AI.skeletonArcher

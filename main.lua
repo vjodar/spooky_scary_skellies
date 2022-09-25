@@ -13,10 +13,12 @@ function love.load()
     humpCam=require 'src/libraries/camera'
     anim8=require 'src/libraries/anim8'
 
-    --GameStates
+    --Game States
     Controls=require 'src/gameStates/controlState'
     Timer=require 'src/gameStates/timerState'
-    PlayState=require 'src/gameStates/playState'    
+    PlayState=require 'src/gameStates/playState'  
+    FadeState=require 'src/gameStates/fadeState'
+    PanState=require 'src/gameStates/panState'
 
     --Modules
     Camera=require 'src/camera'
@@ -52,6 +54,7 @@ function love.draw()
     for i=1, #gameStates do 
         if gameStates[i].draw then gameStates[i]:draw() end
     end
+    Camera.curtain:draw(Camera.target)
     Camera:detach()
 end
 

@@ -20,6 +20,7 @@ player.attack={
     knockback=400,
     projectile={name='bone',yOffset=-10},    
 }
+player.minionsPerSummon=1
 player.nearbyEnemies={}
 player.aggroRange={w=600,h=450}
 player.allyReturnThreshold={x=220,y=150} --distance from player before skeletons run back
@@ -45,16 +46,16 @@ player.scaleX=1 --used to flip sprites horizontally
 
 --Cooldown flags, periods, and callback functions
 player.canTurn={flag=true,cooldownPeriod=0.2}
-Timer:giveCooldownCallbacks(player.canTurn)
+player.canTurn.setOnCooldown=Timer:giveCooldownCallbacks(player.canTurn)
 
 player.canAttack={flag=true,cooldownPeriod=player.attack.period}
-Timer:giveCooldownCallbacks(player.canAttack)
+player.canAttack.setOnCooldown=Timer:giveCooldownCallbacks(player.canAttack)
 
 player.canSummon={flag=true,cooldownPeriod=0.2}
-Timer:giveCooldownCallbacks(player.canSummon)
+player.canSummon.setOnCooldown=Timer:giveCooldownCallbacks(player.canSummon)
 
 player.canQueryAttackTargets={flag=true,cooldownPeriod=0.5}
-Timer:giveCooldownCallbacks(player.canQueryAttackTargets)
+player.canQueryAttackTargets.setOnCooldown=Timer:giveCooldownCallbacks(player.canQueryAttackTargets)
 
 --Shadow
 player.shadow=Shadows:new('player',player.w,player.h)
@@ -77,8 +78,13 @@ function player:update()
         if self.canSummon.flag then 
             if Controls.down.btn1 then self:summon('skeletonWarrior') end 
             if Controls.down.btn2 then self:summon('skeletonArcher') end 
-            if Controls.down.btn3 then self:summon('skeletonMage') end 
+            if Controls.down.btn3 then 
+                local mages={'Fire','Ice','Electric'}
+                self:summon('skeletonMage'..rndElement(mages)) 
+            end 
         end
+    else 
+        self.animations.current=self.animations.idle 
     end
 end
 
@@ -89,11 +95,11 @@ function player:draw()
         nil,self.scaleX,1,self.xOrigin,self.yOrigin
     )
     -- --testing------------------------------------------
-    -- love.graphics.print(self.vx,self.x-10,self.y-10)
-    -- love.graphics.print(self.vy,self.x-10,self.y)
-    love.graphics.print(love.timer.getFPS(),self.x-10,self.y-30)
-    love.graphics.print(#Objects.table,self.x-10,self.y-60)
-    -- love.graphics.print(World:countItems(),self.x-10,self.y-90)
+    -- love.graphics.print(self.center.x,self.x-10,self.y-10)
+    -- love.graphics.print(self.center.y,self.x-10,self.y)
+    -- love.graphics.print('states: '..#gameStates,self.x-10,self.y-30)
+    -- love.graphics.print('objects: '..#Objects.table,self.x-10,self.y-60)
+    -- love.graphics.print('items: '..World:countItems(),self.x-10,self.y-90)
     -- --testing------------------------------------------
 end
 
@@ -102,7 +108,8 @@ function player:updatePosition()
     local goalY=self.y+self.vy*dt 
     local realX,realY,cols,len=World:move(self,goalX,goalY,self.collisionFilter)
     self.x,self.y=realX,realY 
-    self.center=getCenter(self)
+    local c=getCenter(self)
+    self.center.x,self.center.y=c.x,c.y
 
     --apply friction/linearDamping
     self.vx=self.vx-(self.vx*self.linearDamping*dt)
@@ -112,22 +119,22 @@ function player:updatePosition()
     if abs(self.vx)<self.stopThreshold*dt then self.vx=0 end
     if abs(self.vy)<self.stopThreshold*dt then self.vy=0 end
 
-    --push allies out of the way
     for i=1,len do
         local other=cols[i].other 
-        if other.collisionClass=='ally' then 
+        if other.collisionClass=='ally' then --push allies out of the way
             local angle=getAngle(self.center,other.center)
             other.vx=other.vx+cos(angle)*self.moveSpeed*2*dt
             other.vy=other.vy+sin(angle)*self.moveSpeed*2*dt
         end
 
-        if other.collisionClass=='exit' then other:activateExit() end
+        if other.collisionClass=='exit' then 
+            other.collisionClass='solid'
+            LevelManager:startNextLevel() 
+        end
     end
 end
 
 function player:move()
-    if not acceptInput then return end 
-
     local moving=false
     local target={x=self.x,y=self.y} --used to find angle to goal
 
@@ -214,13 +221,7 @@ function player:launchBone()
 end
 
 function player:summon(name)
-
-    for i=1,10 do   
-        if name=='skeletonMage' then 
-            local elements={'Fire','Ice','Electric'}
-            name=name..(rndElement(elements))
-        end
-
+    for i=1,self.minionsPerSummon do
         --spawn directly under player
         local skelly=Entities:new(name,self.x,self.y)
 

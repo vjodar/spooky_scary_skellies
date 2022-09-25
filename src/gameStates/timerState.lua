@@ -41,15 +41,16 @@ timerState.tweenUpdate=function(self)
     if self.t<0.17 then self.obj[self.prop]=self.endVal return false end
 end
 
---Gives a cooldown object its releaseCooldown and setOnCooldown callback function.
+--Returns a setOnCooldown callback function.
 --Defining these callbacks upon initialization and passing them to timerState:after()
 --is much faster than defining the releaseCooldown inside a timerState:after() call.
 function timerState:giveCooldownCallbacks(cd)
-    cd.releaseCooldown=function() cd.flag=true end
-    cd.setOnCooldown=function() 
+    local releaseCooldown=function() cd.flag=true end
+    local setOnCooldown=function() 
         cd.flag=false 
-        self:after(cd.cooldownPeriod,cd.releaseCooldown) 
+        self:after(cd.cooldownPeriod,releaseCooldown) 
     end
+    return setOnCooldown
 end
 
 return timerState

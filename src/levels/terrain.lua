@@ -266,15 +266,12 @@ local terrainDrawFunction=function(self)
     love.graphics.draw(self.sprite,self.x-self.xOffset,self.y-self.yOffset)
 end
 
-local terrainDestroyFunction=function(self) self.state='dead' end
-
 return { --The Module
     definitions=definitions,
     sprites=sprites,
     animations=animations,
     terrainUpdateFunction=terrainUpdateFunction,
     terrainDrawFunction=terrainDrawFunction,
-    terrainDestroyFunction=terrainDestroyFunction,
 
     new=function(self,name,x,y) --constructor
         local def=self.definitions[name]
@@ -292,7 +289,6 @@ return { --The Module
             state='idle',
             update=self.terrainUpdateFunction,
             draw=self.terrainDrawFunction,
-            destroy=self.terrainDestroyFunction,
         }
         World:addItem(t)
         table.insert(Objects.table,t)

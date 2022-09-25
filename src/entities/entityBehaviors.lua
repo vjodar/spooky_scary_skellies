@@ -47,7 +47,8 @@ behaviors.methods.common={
         local goalY=self.y+self.vy*dt 
         local realX,realY,cols,len=World:move(self,goalX,goalY,self.collisionFilter)
         self.x,self.y=realX,realY 
-        self.center=getCenter(self)
+        local c=getCenter(self)
+        self.center.x,self.center.y=c.x,c.y
 
         --update angle/direction, face target
         self.angle=getAngle(self.center,self.moveTarget.center)
@@ -104,7 +105,7 @@ behaviors.methods.common={
 
     die=function(self)
         self:changeState('dead')        
-        LevelManager:decreaseEntityCount(self.collisionClass)
+        LevelManager:decreaseEntityCount(self.collisionClass,self.name)
     end,
 
     clearMoveTarget=function(self)
@@ -874,7 +875,8 @@ behaviors.states.enemy={
             local goalY=self.y+sin(angle)*distance
             local realX,realY=World:move(self,goalX,goalY,self.collisionFilter)
             self.x,self.y=realX,realY 
-            self.center=getCenter(self)
+            local c=getCenter(self)
+            self.center.x,self.center.y=c.x,c.y
 
             self:changeState('raise') 
         end

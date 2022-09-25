@@ -1,9 +1,16 @@
 local PlayState={}
 
 function PlayState:startGame()
-    LevelManager:buildLevel('test')
+    local allyCount={
+        skeletonWarrior=0,
+        skeletonArcher=0,
+        skeletonMageFire=0,
+        skeletonMageIce=0,
+        skeletonMageElectric=0,
+    }
+    LevelManager:buildLevel('test',allyCount)
     Camera:zoomTo(2)
-    Camera.target=Player
+    Camera.target=Player.center
 end
 
 function PlayState:update()
@@ -26,21 +33,16 @@ function love.keyreleased(k)
         LevelManager:buildLevel(LevelManager.currentLevel.name)
     end
     if k=='p' then 
-        for i=1,1 do Entities:new('werebear',Controls.getMousePosition()) end
-        -- for i=1,1 do Entities:new('spider',Controls.getMousePosition()) end
-        -- for i=1,1 do Entities:new('bat',Controls.getMousePosition()) end
-        -- for i=1,1 do Entities:new('headlessHorseman',Controls.getMousePosition()) end
+        -- for i=1,1 do Entities:new('werebear',Controls.getMousePosition()) end
+        FadeState:fadeBoth({fadeTime=2,afterFn=function() print('done') end, holdTime=1})
     end
-    if k=='l' then 
-        for i=1,50 do Entities:new('bat',rnd(100,800),rnd(100,600)) end
-        -- for i=1,50 do Entities:new('gnasherDemon',rnd(0,400),rnd(0,300)) end
-    end
-    if k=='j' then 
-        for i,def in pairs(Entities.definitions) do
-            if def.collider.class=='enemy' then
-                for j=1,5 do Entities:new(def.name,rnd(100,800),rnd(100,600)) end
-            end
-        end
+    if k=='l' then
+        local panObjects={
+            {target={x=0,y=0},afterFn=function() print('hi there!') end,holdTime=0.5},
+            {target={x=600,y=0},afterFn=function() print('hello!') end,holdTime=0.5},
+            {target=Player.center}
+        }
+        PanState:panTo(panObjects)
     end
 end
 --testing-------------------

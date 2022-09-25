@@ -106,10 +106,10 @@ entityClass.new=function(self,entity,x,y) --constructor
 
     --Cooldown flags, periods, and callbacks
     e.canAttack={flag=true,cooldownPeriod=def.attack.period}
-    Timer:giveCooldownCallbacks(e.canAttack)
+    e.canAttack.setOnCooldown=Timer:giveCooldownCallbacks(e.canAttack)
 
     e.canQueryAttackTargets={flag=true,cooldownPeriod=0.5}
-    Timer:giveCooldownCallbacks(e.canQueryAttackTargets)
+    e.canQueryAttackTargets.setOnCooldown=Timer:giveCooldownCallbacks(e.canQueryAttackTargets)
     
     --Actions/AI
     e.methods={} --includes update and draw functions
@@ -123,7 +123,7 @@ entityClass.new=function(self,entity,x,y) --constructor
 
     World:addItem(e)
     table.insert(Objects.table,e)
-    LevelManager:increaseEntityCount(e.collisionClass)
+    LevelManager:increaseEntityCount(e.collisionClass,e.name)
 
     return e
 end

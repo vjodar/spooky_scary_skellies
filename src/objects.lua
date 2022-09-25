@@ -1,5 +1,6 @@
 return {
     table={}, --holds all objects
+    shortCircuit=false, --used to immediately stop updating objects
     ySort=function(obj1,obj2) return obj1.y<obj2.y end, --sort function
     update=function(self)
         --sort objects by y-position to provide semi-3D perspective.
@@ -11,7 +12,8 @@ return {
                 World:remove(obj)
                 table.remove(self.table,i) 
             end
-        end  
+            if self.shortCircuit then self.shortCircuit=false return end 
+        end
     end,
     draw=function(self)
         for i=1, #self.table do 
@@ -22,8 +24,10 @@ return {
         end        
     end,
     clear=function(self) 
-        for i=1,#self.table do World:remove(self.table[i]) end
+        local items,len=World:getItems()
+        for i=1,len do World:remove(items[i]) end
         World:addItem(Player)
         self.table={Player} 
+        self.shortCircuit=true 
     end,
 }

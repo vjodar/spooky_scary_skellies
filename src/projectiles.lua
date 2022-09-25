@@ -121,7 +121,9 @@ local projectileOnHitFunctions=function()
     
         --damages targets, destroys upon hitting solids
         ['base']=function(self,target,touch)
-            if target.collisionClass=='solid' then return false end
+            if target.collisionClass=='solid' 
+            or target.collisionClass=='exit' 
+            then return false end
 
             if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
             or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
@@ -134,7 +136,9 @@ local projectileOnHitFunctions=function()
     
         --damages and sets targets on fire, destroys upon hitting solids
         ['flame']=function(self,target,touch)
-            if target.collisionClass=='solid' then return false end
+            if target.collisionClass=='solid' 
+            or target.collisionClass=='exit' 
+            then return false end
 
             if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
             or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
@@ -148,7 +152,9 @@ local projectileOnHitFunctions=function()
     
         --damages and freezes targets, destroys upon hitting solids
         ['icicle']=function(self,target,touch)
-            if target.collisionClass=='solid' then return false end
+            if target.collisionClass=='solid' 
+            or target.collisionClass=='exit' 
+            then return false end
                
             if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
             or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
@@ -162,7 +168,9 @@ local projectileOnHitFunctions=function()
 
         --damages targets, bounces off solids
         ['spark']=function(self,target,touch)     
-            if target.collisionClass=='solid' then 
+            if target.collisionClass=='solid' 
+            or target.collisionClass=='exit' 
+            then 
                 local angle=getAngle(touch,self)
                 self.vx=cos(angle)*self.moveSpeed 
                 self.vy=sin(angle)*self.moveSpeed
@@ -185,6 +193,7 @@ local projectileOnHitFunctions=function()
             if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
             or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
             or target.collisionClass=='solid'
+            or target.collisionClass=='exit'
             then 
                 local queryData={
                     x=self.x-self.explosionRadius*0.5,
@@ -221,7 +230,7 @@ local projectileUpdateFunctions=function()
         ['base']=function(self)
             self.remainingTravelTime=self.remainingTravelTime-dt 
             if self.remainingTravelTime<0
-            or getDistance(self.center,Camera.target.center)>600 
+            or getDistance(self.center,Camera.target)>600 
             then 
                 return false
             end
@@ -231,7 +240,8 @@ local projectileUpdateFunctions=function()
             local goalY=self.y+self.vy*dt 
             local realX,realY,cols=World:move(self,goalX,goalY,self.filter)
             self.x,self.y=realX,realY 
-            self.center=getCenter(self)
+            local c=getCenter(self)
+            self.center.x,self.center.y=c.x,c.y
 
             --handle collisions
             for i=1,#cols do return self:onHit(cols[i].other,cols[i].touch) end
@@ -277,7 +287,8 @@ local projectileUpdateFunctions=function()
             local goalY=self.y+self.vy*dt 
             local realX,realY,cols=World:move(self,goalX,goalY,self.filter)
             self.x,self.y=realX,realY 
-            self.center=getCenter(self)
+            local c=getCenter(self)
+            self.center.x,self.center.y=c.x,c.y
 
             --handle collisions
             for i=1,#cols do return self:onHit(cols[i].other,cols[i].touch) end

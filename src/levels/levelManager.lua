@@ -3,15 +3,15 @@ local levelDefinitions={
         map='dungeon1',
         waves={
             {
-                slime=1,
+                ghost=1,
             },
             -- {
-            --     zombie=20,            
+            --     zombie=10,            
             --     tombstone=10,            
             -- },
             -- {
-            --     spider=20,            
-            --     spiderEgg=20,            
+            --     spider=10,            
+            --     spiderEgg=10,            
             -- },
             -- {
             --     pumpkin=10,       
@@ -424,12 +424,22 @@ local generateLevelBoundaries=function(boundaries)
     return levelBoundaries
 end
 
-local increaseEntityCount=function(self,class)
-    self.currentLevel[class..'Count']=self.currentLevel[class..'Count']+1
+local increaseEntityCount=function(self,class,name)
+    local level=self.currentLevel 
+    if class=='ally' then
+        level.allyCount[name]=level.allyCount[name]+1
+    else
+        level.enemyCount=level.enemyCount+1
+    end
 end
 
-local decreaseEntityCount=function(self,class)
-    self.currentLevel[class..'Count']=self.currentLevel[class..'Count']-1
+local decreaseEntityCount=function(self,class,name)
+    local level=self.currentLevel 
+    if class=='ally' then
+        level.allyCount[name]=level.allyCount[name]-1
+    else
+        level.enemyCount=level.enemyCount-1
+    end
 end
 
 local maxEnemiesReached=function(self)
@@ -440,6 +450,14 @@ local drawForeground=function(self)
     if self.currentLevel.foreground then 
         love.graphics.draw(self.currentLevel.foreground,0,0) 
     end
+end
+
+local startNextLevel=function(self)
+    local buildNextLevel=function()
+        self:destroyLevel()
+        self:buildLevel(self.currentLevel.name,self.currentLevel.allyCount)
+    end
+    FadeState:fadeBoth({fadeTime=0.4,afterFn=buildNextLevel,holdTime=0.4})
 end
 
 return { --The Module
@@ -458,6 +476,7 @@ return { --The Module
     decreaseEntityCount=decreaseEntityCount,
     maxEnemiesReached=maxEnemiesReached,
     drawForeground=drawForeground,
+    startNextLevel=startNextLevel,
     
     update=function(self) 
         local level=self.currentLevel 
@@ -520,7 +539,6 @@ return { --The Module
         --             elseif o=='decoration' then love.graphics.setColor(0,1,1)
         --             end
         --             love.graphics.rectangle('line',tile.x,tile.y,16,16)
-        --             love.graphics.setColor(1,1,1,1)
         --         end
         --     end
         -- end
@@ -531,7 +549,7 @@ return { --The Module
         --testing------------------------------------------------------
     end,
     
-    buildLevel=function(self,lvl)
+    buildLevel=function(self,lvl,skeletons)
         local levelDef=self.levelDefinitions[lvl]
         local map=self.mapDefinitions[levelDef.map]
         local startPos=map.playerStartPos
@@ -568,21 +586,28 @@ return { --The Module
             boundaries=self.generateLevelBoundaries(map.boundaries),
             decorations=decorations,
             grid=grid,
-            allyCount=0,
+            allyCount={
+                skeletonWarrior=0,
+                skeletonArcher=0,
+                skeletonMageFire=0,
+                skeletonMageIce=0,
+                skeletonMageElectric=0,
+            },
             enemyCount=0,
             currentWave=0,
             complete=false,
             exit=map.exit,
-        }
+        }        
+
+        --spawn in the skeleton minions
+        for name,count in pairs(skeletons) do 
+            local summonSkeleton=function() Player:summon(name) end 
+            for i=1,count do Timer:after(0.5,summonSkeleton) end
+        end
     end,
 
     destroyLevel=function(self)
-        for i=1,#self.currentLevel.boundaries do 
-            local b=self.currentLevel.boundaries[i]
-            World:remove(b)
-        end
         self.currentLevel.boundaries={}
-        self.currentLevel.allyCount=0
         self.currentLevel.enemyCount=0
         Objects:clear()
     end,

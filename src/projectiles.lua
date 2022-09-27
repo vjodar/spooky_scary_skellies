@@ -4,8 +4,8 @@ local projectileDefinitions=function()
             name='bone',
             moveSpeed=150,
             collider={
-                w=3,
-                h=3,
+                w=6,
+                h=6,
                 class='allyProjectile',
             }
         },
@@ -77,8 +77,8 @@ local projectileDefinitions=function()
             moveSpeed=150,
             explosionRadius=50,
             collider={
-                w=5,
-                h=5,
+                w=6,
+                h=6,
                 class='enemyProjectile',
             },
         },
@@ -129,7 +129,11 @@ local projectileOnHitFunctions=function()
             or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
             then 
                 if target.state=='dead' then return end  
-                target:takeDamage(self) 
+                target:takeDamage({
+                    damage=self.attack.damage,
+                    knockback=self.attack.knockback,
+                    angle=getAngle(self.center,target.center),
+                }) 
                 return false
             end 
         end,
@@ -144,8 +148,13 @@ local projectileOnHitFunctions=function()
             or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
             then 
                 if target.state=='dead' then return end  
-                target:takeDamage(self)
-                --TODO: set target on fire
+                target:takeDamage({
+                    damage=self.attack.damage,
+                    knockback=self.attack.knockback,
+                    angle=getAngle(self.center,target.center),
+                    textColor='red'
+                })
+                target.status:burn(self.attack.damage,3) --apply 3s burn
                 return false
             end 
         end,
@@ -160,8 +169,13 @@ local projectileOnHitFunctions=function()
             or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
             then 
                 if target.state=='dead' then return end  
-                target:takeDamage(self)
-                --TODO: freeze target
+                target:takeDamage({
+                    damage=self.attack.damage,
+                    knockback=self.attack.knockback,
+                    angle=getAngle(self.center,target.center),
+                    textColor='blue'
+                })
+                target.status:freeze(target,1,0.5) --slow to half speed for 1s
                 return false
             end 
         end,
@@ -182,8 +196,12 @@ local projectileOnHitFunctions=function()
             or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
             then 
                 if target.state=='dead' then return end  
-                target:takeDamage(self)
-                --TODO: freeze target
+                target:takeDamage({
+                    damage=self.attack.damage,
+                    knockback=self.attack.knockback,
+                    angle=getAngle(self.center,target.center),
+                    textColor='yellow'
+                })
                 return false
             end 
         end,
@@ -208,7 +226,13 @@ local projectileOnHitFunctions=function()
                     queryData.x,queryData.y,queryData.w,queryData.h,filter
                 )
                 for i=1,#targets do 
-                    if targets[i].state~='dead' then targets[i]:takeDamage(self) end
+                    if targets[i].state~='dead' then 
+                        targets[i]:takeDamage({                            
+                            damage=self.attack.damage,
+                            knockback=self.attack.knockback,
+                            angle=getAngle(self.center,targets[i].center),
+                        }) 
+                    end
                 end
                 return false
             end 

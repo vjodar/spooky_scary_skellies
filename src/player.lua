@@ -5,7 +5,8 @@ player.x,player.y=0,0
 player.w,player.h=12,7
 player.center=getCenter(player)
 player.vx,player.vy=0,0
-player.moveSpeed=17*60 --17units/sec at 60fps 
+player.moveSpeedMax=17*60 --17units/sec at 60fps 
+player.moveSpeed=player.moveSpeedMax 
 player.linearDamping=10
 player.stopThreshold=3*60 --speed slow enough to consider stopped (at 60FPS)
 player.collisionClass='ally'
@@ -41,8 +42,15 @@ player.animations={}
 player.animations.idle=anim8.newAnimation(player.grid('1-4',1), 0.1)
 player.animations.moving=anim8.newAnimation(player.grid('1-4',2), 0.1)
 player.animations.current=player.animations.idle
-player.animSpeed={min=0.25,max=3,current=1}
+player.animSpeedMax=1
+player.animSpeed=player.animSpeedMax 
 player.scaleX=1 --used to flip sprites horizontally
+
+--Shadow
+player.shadow=Shadows:new('player',player.w,player.h)
+
+--Status system
+player.status=Statuses:new()
 
 --Cooldown flags, periods, and callback functions
 player.canTurn={flag=true,cooldownPeriod=0.2}
@@ -57,12 +65,10 @@ player.canSummon.setOnCooldown=Timer:giveCooldownCallbacks(player.canSummon)
 player.canQueryAttackTargets={flag=true,cooldownPeriod=0.5}
 player.canQueryAttackTargets.setOnCooldown=Timer:giveCooldownCallbacks(player.canQueryAttackTargets)
 
---Shadow
-player.shadow=Shadows:new('player',player.w,player.h)
-
 function player:update()
-    self.animations.current:update(dt*self.animSpeed.current)
+    self.animations.current:update(dt*self.animSpeed)
     self:updatePosition() --also handles collisions
+    self.status:update(self)
 
     if self.canQueryAttackTargets.flag then 
         self.canQueryAttackTargets.setOnCooldown()
@@ -90,16 +96,20 @@ end
 
 function player:draw()
     self.shadow:draw(self.x,self.y)
+    if self:isBurning() then love.graphics.setColor(1,0.8,0.8,1) end
+    if self:isFrozen() then love.graphics.setColor(0.8,0.9,1,1) end 
     self.animations.current:draw(
         self.spriteSheet,self.x+self.xOffset,self.y+self.yOffset,
         nil,self.scaleX,1,self.xOrigin,self.yOrigin
     )
+    love.graphics.setColor(1,1,1,1)
     -- --testing------------------------------------------
     -- love.graphics.print(self.center.x,self.x-10,self.y-10)
     -- love.graphics.print(self.center.y,self.x-10,self.y)
     -- love.graphics.print('states: '..#gameStates,self.x-10,self.y-30)
     -- love.graphics.print('objects: '..#Objects.table,self.x-10,self.y-60)
     -- love.graphics.print('items: '..World:countItems(),self.x-10,self.y-90)
+    love.graphics.print('enemies: '..LevelManager.currentLevel.enemyCount,self.x-10,self.y-90)
     -- --testing------------------------------------------
 end
 
@@ -188,12 +198,12 @@ function player:queryForEnemies()
     return targets
 end
 
-function player:takeDamage(source,angle)
-    local damage=source.attack.damage  
-    local knockback=source.attack.knockback
+function player:takeDamage(args)
+    local damage=args.damage  
+    local knockback=args.knockback
     knockback=knockback-knockback*(self.kbResistance/100)
 
-    local kbAngle=angle or getAngle(source.center,self.center)
+    local kbAngle=args.angle
     local hp=self.health.current 
     
     hp=max(0,hp-damage)
@@ -202,6 +212,9 @@ function player:takeDamage(source,angle)
     --Apply knockback force
     self.vx=self.vx+cos(kbAngle)*knockback
     self.vy=self.vy+sin(kbAngle)*knockback
+
+    local damageTextColor=args.textColor or 'white'
+    UI.damage:new(self.center.x,self.center.y,damage,damageTextColor)
 
     if self.health.current==0 then print("I'm dead! :O") end
 end
@@ -236,6 +249,9 @@ function player:summon(name)
 
     self.canSummon.setOnCooldown()
 end
+
+function player:isBurning() return #self.status.table.burn>0 end
+function player:isFrozen() return #self.status.table.freeze>0 end
 
 World:addItem(player)
 table.insert(Objects.table,player)

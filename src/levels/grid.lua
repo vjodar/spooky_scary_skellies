@@ -219,7 +219,7 @@ end
 local generateEnemies=function(self,enemyWave,entitiesClass,grid)
     --update grid with the tile currently occupied by player
     self.clearPlayerTiles(grid)
-    self:markPlayerTiles(grid,3)
+    self:markPlayerTiles(grid,4)
 
     for name,count in pairs(enemyWave) do 
         local enemyColliderDef=entitiesClass.definitions[name].collider
@@ -241,7 +241,7 @@ local generateEnemies=function(self,enemyWave,entitiesClass,grid)
     end
 end
 
-local spawnExit=function(self,exitName,exitsClass,grid)
+local generateExitSpawnPosition=function(self,exitName,exitsClass,grid)
     self.clearPlayerTiles(grid)
     self:markPlayerTiles(grid,2)    
     local exitColliderDef=exitsClass.definitions[exitName]
@@ -252,7 +252,7 @@ local spawnExit=function(self,exitName,exitsClass,grid)
         selectedTile.x,selectedTile.y,
         exitColliderDef.w,exitColliderDef.h,exitTileSize
     )
-    exitsClass:new(exitName,spawnX,spawnY)
+    return {x=spawnX,y=spawnY}
 end
 
 return { --The Module  
@@ -271,5 +271,5 @@ return { --The Module
     generateTerrain=generateTerrain,
     generateDecorations=generateDecorations,
     generateEnemies=generateEnemies,
-    spawnExit=spawnExit,
+    generateExitSpawnPosition=generateExitSpawnPosition,
 }

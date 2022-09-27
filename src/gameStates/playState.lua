@@ -17,12 +17,14 @@ function PlayState:update()
     Camera:update()
     LevelManager:update()
     Objects:update()
+    UI:update()
 end
 
 function PlayState:draw()
     LevelManager:draw()
     Objects:draw()
     LevelManager:drawForeground()
+    UI:draw()
 end
 
 --testing-------------------
@@ -30,11 +32,15 @@ function love.keyreleased(k)
     if k=='escape' then love.event.quit() end 
     if k=='o' then 
         LevelManager:destroyLevel()
-        LevelManager:buildLevel(LevelManager.currentLevel.name)
+        LevelManager:buildLevel(
+            LevelManager.currentLevel.name,LevelManager.currentLevel.allyCount
+        )
     end
     if k=='p' then 
         -- for i=1,1 do Entities:new('werebear',Controls.getMousePosition()) end
-        FadeState:fadeBoth({fadeTime=2,afterFn=function() print('done') end, holdTime=1})
+        -- FadeState:fadeBoth({fadeTime=2,afterFn=function() print('done') end, holdTime=1})
+        Player.status:burn(5,3)
+        Player.status:freeze(Player,2,0.3)
     end
     if k=='l' then
         local panObjects={

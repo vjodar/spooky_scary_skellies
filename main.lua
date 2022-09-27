@@ -21,10 +21,12 @@ function love.load()
     PanState=require 'src/gameStates/panState'
 
     --Modules
+    UI=require 'src/userInterface'
     Camera=require 'src/camera'
     World=require 'src/world'
     Objects=require 'src/objects'
     Shadows=require 'src/shadows'
+    Statuses=require 'src/statuses'
     Player=require 'src/player'
     LevelManager=require 'src/levels/levelManager'
     Entities=require 'src/entities/entityClass'
@@ -54,7 +56,7 @@ function love.draw()
     for i=1, #gameStates do 
         if gameStates[i].draw then gameStates[i]:draw() end
     end
-    Camera.curtain:draw(Camera.target)
+    Camera.curtain:draw()
     Camera:detach()
 end
 

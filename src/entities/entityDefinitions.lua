@@ -476,7 +476,7 @@ return {
     ['zombie']={
         name='zombie',
         moveSpeed=8*60,
-        health=6,
+        health=3,
         startState='raise',
         attack={
             range=30,        
@@ -996,7 +996,7 @@ return {
         name='werebear',
         moveSpeed=12*60,
         kbResistance=65,
-        health=10,
+        health=100,
         attack={
             range=55,        
             period=2,

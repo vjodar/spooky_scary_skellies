@@ -7,12 +7,13 @@ behaviors.methods.common={
 
     draw=function(self)
         self.shadow:draw(self.x,self.y)
-        -- love.graphics.setColor(0.8,0.9,1,1) --light blue tint for freeze
-        -- love.graphics.setColor(1,0.8,0.8,1) --red tint for burn
+        if self:isBurning() then love.graphics.setColor(1,0.8,0.8,1) end
+        if self:isFrozen() then love.graphics.setColor(0.8,0.9,1,1) end 
         self.animations.current:draw(
             self.spriteSheet,self.x+self.xOffset,self.y+self.yOffset,
             nil,self.scaleX,1,self.xOrigin,self.yOrigin
         )
+        love.graphics.setColor(1,1,1,1)
         -- --testing------------------------
         -- love.graphics.circle('line',self.moveTarget.center.x,self.moveTarget.center.y,3)
         -- --testing------------------------
@@ -33,6 +34,9 @@ behaviors.methods.common={
             self.animations.current=self.animations[associatedAnimation[newState]]
         end
     end,
+
+    isBurning=function(self) return #self.status.table.burn>0 end,
+    isFrozen=function(self) return #self.status.table.freeze>0 end,
 
     move=function(self)
         --apply a force in the entity's angle to move it
@@ -80,13 +84,13 @@ behaviors.methods.common={
     end,
 
     updateAnimation=function(self)
-        return self.animations.current:update(dt*self.animSpeed.current)
+        return self.animations.current:update(dt*self.animSpeed)
     end,
 
-    takeDamage=function(self,source,angle)
-        local damage=source.attack.damage
-        local knockback=source.attack.knockback
-        local kbAngle=angle or getAngle(source.center,self.center)
+    takeDamage=function(self,args) --args={damage,knockback,angle,textColor}
+        local damage=args.damage 
+        local knockback=args.knockback
+        local kbAngle=args.angle
         knockback=knockback-knockback*(self.kbResistance/100)
         
         self.health.current=max(self.health.current-damage,0)
@@ -95,12 +99,10 @@ behaviors.methods.common={
         self.vx=self.vx+cos(kbAngle)*knockback
         self.vy=self.vy+sin(kbAngle)*knockback
 
-        if self.health.current==0 then self:die() end
-    end,
+        local damageTextColor=args.textColor or 'gray'
+        UI.damage:new(self.center.x,self.center.y,damage,damageTextColor)
 
-    dealDamage=function(self,target,angle)
-        if target.state=='dead' then return end
-        target:takeDamage(self,angle)
+        if self.health.current==0 then self:die() end
     end,
 
     die=function(self)
@@ -309,6 +311,7 @@ behaviors.states={} --States----------------------------------------------------
 behaviors.states.common={
     raise=function(self)
         self:updatePosition()
+        self.status:update(self)
         local onLoop=self:updateAnimation()
         if onLoop then self:changeState('idle') end
     end,
@@ -319,6 +322,7 @@ behaviors.states.common={
 
     shoot=function(self)
         self:updatePosition()
+        self.status:update(self)
         local onLoop=self:updateAnimation()
         if onLoop then self:changeState('idle') end 
 
@@ -350,6 +354,7 @@ behaviors.states.ally={
     idleMelee=function(self)
         self:updateAnimation()
         self:updatePosition()
+        self.status:update(self)
         if self:remainNearPlayer()==false then return end
 
         --if target is a living enemy and skeleton can attack,
@@ -382,6 +387,7 @@ behaviors.states.ally={
     idleRanged=function(self)
         self:updateAnimation()
         self:updatePosition()
+        self.status:update(self)
         if self:remainNearPlayer()==false then return end
 
         --if target is a living enemy, move toward target to attack if attack
@@ -419,6 +425,7 @@ behaviors.states.ally={
     moveToTarget=function(self) 
         self:updateAnimation()
         self:updatePosition()
+        self.status:update(self)
         if self:remainNearPlayer()==false then return end
     
         --if moveTarget has died or has been cleared, return to idle
@@ -447,6 +454,7 @@ behaviors.states.ally={
     moveToPlayer=function(self) 
         self:updateAnimation()
         self:updatePosition()
+        self.status:update(self)
     
         --if moveTarget has died or has been cleared, return to idle
         if self.moveTarget.state=='dead' or self.moveTarget==self then
@@ -495,6 +503,7 @@ behaviors.states.ally={
     end,
     
     lunge=function(self)
+        self.status:update(self)
         local onLoop=self:updateAnimation()
         if onLoop then 
             self.targetsAlreadyAttacked={}
@@ -530,7 +539,11 @@ behaviors.states.ally={
                     self.vy=sin(angle)*magnitude*self.restitution
 
                     --damage target, add to targetsAlreadyAttacked
-                    self:dealDamage(other)
+                    other:takeDamage({
+                        damage=self.attack.damage,
+                        knockback=self.attack.knockback,
+                        angle=getAngle(self.center,other.center),
+                    })
                     table.insert(self.targetsAlreadyAttacked,other)
                 end
             end    
@@ -542,6 +555,7 @@ behaviors.states.enemy={
     idleMelee=function(self) 
         self:updateAnimation()
         self:updatePosition()
+        self.status:update(self)
 
         --if target is a living skeleton and enemy can attack,
         --move toward the target in order to attack.
@@ -573,6 +587,7 @@ behaviors.states.enemy={
     idleRanged=function(self) 
         self:updateAnimation()
         self:updatePosition()
+        self.status:update(self)
 
         --if target is a living skeleton, move toward target to attack if attack
         --is off cooldown, otherwise relocate to a different position.
@@ -608,6 +623,7 @@ behaviors.states.enemy={
     idleStationary=function(self)
         self:updateAnimation()
         self:updatePosition()
+        self.status:update(self)
 
         if self.canQueryAttackTargets.flag then 
             self.canQueryAttackTargets.setOnCooldown()
@@ -621,6 +637,7 @@ behaviors.states.enemy={
     moveToTarget=function(self) 
         self:updateAnimation()
         self:updatePosition()
+        self.status:update(self)
         
         --if target has died, clear moveTarget, return to idle
         if self.moveTarget.state=='dead' or self.moveTarget==self then
@@ -649,6 +666,7 @@ behaviors.states.enemy={
     moveToLocation=function(self)
         self:updateAnimation()
         self:updatePosition()
+        self.status:update(self)
 
         --reached nearby location  
         if getDistance(self.moveTarget.center,self.center)<self.w then 
@@ -680,6 +698,7 @@ behaviors.states.enemy={
     end,
     
     lunge=function(self) --lunges toward target, deals damage and bounces away
+        self.status:update(self)
         local onLoop=self:updateAnimation()
         if onLoop then
             self.targetsAlreadyAttacked={}
@@ -715,7 +734,11 @@ behaviors.states.enemy={
                     self.vy=sin(angle)*magnitude*self.restitution
 
                     --damage target, add to targetsAlreadyAttacked
-                    self:dealDamage(other)
+                    other:takeDamage({
+                        damage=self.attack.damage,
+                        knockback=self.attack.knockback,
+                        angle=getAngle(self.center,other.center),
+                    })
                     table.insert(self.targetsAlreadyAttacked,other)
                 end
             end  
@@ -723,6 +746,7 @@ behaviors.states.enemy={
     end,
     
     roll=function(self) --lunges toward target, deals damage and rolls through
+        self.status:update(self)
         local onLoop=self:updateAnimation()
         if onLoop then
             self.targetsAlreadyAttacked={}
@@ -750,7 +774,11 @@ behaviors.states.enemy={
                     end
 
                     --damage target, add to targetsAlreadyAttacked
-                    self:dealDamage(other)
+                    other:takeDamage({
+                        damage=self.attack.damage,
+                        knockback=self.attack.knockback,
+                        angle=getAngle(self.center,other.center),
+                    })
                     table.insert(self.targetsAlreadyAttacked,other)
                 end
             end  
@@ -759,6 +787,7 @@ behaviors.states.enemy={
 
     spawnMinion=function(self)
         self:updatePosition()
+        self.status:update(self)
         local onLoop=self:updateAnimation()
         if onLoop then self:changeState('idle') end 
 
@@ -775,6 +804,7 @@ behaviors.states.enemy={
     end,
 
     spawnSpiders=function(self)
+        self.status:update(self)
         self:updatePosition()
         self:updateAnimation()
         if self.attackTime==nil then 
@@ -789,6 +819,7 @@ behaviors.states.enemy={
     end,
     
     lungeAndTeleport=function(self) --normal lunge, then roll for a chance to teleport
+        self.status:update(self)
         local onLoop=self:updateAnimation()
         if onLoop then
             self.targetsAlreadyAttacked={}
@@ -825,7 +856,11 @@ behaviors.states.enemy={
                     self.vy=sin(angle)*magnitude*self.restitution
 
                     --damage target, add to targetsAlreadyAttacked
-                    self:dealDamage(other)
+                    other:takeDamage({
+                        damage=self.attack.damage,
+                        knockback=self.attack.knockback,
+                        angle=getAngle(self.center,other.center),
+                    })
                     table.insert(self.targetsAlreadyAttacked,other)
                 end
             end  
@@ -834,6 +869,7 @@ behaviors.states.enemy={
 
     shootAndTeleport=function(self)
         self:updatePosition()
+        self.status:update(self)
         local onLoop=self:updateAnimation()
         if onLoop then 
             local nextState=rnd(4)>1 and 'teleport' or 'idle' --75% chance
@@ -866,6 +902,7 @@ behaviors.states.enemy={
     teleport=function(self)
         local onLoop=self:updateAnimation()
         self:updatePosition()
+        self.status:update(self)
 
         if onLoop then 
             local distance=rnd(20,400)

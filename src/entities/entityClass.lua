@@ -77,7 +77,8 @@ entityClass.new=function(self,entity,x,y) --constructor
 
     --General data
     e.health={current=def.health,max=def.health}
-    e.moveSpeed=def.moveSpeed
+    e.moveSpeedMax=def.moveSpeed
+    e.moveSpeed=e.moveSpeedMax
     e.kbResistance=def.kbResistance or 0
     e.attack=def.attack 
     e.moveTarget=e
@@ -96,13 +97,15 @@ entityClass.new=function(self,entity,x,y) --constructor
     e.yOrigin=def.drawData.frameHeight*0.5
     e.scaleX=def.drawData.scaleX or rndSign() --used to face right (1) or left (-1)
     e.animations=self.parseAnimations(self.grids[e.name],def.animations)
-    e.animSpeed={min=0.25,max=3,current=1}
+    e.animSpeedMax=1
+    e.animSpeed=e.animSpeedMax 
     e.damagingFrames=def.animations.attack.damagingFrames or nil 
     e.firingFrame=def.animations.attack.firingFrame or nil
     e.spawnMinionFrame=def.animations.attack.spawnMinionFrame or nil
 
-    --Shadow
-    e.shadow=Shadows:new(e.name,e.w,e.h)
+    e.shadow=Shadows:new(e.name,e.w,e.h) --Shadow
+
+    e.status=Statuses:new() --status system
 
     --Cooldown flags, periods, and callbacks
     e.canAttack={flag=true,cooldownPeriod=def.attack.period}

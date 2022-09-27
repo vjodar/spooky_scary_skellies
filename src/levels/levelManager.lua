@@ -1,28 +1,3 @@
-local levelDefinitions={
-    test={
-        map='dungeon1',
-        waves={
-            {
-                ghost=1,
-            },
-            -- {
-            --     zombie=10,            
-            --     tombstone=10,            
-            -- },
-            -- {
-            --     spider=10,            
-            --     spiderEgg=10,            
-            -- },
-            -- {
-            --     pumpkin=10,       
-            --     ent=10,  
-            --     headlessHorseman=4,     
-            -- },
-        },
-        maxEnemies=10, --used to limit summoner enemies' minion spawns
-    },
-}
-
 local bgColors={
     black={53/255,53/255,64/255},
     swamp={68/255,99/255,80/255},
@@ -90,15 +65,15 @@ local mapDefinitions={
         playerStartPos={x=432,y=368},
         terrain={
             -- rockCaveLarge=40,
-            rockSwampSmall=10,
-            rockSwampMedium=10,
-            treeSmall=20,
-            treeMedium=20,
-            treeLarge=20,
-            treePine=20,
+            rockSwampSmall=5,
+            rockSwampMedium=5,
+            treeSmall=15,
+            treeMedium=15,
+            treeLarge=15,
+            treePine=15,
             pitWater1=5,
-            pitWater2=5,
-            pitWater3=3,
+            pitWater2=4,
+            pitWater3=2,
             -- signPost1=2,
             -- signPost2=2,
             -- mushroomBig=30,
@@ -112,6 +87,7 @@ local mapDefinitions={
             swampSmall=300,
             swampBig=20,
         },
+        exit={name='swampWallHole',pos={x=373,y=26+31}}
     },
     cave1={ --island in lava
         name='cave1',
@@ -179,6 +155,7 @@ local mapDefinitions={
             caveSmall=300,
             caveBig=10,
         },
+        exit={name='caveWallHole',pos={x=380,y=32+26}},
     },
     dungeon1={ --green carpet
         name='dungeon1',
@@ -455,7 +432,7 @@ end
 local startNextLevel=function(self)
     local buildNextLevel=function()
         self:destroyLevel()
-        self:buildLevel(self.currentLevel.name,self.currentLevel.allyCount)
+        self:buildLevel(self.currentLevel.nextLevel,self.currentLevel.allyCount)
     end
     FadeState:fadeBoth({fadeTime=0.4,afterFn=buildNextLevel,holdTime=0.4})
 end
@@ -465,7 +442,7 @@ return { --The Module
     gridClass=require 'src/levels/grid',
     decorationsClass=require 'src/levels/decorations',
     exitsClass=require 'src/levels/exits',
-    levelDefinitions=levelDefinitions,
+    levelDefinitions=require 'src/levels/levelDefinitions',
     mapDefinitions=mapDefinitions,
     sprites=sprites,
     animations=animations,
@@ -479,11 +456,11 @@ return { --The Module
     startNextLevel=startNextLevel,
     
     update=function(self) 
-        local level=self.currentLevel 
-        if level.anim then level.anim:update(dt) end
         --testing-----------------------------
         -- if love.timer.getAverageDelta()>0.1 then self:destroyLevel() end
         --testing-----------------------------
+        local level=self.currentLevel 
+        if level.anim then level.anim:update(dt) end
 
         if level.complete then return end
 
@@ -493,17 +470,30 @@ return { --The Module
             if level.currentWave==#level.definition.waves then 
                 level.complete=true
 
-                if level.exit.pos then --if exit pos is specified, spawn it there
-                    self.exitsClass:new(
-                        level.exit.name,level.exit.pos.x,level.exit.pos.y
-                    )
-                else --otherwise use the gridClass to spawn it randomly
-                    self.gridClass:spawnExit(
-                        level.exit.name,self.exitsClass,level.grid
-                    )
-                end
-
-                print('level complete!')
+                --if level exit pos isn't specified, generate it using gridClass
+                local spawnPos=level.exit.pos or self.gridClass:generateExitSpawnPosition(
+                    level.exit.name,self.exitsClass,level.grid
+                )
+                local exitDef=self.exitsClass.definitions[level.exit.name]
+                local exitCenter={x=spawnPos.x+exitDef.w*0.5,y=spawnPos.y+exitDef.h*0.5}
+                local panObjects={
+                    -- { 
+                    --     target={x=0,y=0}, --pan to chest
+                    --     afterFn=function() --spawn chest
+                    --         print('this is where the chest would be IF I HAD ONE!')
+                    --     end,
+                    --     holdTime=1.3 --hold for spawn anim duration
+                    -- }, 
+                    { 
+                        target=exitCenter, --pan to exit pos (center)
+                        afterFn=function() --spawn level exit
+                            self.exitsClass:new(level.exit.name,spawnPos.x,spawnPos.y)
+                        end,
+                        holdTime=1.3 --hold for spawn anim duration
+                    }, 
+                    {target=Player.center} --pan back to player
+                }
+                PanState:panTo(panObjects)
                 return 
             end
 
@@ -542,10 +532,10 @@ return { --The Module
         --         end
         --     end
         -- end
-        for i=1,#level.boundaries do 
-            local b=level.boundaries[i]
-            love.graphics.rectangle('line',b.x,b.y,b.w,b.h)
-        end
+        -- for i=1,#level.boundaries do 
+        --     local b=level.boundaries[i]
+        --     love.graphics.rectangle('line',b.x,b.y,b.w,b.h)
+        -- end
         --testing------------------------------------------------------
     end,
     
@@ -597,6 +587,7 @@ return { --The Module
             currentWave=0,
             complete=false,
             exit=map.exit,
+            nextLevel=levelDef.nextLevel,
         }        
 
         --spawn in the skeleton minions

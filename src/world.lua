@@ -47,6 +47,10 @@ world.collisionFilters={
       elseif class=='solid' or class=='exit' then return 'bounce'
       end
    end,
+   intangible=function(item,other) 
+      local class=other.collisionClass 
+      if class=='solid' or class=='exit' then return 'bounce' end 
+   end,
 }
 
 --used for segment queries to check LOS of an attack target or moveTarget

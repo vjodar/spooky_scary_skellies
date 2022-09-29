@@ -89,6 +89,35 @@ local mapDefinitions={
         },
         exit={name='swampWallHole',pos={x=373,y=26+31}}
     },
+    swamp3={ --smaller enclosed (for starting levels)
+        name='swamp3',
+        bgColor=bgColors.swamp,
+        boundaries={
+            t={{x=0,y=61,w=544,class='solid'},}, 
+            b={{x=0,y=415,w=544,class='solid'},},
+            l={{x=8,y=0,h=432,class='solid'},},
+            r={{x=535,y=0,h=432,class='solid'},},
+        },
+        foreground='swamp_small',
+        spawnArea={x=16,y=64,w=512,h=336},
+        playerStartPos={x=256,y=224},
+        terrain={
+            treeSmall=5,
+            treeMedium=5,
+            treeLarge=5,
+            treePine=5,
+            pitWater1=2,
+            pitWater2=1,
+            mushroomSwamp=15,
+            pitSwampSmall=2,
+            moundSwampSmall=2,
+        },
+        decorations={
+            swampSmall=200,
+            swampBig=5,
+        },
+        exit={name='swampWallHole',pos={x=245,y=26+31}}
+    },
     cave1={ --island in lava
         name='cave1',
         animation={

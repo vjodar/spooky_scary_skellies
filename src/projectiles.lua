@@ -1,119 +1,159 @@
-local projectileDefinitions=function()
-    return {
-        ['bone']={
-            name='bone',
-            moveSpeed=150,
-            collider={
-                w=6,
-                h=6,
-                class='allyProjectile',
-            }
+local projectileDefinitions={
+    ['bone']={
+        name='bone',
+        moveSpeed=150,
+        collider={
+            w=6,
+            h=6,
+            class='allyProjectile',
+        }
+    },
+    ['arrow']={
+        name='arrow',
+        moveSpeed=300,
+        collider={
+            w=3,
+            h=3,
+            class='allyProjectile',
         },
-        ['arrow']={
-            name='arrow',
-            moveSpeed=300,
-            collider={
-                w=3,
-                h=3,
-                class='allyProjectile',
-            },
+    },
+    ['flame']={
+        name='flame',
+        moveSpeed=200,
+        collider={
+            w=3,
+            h=3,
+            class='allyProjectile',
         },
-        ['flame']={
-            name='flame',
-            moveSpeed=200,
-            collider={
-                w=3,
-                h=3,
-                class='allyProjectile',
-            },
+    },
+    ['icicle']={
+        name='icicle',
+        moveSpeed=160,
+        collider={
+            w=3,
+            h=3,
+            class='allyProjectile',
         },
-        ['icicle']={
-            name='icicle',
-            moveSpeed=160,
-            collider={
-                w=3,
-                h=3,
-                class='allyProjectile',
-            },
+    },
+    ['spark']={
+        name='spark',
+        moveSpeed=150,
+        collider={
+            w=3,
+            h=3,
+            class='allyProjectile',
         },
-        ['spark']={
-            name='spark',
-            moveSpeed=150,
-            collider={
-                w=3,
-                h=3,
-                class='allyProjectile',
-            },
+    },
+    ['darkArrow']={
+        name='darkArrow',
+        moveSpeed=250,
+        collider={
+            w=3,
+            h=3,
+            class='enemyProjectile',
         },
-        ['darkArrow']={
-            name='darkArrow',
-            moveSpeed=250,
-            collider={
-                w=3,
-                h=3,
-                class='enemyProjectile',
-            },
+    },
+    ['pickaxe']={
+        name='pickaxe',
+        moveSpeed=130,
+        collider={
+            w=3,
+            h=3,
+            class='enemyProjectile',
         },
-        ['pickaxe']={
-            name='pickaxe',
-            moveSpeed=130,
-            collider={
-                w=3,
-                h=3,
-                class='enemyProjectile',
-            },
+    },
+    ['apple']={
+        name='apple',
+        moveSpeed=130,
+        collider={
+            w=3,
+            h=3,
+            class='enemyProjectile',
         },
-        ['apple']={
-            name='apple',
-            moveSpeed=130,
-            collider={
-                w=3,
-                h=3,
-                class='enemyProjectile',
-            },
+    },
+    ['jack-o-lantern']={
+        name='jack-o-lantern',
+        moveSpeed=150,
+        explosionRadius=50,
+        collider={
+            w=12,
+            h=8,
+            class='enemyProjectile',
         },
-        ['jack-o-lantern']={
-            name='jack-o-lantern',
-            moveSpeed=150,
-            explosionRadius=50,
-            collider={
-                w=6,
-                h=6,
-                class='enemyProjectile',
-            },
+    },
+    ['blueSpark']={
+        name='blueSpark',
+        moveSpeed=150,
+        collider={
+            w=3,
+            h=3,
+            class='enemyProjectile',
         },
-        ['blueSpark']={
-            name='blueSpark',
-            moveSpeed=150,
-            collider={
-                w=3,
-                h=3,
-                class='enemyProjectile',
-            },
+    },
+    ['mug']={
+        name='mug', moveSpeed=130,
+        collider={w=3, h=3, class='enemyProjectile'}
+    },
+    ['bottle']={
+        name='bottle', moveSpeed=130,
+        collider={w=3, h=3, class='enemyProjectile'}
+    },
+    ['candle']={
+        name='candle', moveSpeed=130,
+        collider={w=3, h=3, class='enemyProjectile'}
+    },
+    ['fireball']={
+        name='fireball',
+        moveSpeed=200,
+        explosionRadius=50,
+        collider={
+            w=6,
+            h=6,
+            class='allyProjectile',
         },
-        ['mug']={
-            name='mug', moveSpeed=130,
-            collider={w=3, h=3, class='enemyProjectile'}
+        animation={
+            frameWidth=16,
+            frameHeight=10,
+            frames='1-4',
+            durations=0.1,
+        }
+    },
+    ['blizzard']={
+        name='blizzard',
+        moveSpeed=80,
+        travelTime=4,
+        collider={
+            w=10,
+            h=6,
+            class='intangible',
         },
-        ['bottle']={
-            name='bottle', moveSpeed=130,
-            collider={w=3, h=3, class='enemyProjectile'}
+        animation={
+            frameWidth=28,
+            frameHeight=24,
+            frames='1-6',
+            durations=0.07,
         },
-        ['candle']={
-            name='candle', moveSpeed=130,
-            collider={w=3, h=3, class='enemyProjectile'}
-        },
-    }
-end
+    },
+}
 
-local projectileSprites=function()
-    local sprites={}
-    for p,def in pairs(projectileDefinitions()) do 
+local generateDrawData=function(defs)
+    local sprites,anims={},{}
+    for p,def in pairs(defs) do 
         local path='assets/projectiles/'..def.name..'.png'
         sprites[p]=love.graphics.newImage(path)
+
+        if def.animation then 
+            local animDef=def.animation 
+            local grid=anim8.newGrid(
+                animDef.frameWidth,animDef.frameHeight,
+                sprites[p]:getWidth(),animDef.frameHeight 
+            )
+            anims[p]=anim8.newAnimation(grid(animDef.frames,1),animDef.durations)
+        end
     end
-    return sprites 
+    return sprites,anims 
 end
+local sprites,animations=generateDrawData(projectileDefinitions)
 
 --Defining how a projectile behaves upon collisions.
 local projectileOnHitFunctions=function()
@@ -128,7 +168,6 @@ local projectileOnHitFunctions=function()
             if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
             or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
             then 
-                if target.state=='dead' then return end  
                 target:takeDamage({
                     damage=self.attack.damage,
                     knockback=self.attack.knockback,
@@ -147,7 +186,6 @@ local projectileOnHitFunctions=function()
             if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
             or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
             then 
-                if target.state=='dead' then return end  
                 target:takeDamage({
                     damage=self.attack.damage,
                     knockback=self.attack.knockback,
@@ -168,7 +206,6 @@ local projectileOnHitFunctions=function()
             if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
             or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
             then 
-                if target.state=='dead' then return end  
                 target:takeDamage({
                     damage=self.attack.damage,
                     knockback=self.attack.knockback,
@@ -195,7 +232,6 @@ local projectileOnHitFunctions=function()
             if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
             or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
             then 
-                if target.state=='dead' then return end  
                 target:takeDamage({
                     damage=self.attack.damage,
                     knockback=self.attack.knockback,
@@ -226,22 +262,39 @@ local projectileOnHitFunctions=function()
                     queryData.x,queryData.y,queryData.w,queryData.h,filter
                 )
                 for i=1,#targets do 
-                    if targets[i].state~='dead' then 
-                        targets[i]:takeDamage({                            
-                            damage=self.attack.damage,
-                            knockback=self.attack.knockback,
-                            angle=getAngle(self.center,targets[i].center),
-                        }) 
-                    end
+                    local target=targets[i]
+                    target:takeDamage({                 
+                        damage=self.attack.damage,
+                        knockback=self.attack.knockback,
+                        angle=getAngle(self.center,targets[i].center),
+                        textColor='red',
+                    })
+                    target.status:burn(self.attack.damage*0.5,5) --burn for 5s
                 end
                 return false
             end 
+        end,
+        
+        --bounces off solids, slows each bounce
+        ['blizzard']=function(self,target,touch)     
+            if target.collisionClass=='solid' 
+            or target.collisionClass=='exit' 
+            then 
+                self.moveSpeed=self.moveSpeed*0.9
+                self.remainingTravelTime=self.remainingTravelTime*0.9
+                local angle=getAngle(touch,self)
+                self.vx=cos(angle)*self.moveSpeed 
+                self.vy=sin(angle)*self.moveSpeed
+                self.angle=angle
+                return
+            end
         end,
         
     }
 
     onHitFunctions['jack-o-lantern']=onHitFunctions.explode
     onHitFunctions['blueSpark']=onHitFunctions.spark
+    onHitFunctions['fireball']=onHitFunctions.explode
 
     return onHitFunctions
 end
@@ -258,6 +311,8 @@ local projectileUpdateFunctions=function()
             then 
                 return false
             end
+
+            if self.animation then self.animation:update(dt) end 
     
             --update position
             local goalX=self.x+self.vx*dt 
@@ -279,6 +334,8 @@ local projectileUpdateFunctions=function()
             then
                 return false
             end
+
+            if self.animation then self.animation:update(dt) end 
     
             if self.changeDirectionTime==nil then
                 self.changeDirectionTime=rnd()*0.5
@@ -317,7 +374,58 @@ local projectileUpdateFunctions=function()
             --handle collisions
             for i=1,#cols do return self:onHit(cols[i].other,cols[i].touch) end
         end,
-    }
+
+        --Travel in a straight line until hitting an target, solid wall, or expiring.
+        --repeatedly queryies for nearby targets to damage and apply freeze.
+        ['blizzard']=function(self)
+            self.remainingTravelTime=self.remainingTravelTime-dt 
+            if self.remainingTravelTime<0
+            or getDistance(self.center,Camera.target)>600 
+            then 
+                return false
+            end
+
+            if self.animation then self.animation:update(dt) end 
+
+            if self.attackPeriod==nil then 
+                self.attackPeriod=0.2
+                self.attackTimer=0
+            else
+                self.attackTimer=self.attackTimer+dt 
+                if self.attackTimer>self.attackPeriod then 
+                    self.attackTimer=0
+                    self.freezeArea={w=32,h=26}
+                    local queryFilter=World.queryFilters.enemy 
+                    local targets=World:queryRect(
+                        self.center.x-self.freezeArea.w*0.5,
+                        self.center.y-self.freezeArea.h*0.5,
+                        self.freezeArea.w,self.freezeArea.h,queryFilter
+                    )
+                    for i=1,#targets do 
+                        local target=targets[i]                  
+                        target:takeDamage({                 
+                            damage=self.attack.damage,
+                            knockback=0,
+                            angle=getAngle(self.center,targets[i].center),
+                            textColor='blue',
+                        })
+                        target.status:freeze(target,0.5,0.25) --slow to 1/4 speed for 0.5s
+                    end
+                end
+            end
+
+            --update position
+            local goalX=self.x+self.vx*dt 
+            local goalY=self.y+self.vy*dt 
+            local realX,realY,cols=World:move(self,goalX,goalY,self.filter)
+            self.x,self.y=realX,realY 
+            local c=getCenter(self)
+            self.center.x,self.center.y=c.x,c.y
+
+            --handle collisions
+            for i=1,#cols do return self:onHit(cols[i].other,cols[i].touch) end
+        end,
+    }    
 
     updateFunctions['blueSpark']=updateFunctions.spark
 
@@ -331,20 +439,34 @@ local projectileDrawFunctions=function()
         --Projectile is angled toward its initial direction
         ['base']=function(self)
             self.shadow:draw(self.x,self.y,self.angle)
-            love.graphics.draw(
-                self.sprite,self.x+self.xOffset,self.y+self.yOffset,
-                self.angle,1,1,self.xOrigin,self.yOrigin
-            )
+            if self.animation then 
+                self.animation:draw(
+                    self.sprite,self.x+self.xOffset,self.y+self.yOffset,
+                    self.angle,1,1,self.xOrigin,self.yOrigin
+                )
+            else 
+                love.graphics.draw(
+                    self.sprite,self.x+self.xOffset,self.y+self.yOffset,
+                    self.angle,1,1,self.xOrigin,self.yOrigin
+                )
+            end
         end,
     
         --Projectile randomly rotates each frame
         ['spark']=function(self)
             self.rotation=rnd()*6
             self.shadow:draw(self.x,self.y,self.rotation)
-            love.graphics.draw(
-                self.sprite,self.x+self.xOffset,self.y+self.yOffset,
-                self.rotation,1,1,self.xOrigin,self.yOrigin
-            )
+            if self.animation then 
+                self.animation:draw(
+                    self.sprite,self.x+self.xOffset,self.y+self.yOffset,
+                    self.rotation,1,1,self.xOrigin,self.yOrigin
+                )
+            else
+                love.graphics.draw(
+                    self.sprite,self.x+self.xOffset,self.y+self.yOffset,
+                    self.rotation,1,1,self.xOrigin,self.yOrigin
+                )
+            end
         end,
 
         --Projectile spins
@@ -353,26 +475,33 @@ local projectileDrawFunctions=function()
             else self.rotation=self.rotation-dt*self.moveSpeed*0.15
             end
             self.shadow:draw(self.x,self.y,self.rotation)
-            love.graphics.draw(
-                self.sprite,self.x+self.xOffset,self.y+self.yOffset,
-                self.rotation,1,1,self.xOrigin,self.yOrigin
-            )
+            if self.animation then 
+                self.animation:draw(
+                    self.sprite,self.x+self.xOffset,self.y+self.yOffset,
+                    self.rotation,1,1,self.xOrigin,self.yOrigin
+                )
+            else
+                love.graphics.draw(
+                    self.sprite,self.x+self.xOffset,self.y+self.yOffset,
+                    self.rotation,1,1,self.xOrigin,self.yOrigin
+                )
+            end
         end,
 
         --Projectile doesn't rotate, but still faces the correct side
         ['apple']=function(self)
             self.shadow:draw(self.x,self.y)
-            love.graphics.draw(
-                self.sprite,self.x+self.xOffset,self.y+self.yOffset,
-                nil,getSign(self.vx),1,self.xOrigin,self.yOrigin
-            )
-            -- if self.explosionRadius then 
-            --     love.graphics.rectangle(
-            --         'line',self.x-self.explosionRadius*0.5,
-            --         self.y-self.explosionRadius*0.5,
-            --         self.explosionRadius,self.explosionRadius
-            --     )
-            -- end
+            if self.animation then 
+                self.animation:draw (
+                    self.sprite,self.x+self.xOffset,self.y+self.yOffset,
+                    nil,getSign(self.vx),1,self.xOrigin,self.yOrigin
+                )
+            else 
+                love.graphics.draw(
+                    self.sprite,self.x+self.xOffset,self.y+self.yOffset,
+                    nil,getSign(self.vx),1,self.xOrigin,self.yOrigin
+                )
+            end
         end,
 
     }
@@ -382,14 +511,16 @@ local projectileDrawFunctions=function()
     drawFunctions['mug']=drawFunctions.bone 
     drawFunctions['bottle']=drawFunctions.bone 
     drawFunctions['candle']=drawFunctions.bone 
+    drawFunctions['blizzard']=drawFunctions.apple
 
     return drawFunctions
 end
 
 --Module
 return {
-    definitions=projectileDefinitions(),
-    sprites=projectileSprites(),
+    definitions=projectileDefinitions,
+    sprites=sprites,
+    animations=animations,
     onHitFunctions=projectileOnHitFunctions(),
     updateFunctions=projectileUpdateFunctions(),
     drawFunctions=projectileDrawFunctions(),
@@ -400,8 +531,8 @@ return {
         local p={name=def.name} --projectile
     
         --Collider Data
-        p.x,p.y=args.x,args.y 
         p.w,p.h=def.collider.w,def.collider.h
+        p.x,p.y=args.x-p.w*0.5,args.y-p.h*0.5 --align center with spawn pos
         p.center=getCenter(p)
         p.collisionClass=def.collider.class
         p.filter=World.collisionFilters[p.collisionClass]
@@ -415,13 +546,14 @@ return {
             knockback=args.knockback
         } 
         p.explosionRadius=def.explosionRadius or nil
-        p.remainingTravelTime=(200/def.moveSpeed)*4 --2sec per 100units/sec
+        p.remainingTravelTime=def.travelTime or (200/def.moveSpeed)*4 --2sec per 100units/sec
     
         --Draw data
         p.sprite=self.sprites[def.name]
+        p.animation=def.animation and self.animations[def.name]:clone() or nil 
         p.xOffset=p.w*0.5
         p.yOffset=p.h*0.5+args.yOffset
-        p.xOrigin=p.sprite:getWidth()*0.5
+        p.xOrigin=def.animation and def.animation.frameWidth*0.5 or p.sprite:getWidth()*0.5
         p.yOrigin=p.sprite:getHeight()*0.5
         p.shadow=Shadows:new(def.name,p.w,p.h)
     

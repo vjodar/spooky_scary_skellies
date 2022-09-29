@@ -19,7 +19,8 @@ player.attack={
     period=0.5, 
     damage=1,
     knockback=400,
-    projectile={name='bone',yOffset=-10},    
+    -- projectile={name='bone',yOffset=-10},
+    projectile={name='blizzard',yOffset=-15},
 }
 player.minionsPerSummon=1
 player.nearbyEnemies={}
@@ -86,7 +87,8 @@ function player:update()
             if Controls.down.btn2 then self:summon('skeletonArcher') end 
             if Controls.down.btn3 then 
                 local mages={'Fire','Ice','Electric'}
-                self:summon('skeletonMage'..rndElement(mages)) 
+                -- self:summon('skeletonMage'..rndElement(mages)) 
+                self:summon('skeletonMageElectric') 
             end 
         end
     else 
@@ -199,33 +201,32 @@ function player:queryForEnemies()
 end
 
 function player:takeDamage(args)
-    local damage=args.damage  
-    local knockback=args.knockback
-    knockback=knockback-knockback*(self.kbResistance/100)
+    if self.state=='dead' then print('dead') return end 
 
+    local damage=max(args.damage,1)
+    local knockback=args.knockback
     local kbAngle=args.angle
-    local hp=self.health.current 
+    knockback=knockback-knockback*(self.kbResistance/100)
     
-    hp=max(0,hp-damage)
-    self.health.current=hp
+    self.health.current=max(self.health.current-damage,0)
 
     --Apply knockback force
     self.vx=self.vx+cos(kbAngle)*knockback
     self.vy=self.vy+sin(kbAngle)*knockback
 
-    local damageTextColor=args.textColor or 'white'
-    UI.damage:new(self.center.x,self.center.y,damage,damageTextColor)
+    local damageTextColor=args.textColor or 'gray'
+    UI.damage:new(self.center.x,self.center.y,floor(damage),damageTextColor)
 
-    if self.health.current==0 then print("I'm dead! :O") end
+    if self.health.current==0 then self.state='dead' end
 end
 
 function player:launchBone()
     local mouseX,mouseY=Controls.getMousePosition()
     Projectiles:new({
-        x=self.center.x,y=self.center.y,name='bone',
+        x=self.center.x,y=self.center.y,name=self.attack.projectile.name,
         damage=self.attack.damage,knockback=self.attack.knockback,
         angle=getAngle(self.center,{x=mouseX,y=mouseY}),
-        yOffset=self.attack.projectile.yOffset
+        yOffset=self.attack.projectile.yOffset,
     })
 
     --face target direction, lock turning

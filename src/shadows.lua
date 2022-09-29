@@ -45,6 +45,8 @@ local shadowNames={
     'mug',
     'bottle',
     'candle',
+    'fireball',
+    'blizzard',
 }
 
 local sharedSprites={
@@ -65,6 +67,7 @@ local sharedSprites={
     
     darkArrow='arrow',
     blueSpark='spark',
+    blizzard='jack-o-lantern',
 }
 
 local generateShadowSprites=function()

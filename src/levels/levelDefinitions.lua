@@ -1,6 +1,6 @@
 return {
     ['test']={
-        map='swamp2',
+        map='swamp3',
         waves={
             {
                 werebear=1,
@@ -19,7 +19,7 @@ return {
             --     headlessHorseman=4,     
             -- },
         },
-        maxEnemies=20, --used to limit summoner enemies' minion spawns
+        maxEnemies=1, --used to limit summoner enemies' minion spawns
         nextLevel='test',
     },
     ['swampL1']={

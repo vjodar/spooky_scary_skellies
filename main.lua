@@ -4,6 +4,7 @@ function love.load()
     gameStates={} --state stack
 
     love.graphics.setDefaultFilter('nearest','nearest') --set pixelated look
+    love.graphics.setLineStyle('rough') --pixelated lines
 
     --common math functions
     generateCommonMaths()
@@ -31,6 +32,7 @@ function love.load()
     LevelManager=require 'src/levels/levelManager'
     Entities=require 'src/entities/entityClass'
     Projectiles=require 'src/projectiles' 
+    SpecialAttacks=require 'src/specialAttacks'
     
     table.insert(gameStates,Timer) --timer first
     table.insert(gameStates,Controls) --controls second

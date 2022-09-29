@@ -88,7 +88,9 @@ behaviors.methods.common={
     end,
 
     takeDamage=function(self,args) --args={damage,knockback,angle,textColor}
-        local damage=args.damage 
+        if self.state=='dead' then return end 
+
+        local damage=max(args.damage,1)
         local knockback=args.knockback
         local kbAngle=args.angle
         knockback=knockback-knockback*(self.kbResistance/100)
@@ -100,7 +102,7 @@ behaviors.methods.common={
         self.vy=self.vy+sin(kbAngle)*knockback
 
         local damageTextColor=args.textColor or 'gray'
-        UI.damage:new(self.center.x,self.center.y,damage,damageTextColor)
+        UI.damage:new(self.center.x,self.center.y,floor(damage),damageTextColor)
 
         if self.health.current==0 then self:die() end
     end,
@@ -549,6 +551,39 @@ behaviors.states.ally={
             end    
         end
     end,
+
+    chainLightning=function(self)
+        self:updatePosition()
+        self.status:update(self)
+        local onLoop=self:updateAnimation()
+        if onLoop then self:changeState('idle') end 
+
+        if self.canAttack.flag and self:onFiringFrame() then
+            self.canAttack.setOnCooldown()
+            local targets={self.moveTarget}
+            local range=self.attack.range 
+            local queryFilter=World.queryFilters.enemy 
+            for i=1,4 do --chains up to 4 additional targets
+                prevTarget=targets[#targets]
+                --query all enemies surrounding the last target
+                local nearbyEnemies=World:queryRect(
+                    prevTarget.center.x-range,
+                    prevTarget.center.y-range,
+                    range*2,range*2,queryFilter  
+                )
+                --filter out the last target from nearbyEnemies
+                for j,enemy in ipairs(nearbyEnemies) do 
+                    for k=1,#targets do 
+                        if enemy==targets[k] then 
+                            table.remove(nearbyEnemies,j) 
+                        end 
+                    end
+                end
+                table.insert(targets,rndElement(nearbyEnemies))
+            end
+            SpecialAttacks:chainLightning(self,targets)
+        end
+    end,
 }
 
 behaviors.states.enemy={
@@ -937,6 +972,14 @@ behaviors.AI={ --AI-------------------------------------------------------------
         attack=behaviors.states.common.shoot,
         dead=behaviors.states.common.dead,
     },
+    ['skeletonMageElectric']={ --clone of archer, but can't share reference
+        raise=behaviors.states.common.raise,
+        idle=behaviors.states.ally.idleRanged,
+        moveToPlayer=behaviors.states.ally.moveToPlayer,
+        moveToTarget=behaviors.states.ally.moveToTarget,
+        attack=behaviors.states.common.shoot,
+        dead=behaviors.states.common.dead,
+    },
     ['slime']={ --standard melee, has spawn animation
         raise=behaviors.states.common.raise,
         idle=behaviors.states.enemy.idleMelee,
@@ -1006,7 +1049,6 @@ behaviors.AI={ --AI-------------------------------------------------------------
 --shared AI
 behaviors.AI['skeletonMageFire']=behaviors.AI.skeletonArcher
 behaviors.AI['skeletonMageIce']=behaviors.AI.skeletonArcher
-behaviors.AI['skeletonMageElectric']=behaviors.AI.skeletonArcher
 behaviors.AI['spider']=behaviors.AI.pumpkin
 behaviors.AI['bat']=behaviors.AI.pumpkin
 behaviors.AI['zombie']=behaviors.AI.slime

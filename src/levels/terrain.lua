@@ -290,6 +290,7 @@ return { --The Module
             update=self.terrainUpdateFunction,
             draw=self.terrainDrawFunction,
         }
+        t.center=getCenter(t)
         World:addItem(t)
         table.insert(Objects.table,t)
         return t

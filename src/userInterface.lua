@@ -26,13 +26,13 @@ local generateDamageSystem=function()
         local color=color or 'gray'
         local font=self.fonts[color]
         local d={
-            x=x, y=y, val=val,
+            x=x+rnd(-8,8), y=y-rnd(10), val=val,
             vx=cos(angle)*moveSpeed,
             vy=sin(angle)*moveSpeed,
             font=font,
             linearDamping=7,
             stopThreshold=3*60,
-            holdTime=0.5,
+            holdTime=0.3,
             update=function(self)
                 --update position
                 self.x=self.x+self.vx*dt 

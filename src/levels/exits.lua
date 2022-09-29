@@ -74,6 +74,7 @@ return { --The Module
             update=self.exitUpdateFunction,
             draw=self.exitDrawFunction,
         }
+        exit.center=getCenter(exit)
         table.insert(Objects.table,exit)
         World:addItem(exit)
         return exit 

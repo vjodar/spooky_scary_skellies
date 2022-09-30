@@ -3,7 +3,7 @@ return {
         map='swamp3',
         waves={
             {
-                werebear=1,
+                floatingEyeball=10,
             },
             -- {
             --     zombie=10,            

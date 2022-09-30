@@ -30,6 +30,8 @@ local shadowNames={
     'werewolf',             --18x8
     'ghost',                --10x7
     'poltergeist',
+    'pyreFiend',
+    'floatingEyeball',      --12x10
 
     --projectiles
     'arrow',
@@ -47,6 +49,9 @@ local shadowNames={
     'candle',
     'fireball',
     'blizzard',
+    'laser',
+    'pyre',
+    'pyreTrail',
 }
 
 local sharedSprites={
@@ -64,10 +69,12 @@ local sharedSprites={
     vampire='player',
     gnasherDemon='player',
     poltergeist='ghost',
+    pyreFiend='frankenstein',
     
     darkArrow='arrow',
     blueSpark='spark',
     blizzard='jack-o-lantern',
+    pyreTrail='pyre',
 }
 
 local generateShadowSprites=function()

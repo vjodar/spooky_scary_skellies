@@ -134,6 +134,31 @@ local projectileDefinitions={
             durations=0.07,
         },
     },
+    ['laser']={
+        name='laser',
+        moveSpeed=250,
+        collider={
+            w=3,
+            h=3,
+            class='enemyProjectile',
+        },
+    },
+    ['pyre']={
+        name='pyre',
+        moveSpeed=100,
+        travelTime=2,
+        collider={
+            w=8,
+            h=6,
+            class='intangible',
+        },
+        animation={
+            frameWidth=10,
+            frameHeight=12,
+            frames='1-4',
+            durations=0.1,
+        },
+    },
 }
 
 local generateDrawData=function(defs)
@@ -286,15 +311,40 @@ local projectileOnHitFunctions=function()
                 self.vx=cos(angle)*self.moveSpeed 
                 self.vy=sin(angle)*self.moveSpeed
                 self.angle=angle
+            end
+        end,    
+
+        --damages and freezes targets, bounces off solids
+        ['laser']=function(self,target,touch)     
+            if target.collisionClass=='solid' 
+            or target.collisionClass=='exit' 
+            then 
+                local angle=getAngle(touch,self)
+                self.vx=cos(angle)*self.moveSpeed 
+                self.vy=sin(angle)*self.moveSpeed
+                self.angle=angle
                 return
             end
-        end,
-        
+               
+            if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
+            or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
+            then 
+                target:takeDamage({
+                    damage=self.attack.damage,
+                    knockback=self.attack.knockback,
+                    angle=getAngle(self.center,target.center),
+                    textColor='blue'
+                })
+                target.status:freeze(target,1,0.5) --slow to half speed for 1s
+                return false
+            end 
+        end,    
     }
 
     onHitFunctions['jack-o-lantern']=onHitFunctions.explode
     onHitFunctions['blueSpark']=onHitFunctions.spark
     onHitFunctions['fireball']=onHitFunctions.explode
+    onHitFunctions['pyre']=onHitFunctions.blizzard
 
     return onHitFunctions
 end
@@ -326,7 +376,7 @@ local projectileUpdateFunctions=function()
             for i=1,#cols do return self:onHit(cols[i].other,cols[i].touch) end
         end,
     
-        --Changes directions rapidly (every 0.1s-0.5s), bounces off solid walls.
+        --Changes directions rapidly (every 0.1s-0.5s), 
         ['spark']=function(self)
             self.remainingTravelTime=self.remainingTravelTime-dt
             if self.remainingTravelTime<0 
@@ -425,7 +475,75 @@ local projectileUpdateFunctions=function()
             --handle collisions
             for i=1,#cols do return self:onHit(cols[i].other,cols[i].touch) end
         end,
-    }    
+
+        --every 0.2s, spawn a pyreTrail special attack
+        ['pyre']=function(self)
+            self.remainingTravelTime=self.remainingTravelTime-dt 
+            if self.remainingTravelTime<0
+            or getDistance(self.center,Camera.target)>600 
+            then 
+                SpecialAttacks:spawnPyreTrail({
+                    x=self.center.x,y=self.center.y,damage=self.attack.damage,
+                    knockback=self.attack.knockback,yOffset=self.yOffset,
+                })
+                return false
+            end
+
+            if self.animation then self.animation:update(dt) end 
+
+            if self.changeDirectionTime==nil then
+                self.changeDirectionTime=rnd()*0.5
+                self.angles={}            
+                for i=1,20 do -- (-0.2pi,0.2pi) spread from current angle
+                    table.insert(self.angles,-(i*0.01*pi))
+                    table.insert(self.angles,(i*0.01*pi))
+                end
+                self.angle=self.angle+(rndElement(self.angles))
+                    
+                --update direction
+                local magnitude=getMagnitude(self.vy,self.vx)
+                self.vx=cos(self.angle)*magnitude
+                self.vy=sin(self.angle)*magnitude
+            else
+                self.changeDirectionTime=self.changeDirectionTime-dt 
+                if self.changeDirectionTime<0 then 
+                    self.changeDirectionTime=rnd()*0.5
+                    self.angle=self.angle+(rndElement(self.angles))
+                    
+                    --update direction
+                    local magnitude=getMagnitude(self.vy,self.vx)
+                    self.vx=cos(self.angle)*magnitude
+                    self.vy=sin(self.angle)*magnitude
+                end
+            end
+            
+            --update position
+            local goalX=self.x+self.vx*dt 
+            local goalY=self.y+self.vy*dt 
+            local realX,realY,cols=World:move(self,goalX,goalY,self.filter)
+            self.x,self.y=realX,realY 
+            local c=getCenter(self)
+            self.center.x,self.center.y=c.x,c.y
+
+            --spawn a pyreTrail every 0.1s
+            if self.attackPeriod==nil then 
+                self.attackPeriod=0.1
+                self.attackTimer=0
+            else
+                self.attackTimer=self.attackTimer+dt 
+                if self.attackTimer>self.attackPeriod then 
+                    self.attackTimer=0
+                    SpecialAttacks:spawnPyreTrail({
+                        x=self.center.x,y=self.center.y,damage=self.attack.damage,
+                        knockback=self.attack.knockback,yOffset=self.yOffset,
+                    })
+                end
+            end
+            
+            --handle collisions
+            for i=1,#cols do return self:onHit(cols[i].other,cols[i].touch) end
+        end,
+    } 
 
     updateFunctions['blueSpark']=updateFunctions.spark
 
@@ -492,7 +610,7 @@ local projectileDrawFunctions=function()
         ['apple']=function(self)
             self.shadow:draw(self.x,self.y)
             if self.animation then 
-                self.animation:draw (
+                self.animation:draw(
                     self.sprite,self.x+self.xOffset,self.y+self.yOffset,
                     nil,getSign(self.vx),1,self.xOrigin,self.yOrigin
                 )
@@ -512,6 +630,7 @@ local projectileDrawFunctions=function()
     drawFunctions['bottle']=drawFunctions.bone 
     drawFunctions['candle']=drawFunctions.bone 
     drawFunctions['blizzard']=drawFunctions.apple
+    drawFunctions['pyre']=drawFunctions.apple
 
     return drawFunctions
 end
@@ -526,7 +645,7 @@ return {
     drawFunctions=projectileDrawFunctions(),
 
     --constructor
-    new=function(self,args) --args={x,y,name,damage,knockback,yOffset} 
+    new=function(self,args) --args={x,y,name,damage,knockback,angle,yOffset} 
         local def=self.definitions[args.name]
         local p={name=def.name} --projectile
     

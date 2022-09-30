@@ -1062,5 +1062,7 @@ behaviors.AI['gnasherDemon']=behaviors.AI.pumpkin
 behaviors.AI['frankenstein']=behaviors.AI.possessedArcher
 behaviors.AI['werebear']=behaviors.AI.golem
 behaviors.AI['werewolf']=behaviors.AI.pumpkin
+behaviors.AI['floatingEyeball']=behaviors.AI.possessedArcher
+behaviors.AI['pyreFiend']=behaviors.AI.possessedArcher
 
 return behaviors 

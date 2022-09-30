@@ -19,8 +19,7 @@ player.attack={
     period=0.5, 
     damage=1,
     knockback=400,
-    -- projectile={name='bone',yOffset=-10},
-    projectile={name='blizzard',yOffset=-15},
+    projectile={name='bone',yOffset=-10},
 }
 player.minionsPerSummon=1
 player.nearbyEnemies={}

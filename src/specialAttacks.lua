@@ -1,3 +1,29 @@
+local definitions={
+    ['pyreTrail']={
+        name='pyreTrail',
+        travelTime=1,
+        collider={
+            w=8,
+            h=6,
+            class='intangible',
+        },
+        animation={
+            frameWidth=10,
+            frameHeight=12,
+            frames='1-4',
+            durations=0.1,
+        },
+    },
+}
+
+local generateSprites=function(defs)
+    local sprites,anims={},{}
+    sprites['pyreTrail']=Projectiles.sprites.pyre 
+    anims['pyreTrail']=Projectiles.animations.pyre 
+    return sprites,anims 
+end
+local sprites,animations=generateSprites(defs)
+
 local chainLightning=function(self,mage,targets)
     local damage=mage.attack.damage / #targets --split damage equally
     local knockback=mage.attack.knockback
@@ -44,15 +70,81 @@ local chainLightning=function(self,mage,targets)
     table.insert(self.table,cl)
 end
 
+local spawnPyreTrail=function(self,args) --args={x,y,damage,knockback,yOffset}
+    local def=self.definitions.pyreTrail 
+    local pt={name='pyreTrail'} 
+
+    --Collider Data
+    local colliderDef=def.collider 
+    pt.w,pt.h=colliderDef.w,colliderDef.h 
+    pt.x=args.x-pt.w*0.5
+    pt.y=args.y-pt.h*0.5
+    pt.center=getCenter(pt)
+    pt.collisionClass=colliderDef.class
+    pt.filter=World.collisionFilters[pt.collisionClass]
+    pt.queryFilter=World.queryFilters.ally 
+
+    --General Data
+    pt.attack={damage=args.damage, knockback=args.knockback, period=0.2}
+    pt.duration=def.travelTime
+    pt.timer=pt.attack.period
+
+    --Draw Data    
+    pt.sprite=self.sprites.pyreTrail 
+    pt.animation=self.animations.pyreTrail:clone()
+    pt.xOffset=pt.w*0.5
+    pt.yOffset=pt.h*0.5+args.yOffset
+    pt.xOrigin=def.animation.frameWidth*0.5
+    pt.yOrigin=def.animation.frameHeight*0.5
+    pt.shadow=Shadows:new(def.name,pt.w,pt.h)
+
+    --Methods
+    pt.update=function(self)
+        self.animation:update(dt)
+        self.duration=self.duration-dt 
+        if self.duration<0 then return false end 
+        self.timer=self.timer+dt 
+        if self.timer>self.attack.period then 
+            self.timer=0
+            local targets=World:queryRect(self.x,self.y,self.w,self.h,self.queryFilter)
+            for i=1,#targets do 
+                local target=targets[i]
+                target:takeDamage({
+                    damage=self.attack.damage,
+                    knockback=self.attack.knockback,
+                    angle=getAngle(self.center,target.center),
+                    textColor='red'
+                })
+            end
+        end
+    end
+    pt.draw=function(self)
+        self.shadow:draw(self.x,self.y)
+        self.animation:draw(
+            self.sprite,self.x+self.xOffset,self.y+self.yOffset,
+            nil,1,1,self.xOrigin,self.yOrigin
+        )
+    end
+
+    World:addItem(pt)
+    table.insert(Objects.table,pt) --pyreTrail is a physical object
+    return pt 
+end
+
 return {
+    definitions=definitions,
+    sprites=sprites,
+    animations=animations,
+
     chainLightning=chainLightning,
+    spawnPyreTrail=spawnPyreTrail,
 
     colors={  
         yellow={227/255,194/255,91/255},
         white={237/255,228/255,218/255},
     },
 
-    table={}, --holds all specialAttack instances    
+    table={}, --holds specialAttack instances that aren't managed by Objects.lua
     update=function(self)
         for i,special in ipairs(self.table) do 
             if special:update()==false then table.remove(self.table,i) end 

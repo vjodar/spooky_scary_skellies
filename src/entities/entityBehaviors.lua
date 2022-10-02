@@ -6,7 +6,10 @@ behaviors.methods.common={
     update=function(self) return self.AI[self.state](self) end,
 
     draw=function(self)
-        self.shadow:draw(self.x,self.y)
+        --during spawn animation, only draw shadow when sprite is visible
+        if self.state~='spawn' or self:onVisibleFrame() then 
+            self.shadow:draw(self.x,self.y) --always draw shadow in any other state
+        end
         if self:isBurning() then love.graphics.setColor(1,0.8,0.8,1) end
         if self:isFrozen() then love.graphics.setColor(0.8,0.9,1,1) end 
         self.animations.current:draw(
@@ -22,7 +25,7 @@ behaviors.methods.common={
     changeState=function(self,newState)
         self.state=newState 
         local associatedAnimation={
-            raise='raise',
+            spawn='spawn',
             idle='idle',
             attack='attack',
             moveToPlayer='move',
@@ -108,7 +111,8 @@ behaviors.methods.common={
     end,
 
     die=function(self)
-        self:changeState('dead')        
+        self:changeState('dead')
+        self.status:clear()
         LevelManager:decreaseEntityCount(self.collisionClass,self.name)
     end,
 
@@ -127,6 +131,10 @@ behaviors.methods.common={
 
     onSpawnMinionFrame=function(self)
         return self.animations.current.position==self.spawnMinionFrame
+    end,
+
+    onVisibleFrame=function(self)
+        return self.animations.current.position>=self.visibleFrame 
     end,
 }
 
@@ -263,13 +271,14 @@ behaviors.methods.enemy={
         local spawnPoint=self.attack.minion.spawnPoint or 'center'
         local minionName=self.attack.minion.name
         local count=self.attack.minion.count or 1
+        local startState=self.attack.minion.startState
         
         --spawn minion in center of spawner (with small deviation for natural
         --spread when multiple minions spawn at once)
         if spawnPoint=='center' then 
             local goalX,goalY=self.x,self.y
             for i=1,count do 
-                local minion=Entities:new(minionName,goalX,goalY)
+                local minion=Entities:new(minionName,goalX,goalY,startState)
                 local realX,realY=World:move(
                     minion,goalX+rnd()-0.5,goalY+rnd()-0.5,
                     minion.collisionFilter
@@ -286,7 +295,7 @@ behaviors.methods.enemy={
             local goalX=self.scaleX==1 and self.x+self.w-minionCenter.x or self.x-minionCenter.x
             local goalY=self.center.y-minionCenter.y
             for i=1,count do 
-                local minion=Entities:new(minionName,self.x,self.y)
+                local minion=Entities:new(minionName,self.x,self.y,startState)
                 local realX,realY=World:move(minion,goalX,goalY,minion.collisionFilter)
                 minion.x,minion.y=realX,realY
             end
@@ -296,7 +305,7 @@ behaviors.methods.enemy={
         --spawn minion at a random point around the spawner
         if spawnPoint=='random' then 
             for i=1,count do 
-                local minion=Entities:new(minionName,self.x,self.y) 
+                local minion=Entities:new(minionName,self.x,self.y,startState) 
                 local angle=rnd()*pi*2
                 local distance=rnd()*self.w*2 
                 local goalX=self.x+(cos(angle)*distance)
@@ -311,7 +320,7 @@ behaviors.methods.enemy={
 
 behaviors.states={} --States-----------------------------------------------------------------------
 behaviors.states.common={
-    raise=function(self)
+    spawn=function(self)
         self:updatePosition()
         self.status:update(self)
         local onLoop=self:updateAnimation()
@@ -950,14 +959,14 @@ behaviors.states.enemy={
             local c=getCenter(self)
             self.center.x,self.center.y=c.x,c.y
 
-            self:changeState('raise') 
+            self:changeState('spawn') 
         end
     end,
 }
 
 behaviors.AI={ --AI--------------------------------------------------------------------------------
     ['skeletonWarrior']={
-        raise=behaviors.states.common.raise,
+        spawn=behaviors.states.common.spawn,
         idle=behaviors.states.ally.idleMelee,
         moveToPlayer=behaviors.states.ally.moveToPlayer,
         moveToTarget=behaviors.states.ally.moveToTarget,
@@ -965,7 +974,7 @@ behaviors.AI={ --AI-------------------------------------------------------------
         dead=behaviors.states.common.dead,
     },
     ['skeletonArcher']={
-        raise=behaviors.states.common.raise,
+        spawn=behaviors.states.common.spawn,
         idle=behaviors.states.ally.idleRanged,
         moveToPlayer=behaviors.states.ally.moveToPlayer,
         moveToTarget=behaviors.states.ally.moveToTarget,
@@ -973,7 +982,7 @@ behaviors.AI={ --AI-------------------------------------------------------------
         dead=behaviors.states.common.dead,
     },
     ['skeletonMageElectric']={ --clone of archer, but can't share reference
-        raise=behaviors.states.common.raise,
+        spawn=behaviors.states.common.spawn,
         idle=behaviors.states.ally.idleRanged,
         moveToPlayer=behaviors.states.ally.moveToPlayer,
         moveToTarget=behaviors.states.ally.moveToTarget,
@@ -981,14 +990,7 @@ behaviors.AI={ --AI-------------------------------------------------------------
         dead=behaviors.states.common.dead,
     },
     ['slime']={ --standard melee, has spawn animation
-        raise=behaviors.states.common.raise,
-        idle=behaviors.states.enemy.idleMelee,
-        moveToTarget=behaviors.states.enemy.moveToTarget,
-        moveToLocation=behaviors.states.enemy.moveToLocation,
-        attack=behaviors.states.enemy.lunge,
-        dead=behaviors.states.common.dead,
-    },
-    ['pumpkin']={ --standard melee
+        spawn=behaviors.states.common.spawn,
         idle=behaviors.states.enemy.idleMelee,
         moveToTarget=behaviors.states.enemy.moveToTarget,
         moveToLocation=behaviors.states.enemy.moveToLocation,
@@ -996,6 +998,7 @@ behaviors.AI={ --AI-------------------------------------------------------------
         dead=behaviors.states.common.dead,
     },
     ['possessedArcher']={ --standard ranged
+        spawn=behaviors.states.common.spawn,
         idle=behaviors.states.enemy.idleRanged,
         moveToTarget=behaviors.states.enemy.moveToTarget,
         moveToLocation=behaviors.states.enemy.moveToLocation,
@@ -1003,6 +1006,7 @@ behaviors.AI={ --AI-------------------------------------------------------------
         dead=behaviors.states.common.dead,
     },
     ['slimeMatron']={ --'facing' moving summoner
+        spawn=behaviors.states.common.spawn,
         idle=behaviors.states.enemy.idleRanged,
         moveToTarget=behaviors.states.enemy.moveToTarget,
         moveToLocation=behaviors.states.enemy.moveToLocation,
@@ -1010,17 +1014,19 @@ behaviors.AI={ --AI-------------------------------------------------------------
         dead=behaviors.states.common.dead,
     },
     ['tombstone']={ --'random' idle summoner
-        raise=behaviors.states.common.raise,
+        spawn=behaviors.states.common.spawn,
         idle=behaviors.states.enemy.idleStationary,
         attack=behaviors.states.enemy.spawnMinion,
         dead=behaviors.states.common.dead,
     },
     ['spiderEgg']={ --idle summoner, dies upon spawning minions
+        spawn=behaviors.states.common.spawn,
         idle=behaviors.states.enemy.idleStationary,
         attack=behaviors.states.enemy.spawnSpiders,
         dead=behaviors.states.common.dead,
     },
     ['golem']={ --'roll through' melee
+        spawn=behaviors.states.common.spawn,
         idle=behaviors.states.enemy.idleMelee,
         moveToTarget=behaviors.states.enemy.moveToTarget,
         moveToLocation=behaviors.states.enemy.moveToLocation,
@@ -1028,7 +1034,7 @@ behaviors.AI={ --AI-------------------------------------------------------------
         dead=behaviors.states.common.dead,
     },
     ['ghost']={ --standard melee, then chance to teleport around
-        raise=behaviors.states.common.raise,
+        spawn=behaviors.states.common.spawn,
         idle=behaviors.states.enemy.idleMelee,
         moveToTarget=behaviors.states.enemy.moveToTarget,
         moveToLocation=behaviors.states.enemy.moveToLocation,
@@ -1037,7 +1043,7 @@ behaviors.AI={ --AI-------------------------------------------------------------
         dead=behaviors.states.common.dead,
     },
     ['poltergeist']={ --standard ranged, then chance to teleport around
-        raise=behaviors.states.common.raise,
+        spawn=behaviors.states.common.spawn,
         idle=behaviors.states.enemy.idleRanged,
         moveToTarget=behaviors.states.enemy.moveToTarget,
         moveToLocation=behaviors.states.enemy.moveToLocation,
@@ -1049,19 +1055,20 @@ behaviors.AI={ --AI-------------------------------------------------------------
 --shared AI
 behaviors.AI['skeletonMageFire']=behaviors.AI.skeletonArcher
 behaviors.AI['skeletonMageIce']=behaviors.AI.skeletonArcher
-behaviors.AI['spider']=behaviors.AI.pumpkin
-behaviors.AI['bat']=behaviors.AI.pumpkin
+behaviors.AI['pumpkin']=behaviors.AI.slime
+behaviors.AI['spider']=behaviors.AI.slime
+behaviors.AI['bat']=behaviors.AI.slime
 behaviors.AI['zombie']=behaviors.AI.slime
 behaviors.AI['possessedKnight']=behaviors.AI.golem
 behaviors.AI['undeadMiner']=behaviors.AI.possessedArcher
 behaviors.AI['ent']=behaviors.AI.possessedArcher
 behaviors.AI['headlessHorseman']=behaviors.AI.possessedArcher
 behaviors.AI['vampire']=behaviors.AI.slimeMatron
-behaviors.AI['imp']=behaviors.AI.pumpkin
-behaviors.AI['gnasherDemon']=behaviors.AI.pumpkin
+behaviors.AI['imp']=behaviors.AI.slime 
+behaviors.AI['gnasherDemon']=behaviors.AI.slime
 behaviors.AI['frankenstein']=behaviors.AI.possessedArcher
 behaviors.AI['werebear']=behaviors.AI.golem
-behaviors.AI['werewolf']=behaviors.AI.pumpkin
+behaviors.AI['werewolf']=behaviors.AI.slime
 behaviors.AI['floatingEyeball']=behaviors.AI.possessedArcher
 behaviors.AI['pyreFiend']=behaviors.AI.possessedArcher
 

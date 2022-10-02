@@ -17,6 +17,24 @@ local definitions={
             durations={['1-6']=0.07,['7-12']=0.1},
         },
     },
+    ladderDown={
+        w=16, h=14, xOffset=5, yOffset=7,
+        animation={
+            frameWidth=26,
+            frameHeight=21,
+            frames='1-9',
+            durations=0.1,
+        },
+    },
+    ladderUp={
+        w=16, h=5, xOffset=5, yOffset=32,
+        animation={
+            frameWidth=26,
+            frameHeight=37,
+            frames='1-10',
+            durations=0.1,
+        },
+    },
     swampWallHole={
         w=38, h=5, xOffset=8, yOffset=31,
         animation={

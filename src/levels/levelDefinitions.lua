@@ -3,7 +3,7 @@ return {
         map='swamp3',
         waves={
             {
-                floatingEyeball=10,
+                tombstone=1,
             },
             -- {
             --     zombie=10,            
@@ -19,38 +19,43 @@ return {
             --     headlessHorseman=4,     
             -- },
         },
-        maxEnemies=1, --used to limit summoner enemies' minion spawns
+        maxEnemies=10, --used to limit summoner enemies' minion spawns
+        -- exit={name='swampWallHole',pos={x=245,y=26+31}}, --small swamp
+        exit={name='swampWallHole',pos={x=288,y=26+31}}, --swamp boss
+        -- exit={name='ladderUp'},
         nextLevel='test',
     },
     ['swampL1']={
-        map='swamp2',
+        map='swamp3',
         waves={
             {
                 pumpkin=1,
             },
-            {
-                pumpkin=2,
-            },
-            {
-                pumpkin=2,
-                ent=2,
-            },
         },
         maxEnemies=10,
+        exit={name='swampWallHole',pos={x=245,y=26+31}},
         nextLevel='swampL2',
     },
     ['swampL2']={
         map='swamp2',
         waves={
             {
-                zombie=3,
-            },
-            {
-                zombie=3,
-                tombstone=3,
+                pumpkin=1,
             },
         },
         maxEnemies=10,
+        exit={name='swampWallHole',pos={x=373,y=26+31}},
+        nextLevel='swampBoss',
+    },
+    ['swampBoss']={
+        map='swampBoss',
+        waves={
+            {
+                pumpkin=1,
+            },
+        },
+        maxEnemies=10,
+        exit={name='swampWallHole',pos={x=288,y=26+31}},
         nextLevel='caveL1',
     },
     ['caveL1']={
@@ -61,6 +66,7 @@ return {
             },
         },
         maxEnemies=10,
+        exit={name='caveWallHole',pos={x=380,y=32+26}},
         nextLevel='caveL2',
     },
     ['caveL2']={
@@ -71,6 +77,18 @@ return {
             },
         },
         maxEnemies=10,
+        exit={name='ladderDown'},
+        nextLevel='caveBoss',
+    },
+    ['caveBoss']={
+        map='caveBoss',
+        waves={
+            {
+                pumpkin=1,
+            },
+        },
+        maxEnemies=10,
+        exit={name='ladderUp'},
         nextLevel='dungeonL1',
     },
     ['dungeonL1']={
@@ -81,6 +99,7 @@ return {
             },
         },
         maxEnemies=10,
+        exit={name='dungeonStairs'},
         nextLevel='dungeonL2',
     },
     ['dungeonL2']={
@@ -91,6 +110,18 @@ return {
             },
         },
         maxEnemies=10,
+        exit={name='dungeonStairs'},
+        nextLevel='dungeonBoss',
+    },
+    ['dungeonL2']={
+        map='dungeonBoss',
+        waves={
+            {
+                pumpkin=1,
+            },
+        },
+        maxEnemies=10,
+        exit={name='dungeonStairs'},
         nextLevel='test',
     },
 }

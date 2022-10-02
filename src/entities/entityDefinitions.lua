@@ -3,7 +3,6 @@ return {
         name='skeletonWarrior',
         moveSpeed=20*60,
         health=6,
-        startState='raise',
         attack={
             range=40,
             period=2,
@@ -21,10 +20,11 @@ return {
             frameHeight=17,
         },
         animations={
-            raise={
+            spawn={
                 frames='1-7',
                 row=1,
                 duration=0.1,
+                visibleFrame=3,
             },
             lower={
                 frames='7-1',
@@ -53,7 +53,6 @@ return {
         name='skeletonArcher',
         moveSpeed=19*60,
         health=3,
-        startState='raise',
         attack={
             range=200,  
             period=1, 
@@ -72,10 +71,11 @@ return {
             frameHeight=22,
         },
         animations={
-            raise={
+            spawn={
                 frames='1-7',
                 row=1,
                 duration=0.1,
+                visibleFrame=3,
             },
             lower={
                 frames='7-1',
@@ -104,7 +104,6 @@ return {
         name='skeletonMageFire',
         moveSpeed=18*60,  
         health=3,
-        startState='raise',
         attack={
             range=150,  
             period=1.5,   
@@ -123,10 +122,11 @@ return {
             frameHeight=24,
         },
         animations={
-            raise={
+            spawn={
                 frames='1-7',
                 row=1,
                 duration=0.1,
+                visibleFrame=3,
             },
             lower={
                 frames='7-1',
@@ -155,7 +155,6 @@ return {
         name='skeletonMageIce',
         moveSpeed=18*60,
         health=3,
-        startState='raise',        
         attack={
             range=150,  
             period=1,   
@@ -174,10 +173,11 @@ return {
             frameHeight=24,
         },
         animations={
-            raise={
+            spawn={
                 frames='1-7',
                 row=1,
                 duration=0.1,
+                visibleFrame=3,
             },
             lower={
                 frames='7-1',
@@ -206,7 +206,6 @@ return {
         name='skeletonMageElectric',
         moveSpeed=18*60,    
         health=3,
-        startState='raise',
         attack={
             range=100,
             period=1,
@@ -225,10 +224,11 @@ return {
             frameHeight=24,
         },
         animations={
-            raise={
+            spawn={
                 frames='1-7',
                 row=1,
                 duration=0.1,
+                visibleFrame=3,
             },
             lower={
                 frames='7-1',
@@ -257,7 +257,6 @@ return {
         name='slime',
         moveSpeed=15*60,
         health=3,
-        startState='raise',
         attack={
             range=40,
             period=1.5,
@@ -276,10 +275,11 @@ return {
             frameHeight=14,
         },
         animations={
-            raise={
+            spawn={
                 frames='1-7',
                 row=1,
                 duration=0.1,
+                visibleFrame=2,
             },
             idle={
                 frames='1-4',
@@ -318,27 +318,28 @@ return {
         },
         drawData={
             frameWidth=16,
-            frameHeight=16,
+            frameHeight=18,
         },
         animations={
-            wake={
-                frames='1-4',
+            spawn={
+                frames='1-7',
                 row=1,
                 duration=0.1,
+                visibleFrame=4,
             },
             idle={
-                frames='1-4',
-                row=1,
-                duration=0.1,
-            },
-            move={
                 frames='1-4',
                 row=2,
                 duration=0.1,
             },
+            move={
+                frames='1-4',
+                row=3,
+                duration=0.1,
+            },
             attack={
                 frames=1,
-                row=3,
+                row=4,
                 duration=0.4,
                 damagingFrames={1,1}
             },
@@ -364,28 +365,29 @@ return {
             linearDamping=7,
         },
         drawData={
-            frameWidth=16,
-            frameHeight=19,
+            frameWidth=18,
+            frameHeight=22,
         },
         animations={
-            wake={
-                frames='1-4',
+            spawn={
+                frames='1-7',
                 row=1,
                 duration=0.1,
+                visibleFrame=5,
             },
             idle={
-                frames='1-4',
-                row=1,
-                duration=0.1,
-            },
-            move={
                 frames='1-4',
                 row=2,
                 duration=0.1,
             },
+            move={
+                frames='1-4',
+                row=3,
+                duration=0.1,
+            },
             attack={
                 frames='1-9',
-                row=3,
+                row=4,
                 duration=0.1,
                 damagingFrames={4,9}
             },
@@ -409,23 +411,29 @@ return {
             restitution=0.2,
         },
         drawData={
-            frameWidth=14,
+            frameWidth=18,
             frameHeight=16,
         },
         animations={
+            spawn={
+                frames='1-7',
+                row=1,
+                duration=0.07,
+                visibleFrame=4,
+            },
             idle={
                 frames='1-4',
-                row=1,
+                row=2,
                 duration=0.1,
             },
             move={
                 frames='1-4',
-                row=2,
+                row=3,
                 duration=0.04,
             },
             attack={
                 frames='1-2',
-                row=3,
+                row=4,
                 duration=0.2,
                 damagingFrames={2,2}
             },
@@ -451,23 +459,29 @@ return {
             moveFilter='solidOrBoundary',
         },
         drawData={
-            frameWidth=16,
-            frameHeight=12,
+            frameWidth=20,
+            frameHeight=16,
         },
         animations={
+            spawn={
+                frames='1-7',
+                row=1,
+                duration=0.07,
+                visibleFrame=4,
+            },
             idle={
                 frames='1-3',
-                row=1,
+                row=2,
                 duration=0.1,
             },
             move={
                 frames='1-3',
-                row=1,
+                row=2,
                 duration=0.07,
             },
             attack={
                 frames=1,
-                row=1,
+                row=2,
                 duration=0.3,
                 damagingFrames={1,1}
             },
@@ -477,7 +491,6 @@ return {
         name='zombie',
         moveSpeed=8*60,
         health=3,
-        startState='raise',
         attack={
             range=30,        
             period=2,
@@ -496,10 +509,11 @@ return {
             frameHeight=21,
         },
         animations={
-            raise={
+            spawn={
                 frames='1-8',
                 row=1,
                 duration=0.1,
+                visibleFrame=3,
             },
             idle={
                 frames='1-4',
@@ -538,22 +552,28 @@ return {
         },
         drawData={
             frameWidth=34,
-            frameHeight=26,
+            frameHeight=23,
         },
         animations={
-            idle={
-                frames='1-4',
+            spawn={
+                frames='1-9',
                 row=1,
                 duration=0.1,
+                visibleFrame=6,
             },
-            move={
+            idle={
                 frames='1-4',
                 row=2,
                 duration=0.1,
             },
-            attack={
+            move={
                 frames='1-4',
                 row=3,
+                duration=0.1,
+            },
+            attack={
+                frames='1-4',
+                row=4,
                 duration={0.1,0.1,0.3,0.1},
                 firingFrame=4,
             },
@@ -581,19 +601,25 @@ return {
             frameHeight=23,
         },
         animations={
-            idle={
-                frames='1-4',
+            spawn={
+                frames='1-9',
                 row=1,
                 duration=0.1,
+                visibleFrame=5,
             },
-            move={
+            idle={
                 frames='1-4',
                 row=2,
                 duration=0.1,
             },
-            attack={
+            move={
                 frames='1-4',
                 row=3,
+                duration=0.1,
+            },
+            attack={
+                frames='1-4',
+                row=4,
                 duration={0.2,0.1,0.1,0.3},
                 damagingFrames={2,4}
             },
@@ -621,19 +647,25 @@ return {
             frameHeight=24,
         },
         animations={
-            idle={
-                frames='1-4',
+            spawn={
+                frames='1-8',
                 row=1,
                 duration=0.1,
+                visibleFrame=3,
             },
-            move={
+            idle={
                 frames='1-4',
                 row=2,
                 duration=0.1,
             },
+            move={
+                frames='1-4',
+                row=3,
+                duration=0.1,
+            },
             attack={
                 frames='1-3',
-                row=3,
+                row=4,
                 duration={0.2,0.1,0.2},
                 firingFrame=3,
             },
@@ -657,23 +689,29 @@ return {
             losFilter='solid',
         },
         drawData={
-            frameWidth=23,
+            frameWidth=28,
             frameHeight=32,
         },
         animations={
-            idle={
-                frames='1-4',
+            spawn={
+                frames='1-9',
                 row=1,
                 duration=0.1,
+                visibleFrame=5,
             },
-            move={
+            idle={
                 frames='1-4',
                 row=2,
                 duration=0.1,
             },
+            move={
+                frames='1-4',
+                row=3,
+                duration=0.1,
+            },
             attack={
                 frames=1,
-                row=1,
+                row=2,
                 duration=0.4,
                 firingFrame=1,
             },
@@ -697,23 +735,29 @@ return {
             losFilter='solid',
         },
         drawData={
-            frameWidth=33,
-            frameHeight=30,
+            frameWidth=41,
+            frameHeight=40,
         },
         animations={
-            idle={
-                frames='1-4',
+            spawn={
+                frames='1-11',
                 row=1,
                 duration=0.1,
+                visibleFrame=8,
             },
-            move={
+            idle={
                 frames='1-4',
                 row=2,
                 duration=0.1,
             },
+            move={
+                frames='1-4',
+                row=3,
+                duration=0.1,
+            },
             attack={
                 frames='1-10',
-                row=3,
+                row=4,
                 duration={['1-4']=0.1,[5]=0.4,['6-10']=0.1},
                 firingFrame=5,
             },
@@ -739,19 +783,25 @@ return {
             frameHeight=16,
         },
         animations={
+            spawn={
+                frames='1-8',
+                row=1,
+                duration=0.1,
+                visibleFrame=3,
+            },
             idle={
                 frames='1-4',
-                row=1,
+                row=2,
                 duration=0.1,
             },
             move={
                 frames='1-5',
-                row=2,
+                row=3,
                 duration=0.1,
             },
             attack={
                 frames='1-13',
-                row=3,
+                row=4,
                 duration=0.1,
                 spawnMinionFrame=7,
             },
@@ -763,7 +813,7 @@ return {
         attack={
             range=160,  
             period=3, 
-            minion={name='bat',count=2,spawnPoint='facing'},
+            minion={name='bat',count=2,spawnPoint='facing',startState='idle'},
         },
         health=5,
         collider={
@@ -779,19 +829,25 @@ return {
             frameHeight=22,
         },
         animations={
+            spawn={
+                frames='1-7',
+                row=1,
+                duration=0.1,
+                visibleFrame=4,
+            },
             idle={
                 frames='1-3',
-                row=1,
+                row=2,
                 duration=0.1,
             },
             move={
                 frames='1-3',
-                row=1,
+                row=2,
                 duration=0.1,
             },
             attack={
                 frames='1-18',
-                row=2,
+                row=3,
                 duration={['1-8']=0.05,[9]=0.2,[10]=0.4,['11-18']=0.05},
                 spawnMinionFrame=10,
             },
@@ -807,7 +863,6 @@ return {
         },
         health=5,
         kbResistance=100,
-        startState='raise',
         collider={
             w=19,
             h=7,
@@ -821,10 +876,11 @@ return {
             scaleX=1,
         },
         animations={
-            raise={
+            spawn={
                 frames='1-7',
                 row=1,
                 duration=0.1,
+                visibleFrame=5,
             },
             idle={
                 frames=7,
@@ -847,7 +903,7 @@ return {
         attack={
             range=120,  
             period=5, 
-            minion={name='spider',count=3},
+            minion={name='spider',count=3,startState='idle'},
         },
         collider={
             w=20,
@@ -856,18 +912,24 @@ return {
             losFilter='solid',
         },
         drawData={
-            frameWidth=20,
-            frameHeight=13,
+            frameWidth=24,
+            frameHeight=16,
         },
         animations={
+            spawn={
+                frames='1-8',
+                row=1,
+                duration=0.1,
+                visibleFrame=5,
+            },
             idle={
                 frames=1,
-                row=1,
+                row=2,
                 duration=10,
             },
             attack={
                 frames='1-8',
-                row=1,
+                row=2,
                 duration=0.05,
             },
         },
@@ -889,23 +951,29 @@ return {
             class='enemy',
         },
         drawData={
-            frameWidth=12,
-            frameHeight=14,
+            frameWidth=23,
+            frameHeight=26,
         },
         animations={
-            idle={
-                frames='1-4',
+            spawn={
+                frames='1-8',
                 row=1,
                 duration=0.1,
+                visibleFrame=4,
             },
-            move={
+            idle={
                 frames='1-4',
                 row=2,
                 duration=0.1,
             },
+            move={
+                frames='1-4',
+                row=3,
+                duration=0.1,
+            },
             attack={
                 frames=1,
-                row=3,
+                row=4,
                 duration=0.4,
                 damagingFrames={1,1}
             },
@@ -929,23 +997,29 @@ return {
             restitution=0.4,
         },
         drawData={
-            frameWidth=14,
-            frameHeight=24,
+            frameWidth=22,
+            frameHeight=26,
         },
         animations={
-            idle={
-                frames='1-4',
+            spawn={
+                frames='1-8',
                 row=1,
                 duration=0.1,
+                visibleFrame=4,
             },
-            move={
+            idle={
                 frames='1-4',
                 row=2,
                 duration=0.1,
             },
+            move={
+                frames='1-4',
+                row=3,
+                duration=0.1,
+            },
             attack={
                 frames='1-3',
-                row=3,
+                row=4,
                 duration={0.2,0.1,0.3},
                 damagingFrames={2,3}
             },
@@ -970,23 +1044,29 @@ return {
             losFilter='solid',
         },
         drawData={
-            frameWidth=22,
+            frameWidth=26,
             frameHeight=30,
         },
         animations={
-            idle={
-                frames='1-4',
+            spawn={
+                frames='1-10',
                 row=1,
                 duration=0.1,
+                visibleFrame=5,
             },
-            move={
+            idle={
                 frames='1-4',
                 row=2,
                 duration=0.1,
             },
+            move={
+                frames='1-4',
+                row=3,
+                duration=0.1,
+            },
             attack={
                 frames='1-5',
-                row=3,
+                row=4,
                 duration=0.1,
                 firingFrame=4,
             },
@@ -1011,22 +1091,28 @@ return {
         },
         drawData={
             frameWidth=46,
-            frameHeight=23,
+            frameHeight=25,
         },
         animations={
-            idle={
-                frames='1-4',
+            spawn={
+                frames='1-10',
                 row=1,
                 duration=0.1,
+                visibleFrame=6,
             },
-            move={
+            idle={
                 frames='1-4',
                 row=2,
                 duration=0.1,
             },
+            move={
+                frames='1-4',
+                row=3,
+                duration=0.1,
+            },
             attack={
                 frames='1-5',
-                row=3,
+                row=4,
                 duration={0.2,['2-5']=0.1},
                 damagingFrames={2,4}
             },
@@ -1050,22 +1136,28 @@ return {
         },
         drawData={
             frameWidth=30,
-            frameHeight=17,
+            frameHeight=20,
         },
         animations={
-            idle={
-                frames='1-4',
+            spawn={
+                frames='1-9',
                 row=1,
                 duration=0.1,
+                visibleFrame=5,
             },
-            move={
+            idle={
                 frames='1-4',
                 row=2,
                 duration=0.1,
             },
-            attack={
+            move={
                 frames='1-4',
                 row=3,
+                duration=0.1,
+            },
+            attack={
+                frames='1-4',
+                row=4,
                 duration={0.1,0.2,0.1,0.1},
                 damagingFrames={2,2}
             },
@@ -1097,10 +1189,11 @@ return {
             frameHeight=21,
         },
         animations={
-            raise={
+            spawn={
                 frames='1-8',
                 row=1,
                 duration=0.1,
+                visibleFrame=4,
             },
             idle={
                 frames='1-12',
@@ -1151,10 +1244,11 @@ return {
             frameHeight=22,
         },
         animations={
-            raise={
+            spawn={
                 frames='1-6',
                 row=1,
                 duration=0.1,
+                visibleFrame=3,
             },
             idle={
                 frames='1-12',
@@ -1204,19 +1298,25 @@ return {
             frameHeight=23,
         },
         animations={
+            spawn={
+                frames='1-7',
+                row=1,
+                duration=0.12,
+                visibleFrame=4,
+            },
             idle={
                 frames='1-4',
-                row=1,
+                row=2,
                 duration=0.12,
             },
             move={
                 frames='1-4',
-                row=2,
+                row=3,
                 duration=0.12,
             },
             attack={
                 frames=1,
-                row=2,
+                row=3,
                 duration=0.4,
                 firingFrame=1,
             },
@@ -1242,22 +1342,28 @@ return {
         },
         drawData={
             frameWidth=32,
-            frameHeight=32,
+            frameHeight=42,
         },
         animations={
-            idle={
-                frames='1-4',
+            spawn={
+                frames='1-8',
                 row=1,
                 duration=0.1,
+                visibleFrame=4,
             },
-            move={
+            idle={
                 frames='1-4',
                 row=2,
                 duration=0.1,
             },
+            move={
+                frames='1-4',
+                row=3,
+                duration=0.1,
+            },
             attack={
                 frames='1-7',
-                row=3,
+                row=4,
                 duration={[1]=0.2,['2-3']=0.1,[4]=0.4,['5-7']=0.1},
                 firingFrame=4,
             },

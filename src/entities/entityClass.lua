@@ -55,7 +55,7 @@ entityClass.behaviors=require 'src/entities/entityBehaviors'
 entityClass.spriteSheets,entityClass.grids=sheetsAndGrids(entityClass.definitions)
 entityClass.parseAnimations=parseAnimations 
 entityClass.chooseSpriteSheet=chooseSpriteSheet
-entityClass.new=function(self,entity,x,y) --constructor
+entityClass.new=function(self,entity,x,y,startState) --constructor
     local def=self.definitions[entity]
     local e={name=def.name}
     
@@ -99,6 +99,7 @@ entityClass.new=function(self,entity,x,y) --constructor
     e.animations=self.parseAnimations(self.grids[e.name],def.animations)
     e.animSpeedMax=1
     e.animSpeed=e.animSpeedMax 
+    e.visibleFrame=def.animations.spawn.visibleFrame --only draw shadow after this frame
     e.damagingFrames=def.animations.attack.damagingFrames or nil 
     e.firingFrame=def.animations.attack.firingFrame or nil
     e.spawnMinionFrame=def.animations.attack.spawnMinionFrame or nil
@@ -121,8 +122,8 @@ entityClass.new=function(self,entity,x,y) --constructor
     for i,method in pairs(methods[e.collisionClass]) do e[i]=method end 
     e.AI=self.behaviors.AI[e.name]
 
-    local startState=def.startState or 'idle'
-    e:changeState(startState)
+    local state=startState or 'spawn'
+    e:changeState(state)
 
     World:addItem(e)
     table.insert(Objects.table,e)

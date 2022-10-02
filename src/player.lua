@@ -216,7 +216,12 @@ function player:takeDamage(args)
     local damageTextColor=args.textColor or 'gray'
     UI.damage:new(self.center.x,self.center.y,floor(damage),damageTextColor)
 
-    if self.health.current==0 then self.state='dead' end
+    if self.health.current==0 then self:die() end
+end
+
+function player:die()
+    self.state='dead'
+    self.status:clear()
 end
 
 function player:launchBone()

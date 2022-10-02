@@ -61,6 +61,7 @@ return {
                     end
                 end
             end,
+            clear=function(self) self.table={burn={},freeze={}} end,
         }
     end
 }

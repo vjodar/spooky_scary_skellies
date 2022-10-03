@@ -4,6 +4,7 @@ function PlayState:startGame()
     GameScale=2
     Camera:zoomTo(GameScale)
     love.graphics.setPointSize(GameScale)
+    love.graphics.setLineWidth(GameScale)
     Camera.target=Player.center
 
     local allyCount={

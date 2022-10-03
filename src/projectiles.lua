@@ -386,7 +386,7 @@ local projectileOnHitFunctions=function()
             or target.collisionClass=='exit' 
             then 
                 self.moveSpeed=self.moveSpeed*1.2
-                self.moveSpeed=(min(self.moveSpeed,200))
+                self.moveSpeed=(min(self.moveSpeed,300))
                 local angle=getAngle(touch,self)
                 self.vx=cos(angle)*self.moveSpeed 
                 self.vy=sin(angle)*self.moveSpeed

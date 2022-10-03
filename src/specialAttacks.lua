@@ -45,6 +45,7 @@ local chainLightning=function(self,mage,targets)
         duration=0.1,
         yellow=self.colors.yellow,
         white=self.colors.white,
+        width=GameScale,
         yOffset=-7,
         update=function(self)
             self.duration=self.duration-dt 
@@ -58,10 +59,10 @@ local chainLightning=function(self,mage,targets)
                 local p1=self.points[i]
                 local p2=self.points[i+1]
                 love.graphics.setColor(self.yellow) --draw yellow border
-                love.graphics.setLineWidth(2)
+                love.graphics.setLineWidth(self.width)
                 self.drawLine(p1,p2,self.yOffset)
                 love.graphics.setColor(self.white) --draw white inner line
-                love.graphics.setLineWidth(1)
+                love.graphics.setLineWidth(self.width*0.5)
                 self.drawLine(p1,p2,self.yOffset)
                 love.graphics.setColor(1,1,1) --reset color
             end

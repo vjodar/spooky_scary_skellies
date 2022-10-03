@@ -89,11 +89,16 @@ local decreaseEntityCount=function(self,class,name)
     else
         level.enemyCount=level.enemyCount-1
     end
-    if level.enemyCount<=0 then level.waveComplete=true end
 end
 
 local maxEnemiesReached=function(self)
     return self.currentLevel.enemyCount>=self.currentLevel.definition.maxEnemies
+end
+
+local getWaveEnemyCount=function(waveDef)
+    local total=0
+    for name,count in pairs(waveDef) do total=total+count end
+    return total
 end
 
 local drawForeground=function(self)
@@ -111,6 +116,121 @@ local startNextLevel=function(self)
     FadeState:fadeBoth({fadeTime=0.4,afterFn=buildNextLevel,holdTime=0.4})
 end
 
+local buildLevel=function(self,lvl,skeletons)
+    local levelDef=self.levelDefinitions[lvl]
+    local map=self.mapDefinitions[levelDef.map]
+    local startPos=map.playerStartPos
+
+    love.graphics.setBackgroundColor(map.bgColor)
+
+    --move player to start position
+    Player.x,Player.y=startPos.x,startPos.y 
+    World:update(Player,Player.x,Player.y)
+
+    --divide the map's spawnArea into a grid, reserving tiles for startPos
+    local grid=self.gridClass:generate(map.spawnArea,startPos) 
+    local decorations={}
+    
+    --spawn randomly generated map terrain, using gridClass to ensure no overlap
+    if map.terrain then 
+        self.gridClass:generateTerrain(map.terrain,self.terrainClass,grid)
+    end
+
+    --spawn randomly generate ground decorations, using gridClass to ensure no overlap
+    if map.decorations then 
+        local decor=self.gridClass:generateDecorations(
+            map.decorations,self.decorationsClass,grid
+        )
+        for i=1,#decor do table.insert(decorations,decor[i]) end
+    end
+
+    self.currentLevel={
+        name=lvl,
+        definition=levelDef,
+        sprite=self.sprites[map.name],
+        anim=self.animations[map.name] or nil,
+        foreground=self.foregrounds[map.name] or nil,
+        boundaries=self.generateLevelBoundaries(map.boundaries),
+        decorations=decorations,
+        grid=grid,
+        allyCount={
+            skeletonWarrior=0,
+            skeletonArcher=0,
+            skeletonMageFire=0,
+            skeletonMageIce=0,
+            skeletonMageElectric=0,
+        },
+        enemyCount=0,
+        currentWave=0,
+        canCheckWaveCompletion=true,
+        complete=false,
+        exit=levelDef.exit,
+        nextLevel=levelDef.nextLevel,
+    }        
+
+    --spawn in the skeleton minions
+    for name,count in pairs(skeletons) do 
+        local summonSkeleton=function() Player:summon(name) end 
+        for i=1,count do Timer:after(0.5,summonSkeleton) end
+    end
+end
+
+local updateStandardLevel=function(self) 
+    --testing-----------------------------
+    -- if love.timer.getAverageDelta()>0.1 then Objects:clear() end
+    --testing-----------------------------
+    local level=self.currentLevel 
+    if level.anim then level.anim:update(dt) end
+
+    if level.complete then return end
+
+    --Current wave of enemies are defeated
+    --Will wait until every enemy in wave has spawned before checking
+    if level.canCheckWaveCompletion and level.enemyCount==0 then 
+
+        --no more waves, proceed to next level
+        if level.currentWave==#level.definition.waves then 
+            level.complete=true
+
+            --if level exit pos isn't specified, generate it using gridClass
+            local spawnPos=level.exit.pos or self.gridClass:generateExitSpawnPosition(
+                level.exit.name,self.exitsClass,level.grid
+            )
+            local exitDef=self.exitsClass.definitions[level.exit.name]
+            local exitCenter={x=spawnPos.x+exitDef.w*0.5,y=spawnPos.y+exitDef.h*0.5}
+            local panObjects={
+                -- { 
+                --     target={x=0,y=0}, --pan to chest
+                --     afterFn=function() --spawn chest
+                --         print('this is where the chest would be IF I HAD ONE!')
+                --     end,
+                --     holdTime=1.3 --hold for spawn anim duration
+                -- }, 
+                { 
+                    target=exitCenter, --pan to exit pos (center)
+                    afterFn=function() --spawn level exit
+                        self.exitsClass:new(level.exit.name,spawnPos.x,spawnPos.y)
+                    end,
+                    holdTime=1.3 --hold for spawn anim duration
+                }, 
+                {target=Player.center} --pan back to player
+            }
+            PanState:panTo(panObjects)
+            return 
+        end
+
+        --spawn the next wave of enemies, set timer to force level to wait until
+        --all enemies of the wave finish spawning before checking wave completion
+        level.currentWave=level.currentWave+1
+        local nextWaveDef=level.definition.waves[level.currentWave]
+        self.gridClass:generateEnemies(nextWaveDef,Entities,level.grid)
+        level.canCheckWaveCompletion=false 
+        local enemyCount=self.getWaveEnemyCount(nextWaveDef)
+        local enableCheck=function() level.canCheckWaveCompletion=true end 
+        Timer:after(0.1*enemyCount,enableCheck)
+    end
+end
+
 return { --The Module
     terrainClass=require 'src/levels/terrain',
     gridClass=require 'src/levels/grid',
@@ -126,60 +246,11 @@ return { --The Module
     increaseEntityCount=increaseEntityCount,
     decreaseEntityCount=decreaseEntityCount,
     maxEnemiesReached=maxEnemiesReached,
+    getWaveEnemyCount=getWaveEnemyCount,
     drawForeground=drawForeground,
-    startNextLevel=startNextLevel,
-    
-    update=function(self) 
-        --testing-----------------------------
-        -- if love.timer.getAverageDelta()>0.1 then self:destroyLevel() end
-        --testing-----------------------------
-        local level=self.currentLevel 
-        if level.anim then level.anim:update(dt) end
-
-        if level.levelComplete then return end
-
-        --Current wave of enemies are defeated (wait for death particles to expire)
-        if level.waveComplete and #ParticleSystem.table==0 then 
-
-            --no more waves, proceed to next level
-            if level.currentWave==#level.definition.waves then 
-                level.levelComplete=true
-
-                --if level exit pos isn't specified, generate it using gridClass
-                local spawnPos=level.exit.pos or self.gridClass:generateExitSpawnPosition(
-                    level.exit.name,self.exitsClass,level.grid
-                )
-                local exitDef=self.exitsClass.definitions[level.exit.name]
-                local exitCenter={x=spawnPos.x+exitDef.w*0.5,y=spawnPos.y+exitDef.h*0.5}
-                local panObjects={
-                    -- { 
-                    --     target={x=0,y=0}, --pan to chest
-                    --     afterFn=function() --spawn chest
-                    --         print('this is where the chest would be IF I HAD ONE!')
-                    --     end,
-                    --     holdTime=1.3 --hold for spawn anim duration
-                    -- }, 
-                    { 
-                        target=exitCenter, --pan to exit pos (center)
-                        afterFn=function() --spawn level exit
-                            self.exitsClass:new(level.exit.name,spawnPos.x,spawnPos.y)
-                        end,
-                        holdTime=1.3 --hold for spawn anim duration
-                    }, 
-                    {target=Player.center} --pan back to player
-                }
-                PanState:panTo(panObjects)
-                return 
-            end
-
-            --spawn the next wave of enemies
-            level.currentWave=level.currentWave+1
-            level.waveComplete=false 
-            self.gridClass:generateEnemies(
-                level.definition.waves[level.currentWave],Entities,level.grid
-            )
-        end
-    end,    
+    startNextLevel=startNextLevel,    
+    buildLevel=buildLevel,
+    update=updateStandardLevel, 
 
     draw=function(self) 
         local level=self.currentLevel
@@ -213,64 +284,5 @@ return { --The Module
             love.graphics.rectangle('line',b.x,b.y,b.w,b.h)
         end
         --testing------------------------------------------------------
-    end,
-    
-    buildLevel=function(self,lvl,skeletons)
-        local levelDef=self.levelDefinitions[lvl]
-        local map=self.mapDefinitions[levelDef.map]
-        local startPos=map.playerStartPos
-
-        love.graphics.setBackgroundColor(map.bgColor)
-
-        --move player to start position
-        Player.x,Player.y=startPos.x,startPos.y 
-        World:update(Player,Player.x,Player.y)
-
-        --divide the map's spawnArea into a grid, reserving tiles for startPos
-        local grid=self.gridClass:generate(map.spawnArea,startPos) 
-        local decorations={}
-        
-        --spawn randomly generated map terrain, using gridClass to ensure no overlap
-        if map.terrain then 
-            self.gridClass:generateTerrain(map.terrain,self.terrainClass,grid)
-        end
-
-        --spawn randomly generate ground decorations, using gridClass to ensure no overlap
-        if map.decorations then 
-            local decor=self.gridClass:generateDecorations(
-                map.decorations,self.decorationsClass,grid
-            )
-            for i=1,#decor do table.insert(decorations,decor[i]) end
-        end
-
-        self.currentLevel={
-            name=lvl,
-            definition=levelDef,
-            sprite=self.sprites[map.name],
-            anim=self.animations[map.name] or nil,
-            foreground=self.foregrounds[map.name] or nil,
-            boundaries=self.generateLevelBoundaries(map.boundaries),
-            decorations=decorations,
-            grid=grid,
-            allyCount={
-                skeletonWarrior=0,
-                skeletonArcher=0,
-                skeletonMageFire=0,
-                skeletonMageIce=0,
-                skeletonMageElectric=0,
-            },
-            enemyCount=0,
-            currentWave=0,
-            waveComplete=true, --starts true to spawn initial wave
-            levelComplete=false,
-            exit=levelDef.exit,
-            nextLevel=levelDef.nextLevel,
-        }        
-
-        --spawn in the skeleton minions
-        for name,count in pairs(skeletons) do 
-            local summonSkeleton=function() Player:summon(name) end 
-            for i=1,count do Timer:after(0.5,summonSkeleton) end
-        end
     end,
 }

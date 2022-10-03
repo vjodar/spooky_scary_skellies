@@ -3,7 +3,8 @@ return {
         map='swamp3',
         waves={
             {
-                beholder=1,
+                pumpkin=50,
+                ent=50,
             },
             -- {
             --     spider=10,            

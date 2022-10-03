@@ -4,7 +4,7 @@ local generateFonts=function()
     local glyphs=(
         " abcdefghijklmnopqrstuvwxyz"..
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"..
-        "1234567890.:!,'+/()"
+        "1234567890.:!,'+-/()"
     )
 
     local colors={'white','yellow','gray','blue','red','green'}

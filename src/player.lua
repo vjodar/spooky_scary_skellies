@@ -86,8 +86,7 @@ function player:update()
             if Controls.down.btn2 then self:summon('skeletonArcher') end 
             if Controls.down.btn3 then 
                 local mages={'Fire','Ice','Electric'}
-                -- self:summon('skeletonMage'..rndElement(mages)) 
-                self:summon('skeletonMageElectric') 
+                self:summon('skeletonMage'..rndElement(mages)) 
             end 
         end
     else 

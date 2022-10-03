@@ -3,25 +3,36 @@ return {
         map='swamp3',
         waves={
             {
-                tombstone=1,
+                slimeMatron=5,
             },
-            -- {
-            --     zombie=10,            
-            --     tombstone=10,            
-            -- },
+            {
+                slimeMatron=5,
+            },
+            {
+                slimeMatron=5,
+            },
+            {
+                slimeMatron=5,
+            },
+            {
+                slimeMatron=5,
+            },
+            {
+                slimeMatron=5,
+            },
             -- {
             --     spider=10,            
             --     spiderEgg=10,            
             -- },
             -- {
-            --     pumpkin=10,       
+            --     pumpkin=10,
             --     ent=10,  
             --     headlessHorseman=4,     
             -- },
         },
-        maxEnemies=10, --used to limit summoner enemies' minion spawns
-        -- exit={name='swampWallHole',pos={x=245,y=26+31}}, --small swamp
-        exit={name='swampWallHole',pos={x=288,y=26+31}}, --swamp boss
+        maxEnemies=100, --used to limit summoner enemies' minion spawns
+        exit={name='swampWallHole',pos={x=245,y=26+31}}, --small swamp
+        -- exit={name='swampWallHole',pos={x=288,y=26+31}}, --swamp boss
         -- exit={name='ladderUp'},
         nextLevel='test',
     },

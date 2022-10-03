@@ -235,7 +235,12 @@ local generateEnemies=function(self,enemyWave,entitiesClass,grid)
                     selectedTile.x,selectedTile.y,
                     enemyColliderDef.w,enemyColliderDef.h,enemyTileSize
                 )
-                entitiesClass:new(name,spawnX,spawnY)
+                local spawnEnemy=function() entitiesClass:new(name,spawnX,spawnY) end
+                if i==1 then --spawn first enemy immediately
+                    spawnEnemy() 
+                else --stagger all following enemy spawns
+                    Timer:after(i*0.1,spawnEnemy)
+                end
             else print('no available tiles for '..name) break end
         end
     end

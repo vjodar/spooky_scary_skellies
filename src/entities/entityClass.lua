@@ -49,12 +49,23 @@ local chooseSpriteSheet=function(def)
     end
 end
 
+local generateParticleEmitters=function(defs)
+    local emitters={}
+    for name,def in pairs(defs) do
+        if def.particles~=nil then 
+            emitters[name]=ParticleSystem:generateEmitter(def.particles)
+        else print(name, 'has no particle definition') end
+    end
+    return emitters 
+end
+
 local entityClass={}
 entityClass.definitions=require 'src/entities/entityDefinitions'
 entityClass.behaviors=require 'src/entities/entityBehaviors'
 entityClass.spriteSheets,entityClass.grids=sheetsAndGrids(entityClass.definitions)
 entityClass.parseAnimations=parseAnimations 
 entityClass.chooseSpriteSheet=chooseSpriteSheet
+entityClass.particleEmitters=generateParticleEmitters(entityClass.definitions)
 entityClass.new=function(self,entity,x,y,startState) --constructor
     local def=self.definitions[entity]
     local e={name=def.name}
@@ -107,6 +118,8 @@ entityClass.new=function(self,entity,x,y,startState) --constructor
     e.shadow=Shadows:new(e.name,e.w,e.h) --Shadow
 
     e.status=Statuses:new() --status system
+ 
+    e.particles=self.particleEmitters[e.name] --particle emitter
 
     --Cooldown flags, periods, and callbacks
     e.canAttack={flag=true,cooldownPeriod=def.attack.period}

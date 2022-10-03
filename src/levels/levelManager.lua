@@ -89,6 +89,7 @@ local decreaseEntityCount=function(self,class,name)
     else
         level.enemyCount=level.enemyCount-1
     end
+    if level.enemyCount<=0 then level.waveComplete=true end
 end
 
 local maxEnemiesReached=function(self)
@@ -102,8 +103,9 @@ local drawForeground=function(self)
 end
 
 local startNextLevel=function(self)
-    local buildNextLevel=function()
-        self:destroyLevel()
+    local buildNextLevel=function()        
+        self.currentLevel.boundaries={}
+        Objects:clear()
         self:buildLevel(self.currentLevel.nextLevel,self.currentLevel.allyCount)
     end
     FadeState:fadeBoth({fadeTime=0.4,afterFn=buildNextLevel,holdTime=0.4})
@@ -134,13 +136,14 @@ return { --The Module
         local level=self.currentLevel 
         if level.anim then level.anim:update(dt) end
 
-        if level.complete then return end
+        if level.levelComplete then return end
 
-        if level.enemyCount==0 then --current wave of enemies defeated
+        --Current wave of enemies are defeated (wait for death particles to expire)
+        if level.waveComplete and #ParticleSystem.table==0 then 
 
             --no more waves, proceed to next level
             if level.currentWave==#level.definition.waves then 
-                level.complete=true
+                level.levelComplete=true
 
                 --if level exit pos isn't specified, generate it using gridClass
                 local spawnPos=level.exit.pos or self.gridClass:generateExitSpawnPosition(
@@ -171,6 +174,7 @@ return { --The Module
 
             --spawn the next wave of enemies
             level.currentWave=level.currentWave+1
+            level.waveComplete=false 
             self.gridClass:generateEnemies(
                 level.definition.waves[level.currentWave],Entities,level.grid
             )
@@ -257,7 +261,8 @@ return { --The Module
             },
             enemyCount=0,
             currentWave=0,
-            complete=false,
+            waveComplete=true, --starts true to spawn initial wave
+            levelComplete=false,
             exit=levelDef.exit,
             nextLevel=levelDef.nextLevel,
         }        
@@ -267,11 +272,5 @@ return { --The Module
             local summonSkeleton=function() Player:summon(name) end 
             for i=1,count do Timer:after(0.5,summonSkeleton) end
         end
-    end,
-
-    destroyLevel=function(self)
-        self.currentLevel.boundaries={}
-        self.currentLevel.enemyCount=0
-        Objects:clear()
     end,
 }

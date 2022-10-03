@@ -113,6 +113,7 @@ behaviors.methods.common={
     die=function(self)
         self:changeState('dead')
         self.status:clear()
+        self.particles:emit(self.center.x,self.center.y)
         LevelManager:decreaseEntityCount(self.collisionClass,self.name)
     end,
 

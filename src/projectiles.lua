@@ -80,6 +80,16 @@ local projectileDefinitions={
             h=8,
             class='enemyProjectile',
         },
+        particles={
+            count=300,
+            spread={x=1, y=1},
+            yOffset=18,
+            colors={
+                [0xe3c25b]=4,
+                [0xe39347]=2,
+                [0xe56f4b]=1,
+            }
+        }
     },
     ['blueSpark']={
         name='blueSpark',
@@ -116,6 +126,16 @@ local projectileDefinitions={
             frameHeight=10,
             frames='1-4',
             durations=0.1,
+        },
+        particles={
+            count=200,
+            spread={x=1, y=1},
+            yOffset=18,
+            colors={
+                [0xe3c25b]=2,
+                [0xe39347]=3,
+                [0xe56f4b]=1,
+            }
         }
     },
     ['blizzard']={
@@ -133,6 +153,17 @@ local projectileDefinitions={
             frames='1-6',
             durations=0.07,
         },
+        particles={
+            count=10,
+            spread={x=6, y=6},
+            yOffset=15,
+            colors={
+                [0x769fa6]=4,
+                [0xede4da]=1,
+                [0x668da9]=1,
+                [0x5c699f]=1,
+            }
+        }
     },
     ['laser']={
         name='laser',
@@ -179,6 +210,17 @@ local generateDrawData=function(defs)
     return sprites,anims 
 end
 local sprites,animations=generateDrawData(projectileDefinitions)
+
+local generateParticleEmitters=function(defs)
+    local emitters={}
+    for name,def in pairs(defs) do
+        if def.particles~=nil then 
+            emitters[name]=ParticleSystem:generateEmitter(def.particles)
+        end
+    end
+    return emitters 
+end
+local particleEmitters=generateParticleEmitters(projectileDefinitions)
 
 --Defining how a projectile behaves upon collisions.
 local projectileOnHitFunctions=function()
@@ -296,6 +338,7 @@ local projectileOnHitFunctions=function()
                     })
                     target.status:burn(self.attack.damage*0.5,5) --burn for 5s
                 end
+                self.particles:emit(self.center.x,self.center.y)
                 return false
             end 
         end,
@@ -461,6 +504,7 @@ local projectileUpdateFunctions=function()
                         })
                         target.status:freeze(target,0.5,0.25) --slow to 1/4 speed for 0.5s
                     end
+                    self.particles:emit(self.center.x,self.center.y)
                 end
             end
 
@@ -640,6 +684,7 @@ return {
     definitions=projectileDefinitions,
     sprites=sprites,
     animations=animations,
+    particleEmitters=particleEmitters,
     onHitFunctions=projectileOnHitFunctions(),
     updateFunctions=projectileUpdateFunctions(),
     drawFunctions=projectileDrawFunctions(),
@@ -675,6 +720,9 @@ return {
         p.xOrigin=def.animation and def.animation.frameWidth*0.5 or p.sprite:getWidth()*0.5
         p.yOrigin=p.sprite:getHeight()*0.5
         p.shadow=Shadows:new(def.name,p.w,p.h)
+
+        --Particle emitter
+        p.particles=self.particleEmitters[p.name]
     
         --Methods (update and draw)
         p.onHit=self.onHitFunctions[p.name] or self.onHitFunctions.base 

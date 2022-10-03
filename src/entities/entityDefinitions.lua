@@ -48,6 +48,14 @@ return {
                 damagingFrames={1,1}
             },
         },
+        particles={
+            count=100,
+            spread={x=4, y=8},
+            yOffset=7,
+            colors={
+                [0xede4da]=1,
+            }
+        },
     },
     ['skeletonArcher']={
         name='skeletonArcher',
@@ -98,6 +106,15 @@ return {
                 duration={0.1,0.1,0.3,0.1},
                 firingFrame=4,
             },
+        },
+        particles={
+            count=100,
+            spread={x=4, y=8},
+            yOffset=7,
+            colors={
+                [0xede4da]=3,
+                [0x8b9150]=1,
+            }
         },
     },
     ['skeletonMageFire']={
@@ -150,6 +167,15 @@ return {
                 firingFrame=1,
             },
         },
+        particles={
+            count=100,
+            spread={x=4, y=8},
+            yOffset=7,
+            colors={
+                [0xede4da]=3,
+                [0xe56f4b]=1,
+            }
+        },
     },
     ['skeletonMageIce']={
         name='skeletonMageIce',
@@ -200,6 +226,15 @@ return {
                 duration=0.4,
                 firingFrame=1,
             },
+        },
+        particles={
+            count=100,
+            spread={x=4, y=8},
+            yOffset=7,
+            colors={
+                [0xede4da]=3,
+                [0x769fa6]=1,
+            }
         },
     },
     ['skeletonMageElectric']={
@@ -252,6 +287,15 @@ return {
                 firingFrame=1,
             },
         },
+        particles={
+            count=100,
+            spread={x=4, y=8},
+            yOffset=7,
+            colors={
+                [0xede4da]=3,
+                [0xe3c25b]=1,
+            }
+        },
     },
     ['slime']={
         name='slime',
@@ -298,6 +342,15 @@ return {
                 damagingFrames={3,8}
             },
         },
+        particles={
+            count=80,
+            spread={x=4, y=4},
+            yOffset=4,
+            colors={
+                [0xbda351]=3,
+                [0x8b9150]=1,
+            }
+        },
     },
     ['pumpkin']={
         name='pumpkin',
@@ -343,6 +396,15 @@ return {
                 duration=0.4,
                 damagingFrames={1,1}
             },
+        },
+        particles={
+            count=80,
+            spread={x=5, y=5},
+            yOffset=6,
+            colors={
+                [0xe39347]=3,
+                [0x557d55]=1,
+            }
         },
     },
     ['golem']={
@@ -392,6 +454,14 @@ return {
                 damagingFrames={4,9}
             },
         },
+        particles={
+            count=120,
+            spread={x=5, y=8},
+            yOffset=8,
+            colors={
+                [0x918d8d]=1,
+            }
+        },
     },
     ['spider']={
         name='spider',
@@ -437,6 +507,15 @@ return {
                 duration=0.2,
                 damagingFrames={2,2}
             },
+        },
+        particles={
+            count=50,
+            spread={x=5, y=4},
+            yOffset=4,
+            colors={
+                [0x636167]=3,
+                [0xca5954]=1,
+            }
         },
     },
     ['bat']={
@@ -486,6 +565,15 @@ return {
                 damagingFrames={1,1}
             },
         },
+        particles={
+            count=40,
+            spread={x=2, y=2},
+            yOffset=7,
+            colors={
+                [0xb24c4c]=3,
+                [0x636167]=1,
+            }
+        },
     },
     ['zombie']={
         name='zombie',
@@ -531,6 +619,16 @@ return {
                 duration={0.2,0.1,0.1,0.3},
                 damagingFrames={2,4}
             },
+        },
+        particles={
+            count=100,
+            spread={x=4, y=8},
+            yOffset=7,
+            colors={
+                [0x557d55]=4,
+                [0x3b5247]=1,
+                [0x737b42]=1,
+            }
         },
     },
     ['possessedArcher']={
@@ -578,6 +676,17 @@ return {
                 firingFrame=4,
             },
         },
+        particles={
+            count=100,
+            spread={x=6, y=9},
+            yOffset=8,
+            colors={
+                [0x636167]=3,
+                [0x918d8d]=3,
+                [0xca5954]=1,
+                [0xeeb551]=1,
+            }
+        },
     },
     ['possessedKnight']={
         name='possessedKnight',
@@ -623,6 +732,16 @@ return {
                 duration={0.2,0.1,0.1,0.3},
                 damagingFrames={2,4}
             },
+        },
+        particles={
+            count=100,
+            spread={x=5, y=8},
+            yOffset=8,
+            colors={
+                [0x636167]=3,
+                [0x918d8d]=3,
+                [0xeeb551]=1,
+            }
         },
     },
     ['undeadMiner']={
@@ -670,6 +789,16 @@ return {
                 firingFrame=3,
             },
         },
+        particles={
+            count=100,
+            spread={x=4, y=8},
+            yOffset=7,
+            colors={
+                [0x557d55]=4,
+                [0xe39347]=2,
+                [0x575a88]=1,
+            }
+        },
     },    
     ['ent']={
         name='ent',
@@ -715,6 +844,17 @@ return {
                 duration=0.4,
                 firingFrame=1,
             },
+        },
+        particles={
+            count=140,
+            spread={x=10, y=15},
+            yOffset=15,
+            colors={
+                [0x557d55]=2,
+                [0x446350]=1,
+                [0x735b42]=1,
+                [0x5d483c]=1,
+            }
         },
     },
     ['headlessHorseman']={
@@ -762,6 +902,16 @@ return {
                 firingFrame=5,
             },
         },
+        particles={
+            count=200,
+            spread={x=10, y=14},
+            yOffset=14,
+            colors={
+                [0x4c4b54]=4,
+                [0xe56f4b]=1,
+                [0x575a88]=1,
+            }
+        },
     },
     ['slimeMatron']={
         name='slimeMatron',
@@ -805,6 +955,15 @@ return {
                 duration=0.1,
                 spawnMinionFrame=7,
             },
+        },
+        particles={
+            count=100,
+            spread={x=4, y=7},
+            yOffset=7,
+            colors={
+                [0xbda351]=3,
+                [0x8b9150]=1,
+            }
         },
     },
     ['vampire']={
@@ -852,6 +1011,16 @@ return {
                 spawnMinionFrame=10,
             },
         },
+        particles={
+            count=100,
+            spread={x=9, y=5},
+            yOffset=12,
+            colors={
+                [0xb24c4c]=3,
+                [0xf6f0eb]=1,
+                [0x41404a]=1,
+            }
+        },
     },
     ['tombstone']={
         name='tombstone',
@@ -894,6 +1063,16 @@ return {
                 spawnMinionFrame=1,
             },
         },
+        particles={
+            count=100,
+            spread={x=6, y=8},
+            yOffset=8,
+            colors={
+                [0x918d8d]=4,
+                [0x735b42]=3,
+                [0x4c4b54]=1,
+            }
+        },
     },
     ['spiderEgg']={
         name='spiderEgg',
@@ -932,6 +1111,16 @@ return {
                 row=2,
                 duration=0.05,
             },
+        },
+        particles={
+            count=100,
+            spread={x=10, y=6},
+            yOffset=6,
+            colors={
+                [0x918d8d]=2,
+                [0xbfb8b4]=1,
+                [0x4c4b54]=1,
+            }
         },
     },
     ['imp']={
@@ -978,6 +1167,15 @@ return {
                 damagingFrames={1,1}
             },
         },
+        particles={
+            count=60,
+            spread={x=4, y=6},
+            yOffset=6,
+            colors={
+                [0xe56f4b]=3,
+                [0x5d483c]=1,
+            }
+        },
     },
     ['gnasherDemon']={
         name='gnasherDemon',
@@ -1023,6 +1221,15 @@ return {
                 duration={0.2,0.1,0.3},
                 damagingFrames={2,3}
             },
+        },
+        particles={
+            count=120,
+            spread={x=6, y=9},
+            yOffset=9,
+            colors={
+                [0xe56f4b]=3,
+                [0xf6f0eb]=1,
+            }
         },
     },
     ['frankenstein']={
@@ -1071,6 +1278,16 @@ return {
                 firingFrame=4,
             },
         },
+        particles={
+            count=160,
+            spread={x=10, y=14},
+            yOffset=14,
+            colors={
+                [0x557d55]=2,
+                [0x735b42]=2,
+                [0x769fa6]=1,
+            }
+        },
     },
     ['werebear']={
         name='werebear',
@@ -1117,6 +1334,15 @@ return {
                 damagingFrames={2,4}
             },
         },
+        particles={
+            count=160,
+            spread={x=14, y=10},
+            yOffset=11,
+            colors={
+                [0x735b42]=3,
+                [0x5d483c]=1,
+            }
+        },
     },
     ['werewolf']={
         name='werewolf',
@@ -1161,6 +1387,15 @@ return {
                 duration={0.1,0.2,0.1,0.1},
                 damagingFrames={2,2}
             },
+        },
+        particles={
+            count=80,
+            spread={x=14, y=10},
+            yOffset=11,
+            colors={
+                [0x735b42]=3,
+                [0x5d483c]=1,
+            }
         },
     },
     ['ghost']={
@@ -1215,6 +1450,14 @@ return {
                 frames='8-1',
                 row=1,
                 duration=0.1,
+            }
+        },
+        particles={
+            count=100,
+            spread={x=5, y=7},
+            yOffset=10,
+            colors={
+                [0xd6cec7]=1,
             }
         },
     },
@@ -1272,6 +1515,14 @@ return {
                 duration=0.1,
             }
         },
+        particles={
+            count=120,
+            spread={x=7, y=8},
+            yOffset=10,
+            colors={
+                [0xd6cec7]=1,
+            }
+        },
     },
     ['floatingEyeball']={
         name='floatingEyeball',
@@ -1321,6 +1572,16 @@ return {
                 firingFrame=1,
             },
         },
+        particles={
+            count=100,
+            spread={x=8, y=9},
+            yOffset=9,
+            colors={
+                [0xd6cec7]=2,
+                [0xca5954]=2,
+                [0x668da9]=1,
+            }
+        },
     },
     ['pyreFiend']={
         name='pyreFiend',
@@ -1367,6 +1628,16 @@ return {
                 duration={[1]=0.2,['2-3']=0.1,[4]=0.4,['5-7']=0.1},
                 firingFrame=4,
             },
+        },
+        particles={
+            count=200,
+            spread={x=10, y=13},
+            yOffset=13,
+            colors={
+                [0xe56f4b]=3,
+                [0xb24c4c]=2,
+                [0xf6f0eb]=1,
+            }
         },
     },
 }

@@ -1072,5 +1072,6 @@ behaviors.AI['werebear']=behaviors.AI.golem
 behaviors.AI['werewolf']=behaviors.AI.slime
 behaviors.AI['floatingEyeball']=behaviors.AI.possessedArcher
 behaviors.AI['pyreFiend']=behaviors.AI.possessedArcher
+behaviors.AI['beholder']=behaviors.AI.possessedArcher
 
 return behaviors 

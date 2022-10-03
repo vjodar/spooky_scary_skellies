@@ -56,14 +56,14 @@ local pSystem={ --The Module
         end
     end,
     draw=function(self) for i=1,#self.table do self.table[i]:draw() end end,
-    addParticles=function(self,x,y,count,xSpread,ySpread,colors) --particle constructor
+    addParticles=function(self,x,y,count,maxSpeed,xSpread,ySpread,colors) --particle constructor
         for i=1,count do 
             local frameRate=60
             local angle=rnd()*2*pi 
-            local speed=rnd()*10
+            local speed=rnd()*maxSpeed 
             local vx=cos(angle)*speed*frameRate
             local vy=sin(angle)*speed*frameRate
-            local duration=speed*0.05
+            local duration=0.1+speed*0.05
             local linearDamping=rnd(10,30)
             local particle={
                 x=x+cos(angle)*rnd()*xSpread, 
@@ -106,10 +106,11 @@ local pSystem={ --The Module
             xSpread=def.spread.x,
             ySpread=def.spread.y,
             yOffset=def.yOffset,
+            maxSpeed=def.maxSpeed or 10,
             colors=self:generateRGBColorTable(def.colors),
             emit=function(self,x,y)
                 ParticleSystem:addParticles(
-                    x,y-self.yOffset, self.count, 
+                    x,y-self.yOffset, self.count, self.maxSpeed,
                     self.xSpread, self.ySpread, self.colors
                 )
             end,

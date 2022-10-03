@@ -32,6 +32,7 @@ local shadowNames={
     'poltergeist',
     'pyreFiend',
     'floatingEyeball',      --12x10
+    'beholder',             --19x16
 
     --projectiles
     'arrow',
@@ -52,6 +53,7 @@ local shadowNames={
     'laser',
     'pyre',
     'pyreTrail',
+    'orb',
 }
 
 local sharedSprites={

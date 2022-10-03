@@ -3,22 +3,7 @@ return {
         map='swamp3',
         waves={
             {
-                slimeMatron=5,
-            },
-            {
-                slimeMatron=5,
-            },
-            {
-                slimeMatron=5,
-            },
-            {
-                slimeMatron=5,
-            },
-            {
-                slimeMatron=5,
-            },
-            {
-                slimeMatron=5,
+                beholder=1,
             },
             -- {
             --     spider=10,            

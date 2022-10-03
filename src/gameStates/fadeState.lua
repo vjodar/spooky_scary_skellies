@@ -34,7 +34,7 @@ local holdUpdate=function(self)
             self.inc=-self.inc
             self.afterFn=nil 
             self.update=self.fadeUpdate
-        else 
+        else
             return false --fade is done, remove from gameStates
         end
     end

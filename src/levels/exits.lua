@@ -74,12 +74,18 @@ local exitDrawFunction=function(self)
     self.anim:draw(self.sprite,self.x-self.xOffset,self.y-self.yOffset)
 end
 
+local activateExitFunction=function(self) 
+    self.collisionClass='solid'
+    LevelManager:startNextLevel() 
+end
+
 return { --The Module
     definitions=definitions,
     sprites=sprites,
     animations=animations,
     exitUpdateFunction=exitUpdateFunction,
     exitDrawFunction=exitDrawFunction,
+    activateExitFunction=activateExitFunction,
     new=function(self,name,x,y) --constructor        
         local def=self.definitions[name]
         local exit={
@@ -91,6 +97,7 @@ return { --The Module
             collisionClass='exit',
             update=self.exitUpdateFunction,
             draw=self.exitDrawFunction,
+            activateExit=self.activateExitFunction,
         }
         exit.center=getCenter(exit)
         table.insert(Objects.table,exit)

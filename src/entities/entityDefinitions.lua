@@ -1640,4 +1640,63 @@ return {
             }
         },
     },
+    ['beholder']={
+        name='beholder',
+        moveSpeed=9*60,
+        kbResistance=50,
+        attack={
+            range=180,  
+            period=2, 
+            damage=1,
+            knockback=100,
+            projectile={name='orb',xOffset=0,yOffset=-16,count=3,spread=1},
+        },
+        health=20,
+        collider={
+            w=19,
+            h=16,
+            class='enemy',
+            collisionFilter='enemyFlying',
+            losFilter='solid',
+            moveFilter='solidOrBoundary',
+        },
+        drawData={
+            frameWidth=38,
+            frameHeight=46,
+        },
+        animations={
+            spawn={
+                frames='1-9',
+                row=1,
+                duration=0.1,
+                visibleFrame=4,
+            },
+            idle={
+                frames='1-8',
+                row=2,
+                duration=0.12,
+            },
+            move={
+                frames='1-8',
+                row=2,
+                duration=0.12,
+            },
+            attack={
+                frames=1,
+                row=2,
+                duration=0.4,
+                firingFrame=1,
+            },
+        },
+        particles={
+            count=200,
+            spread={x=9, y=9},
+            yOffset=15,
+            colors={
+                [0xe56f4b]=3,
+                [0xb24c4c]=2,
+                [0xf6f0eb]=1,
+            }
+        },
+    },
 }

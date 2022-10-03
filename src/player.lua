@@ -106,7 +106,7 @@ function player:draw()
     -- --testing------------------------------------------
     -- love.graphics.print(self.center.x,self.x-10,self.y-10)
     -- love.graphics.print(self.center.y,self.x-10,self.y)
-    -- love.graphics.print('states: '..#gameStates,self.x-10,self.y-30)
+    love.graphics.print('states: '..#gameStates,self.x-10,self.y-30)
     -- love.graphics.print('objects: '..#Objects.table,self.x-10,self.y-60)
     -- love.graphics.print('items: '..World:countItems(),self.x-10,self.y-90)
     love.graphics.print('enemies: '..LevelManager.currentLevel.enemyCount,self.x-10,self.y-90)
@@ -137,10 +137,7 @@ function player:updatePosition()
             other.vy=other.vy+sin(angle)*self.moveSpeed*2*dt
         end
 
-        if other.collisionClass=='exit' then 
-            other.collisionClass='solid'
-            LevelManager:startNextLevel() 
-        end
+        if other.collisionClass=='exit' then other:activateExit() end 
     end
 end
 

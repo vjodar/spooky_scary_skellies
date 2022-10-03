@@ -82,8 +82,9 @@ local projectileDefinitions={
         },
         particles={
             count=300,
-            spread={x=1, y=1},
+            spread={x=6, y=5},
             yOffset=18,
+            maxSpeed=12,
             colors={
                 [0xe3c25b]=4,
                 [0xe39347]=2,
@@ -129,8 +130,9 @@ local projectileDefinitions={
         },
         particles={
             count=200,
-            spread={x=1, y=1},
+            spread={x=4, y=3},
             yOffset=18,
+            maxSpeed=8,
             colors={
                 [0xe3c25b]=2,
                 [0xe39347]=3,
@@ -154,8 +156,8 @@ local projectileDefinitions={
             durations=0.07,
         },
         particles={
-            count=10,
-            spread={x=6, y=6},
+            count=30,
+            spread={x=5, y=4},
             yOffset=15,
             colors={
                 [0x769fa6]=4,
@@ -189,6 +191,28 @@ local projectileDefinitions={
             frames='1-4',
             durations=0.1,
         },
+    },
+    ['orb']={
+        name='orb',
+        moveSpeed=100,
+        explosionRadius=60,
+        travelTime=20,
+        collider={
+            w=6,
+            h=6,
+            class='intangible',
+        },
+        particles={
+            count=400,
+            spread={x=6, y=6},
+            yOffset=18,
+            maxSpeed=14,
+            colors={
+                [0xe3c25b]=2,
+                [0xe39347]=3,
+                [0xe56f4b]=1,
+            }
+        }
     },
 }
 
@@ -349,7 +373,20 @@ local projectileOnHitFunctions=function()
             or target.collisionClass=='exit' 
             then 
                 self.moveSpeed=self.moveSpeed*0.9
-                self.remainingTravelTime=self.remainingTravelTime*0.9
+                local angle=getAngle(touch,self)
+                self.vx=cos(angle)*self.moveSpeed 
+                self.vy=sin(angle)*self.moveSpeed
+                self.angle=angle
+            end
+        end,    
+
+        --bounces off solids, speeds up each bounce
+        ['orb']=function(self,target,touch)     
+            if target.collisionClass=='solid' 
+            or target.collisionClass=='exit' 
+            then 
+                self.moveSpeed=self.moveSpeed*1.2
+                self.moveSpeed=(min(self.moveSpeed,200))
                 local angle=getAngle(touch,self)
                 self.vx=cos(angle)*self.moveSpeed 
                 self.vy=sin(angle)*self.moveSpeed
@@ -381,7 +418,7 @@ local projectileOnHitFunctions=function()
                 target.status:freeze(target,1,0.5) --slow to half speed for 1s
                 return false
             end 
-        end,    
+        end,
     }
 
     onHitFunctions['jack-o-lantern']=onHitFunctions.explode
@@ -587,6 +624,64 @@ local projectileUpdateFunctions=function()
             --handle collisions
             for i=1,#cols do return self:onHit(cols[i].other,cols[i].touch) end
         end,
+
+        --Same as base, except will randomly explode during travel
+        ['orb']=function(self)
+            self.remainingTravelTime=self.remainingTravelTime-dt 
+            if self.remainingTravelTime<0
+            or getDistance(self.center,Camera.target)>600 
+            then 
+                return false
+            end
+
+            if self.animation then self.animation:update(dt) end 
+
+            if self.attackPeriod==nil then --will decide on exploding every 0.5s
+                self.attackPeriod=0.5
+                self.attackTimer=0
+            else 
+                self.attackTimer=self.attackTimer+dt 
+                if self.attackTimer>self.attackPeriod then 
+                    self.attackTimer=0
+
+                    --chance to explode increases as orb travels
+                    if rnd(ceil(self.remainingTravelTime))==1 then 
+                        local queryData={
+                            x=self.x-self.explosionRadius*0.5,
+                            y=self.y-self.explosionRadius*0.5,
+                            w=self.explosionRadius,h=self.explosionRadius
+                        }
+                        local filter=World.queryFilters.ally
+                        local targets=World:queryRect(
+                            queryData.x,queryData.y,queryData.w,queryData.h,filter
+                        )
+                        for i=1,#targets do 
+                            local target=targets[i]
+                            target:takeDamage({                 
+                                damage=self.attack.damage,
+                                knockback=self.attack.knockback,
+                                angle=getAngle(self.center,targets[i].center),
+                                textColor='red',
+                            })
+                            target.status:burn(self.attack.damage*0.5,5) --burn for 5s
+                        end
+                        self.particles:emit(self.center.x,self.center.y)
+                        return false
+                    end
+                end
+            end
+    
+            --update position
+            local goalX=self.x+self.vx*dt 
+            local goalY=self.y+self.vy*dt 
+            local realX,realY,cols=World:move(self,goalX,goalY,self.filter)
+            self.x,self.y=realX,realY 
+            local c=getCenter(self)
+            self.center.x,self.center.y=c.x,c.y
+
+            --handle collisions
+            for i=1,#cols do return self:onHit(cols[i].other,cols[i].touch) end
+        end,
     } 
 
     updateFunctions['blueSpark']=updateFunctions.spark
@@ -675,6 +770,7 @@ local projectileDrawFunctions=function()
     drawFunctions['candle']=drawFunctions.bone 
     drawFunctions['blizzard']=drawFunctions.apple
     drawFunctions['pyre']=drawFunctions.apple
+    drawFunctions['orb']=drawFunctions.apple
 
     return drawFunctions
 end

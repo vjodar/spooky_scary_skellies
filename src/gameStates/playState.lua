@@ -11,7 +11,7 @@ function PlayState:startGame()
         skeletonArcher=0,
         skeletonMageFire=0,
         skeletonMageIce=0,
-        skeletonMageElectric=10,
+        skeletonMageElectric=0,
     }
     LevelManager:buildLevel('test',allyCount)
 end

@@ -156,7 +156,7 @@ local projectileDefinitions={
             durations=0.07,
         },
         particles={
-            count=30,
+            count=10,
             spread={x=5, y=4},
             yOffset=15,
             colors={

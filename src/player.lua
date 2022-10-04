@@ -218,6 +218,7 @@ end
 function player:die()
     self.state='dead'
     self.status:clear()
+    LevelManager:setEntityAggro(false)
 end
 
 function player:launchBone()

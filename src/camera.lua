@@ -13,6 +13,6 @@ camera.curtain={ --curtain is used for fading in/out
     end
 }
 
-function camera:update() self:lockPosition(self.target.x,self.target.y,self.smoother) end
+function camera:update() self:lockPosition(self.target.x,self.target.y) end
 
 return camera

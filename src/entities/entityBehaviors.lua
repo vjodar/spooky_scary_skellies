@@ -28,6 +28,7 @@ behaviors.methods.common={
             spawn='spawn',
             idle='idle',
             attack='attack',
+            dead='dead',
             moveToPlayer='move',
             moveToTarget='move',
             moveToLocation='move',
@@ -112,9 +113,6 @@ behaviors.methods.common={
 
     die=function(self)
         self:changeState('dead')
-        self.status:clear()
-        self.particles:emit(self.center.x,self.center.y)
-        LevelManager:decreaseEntityCount(self.collisionClass,self.name)
     end,
 
     clearMoveTarget=function(self)
@@ -329,7 +327,19 @@ behaviors.states.common={
     end,
     
     dead=function(self) 
-        return false
+        self.status:clear()
+        if self.animations.dead then
+            local onLoop=self:updateAnimation()
+            if onLoop then 
+                self.particles:emit(self.center.x,self.center.y)
+                LevelManager:decreaseEntityCount(self.collisionClass,self.name)
+                return false
+            end
+        else
+            self.particles:emit(self.center.x,self.center.y)
+            LevelManager:decreaseEntityCount(self.collisionClass,self.name)
+            return false
+        end
     end,
 
     shoot=function(self)
@@ -372,7 +382,9 @@ behaviors.states.ally={
         --if target is a living enemy and skeleton can attack,
         --move toward the target in order to attack.
         if self.moveTarget~=self and self.moveTarget.state~='dead' then 
-            if self.canAttack.flag then self:changeState('moveToTarget') end 
+            if self.canAttack.flag and LevelManager:getEntityAggro()==true then 
+                self:changeState('moveToTarget') 
+            end 
             return --return to wait until attack is ready or target dies          
         end
     
@@ -380,7 +392,7 @@ behaviors.states.ally={
         if self.canQueryAttackTargets.flag then 
             self.canQueryAttackTargets.setOnCooldown()
             self.moveTarget=self:getNearestAllyAttackTarget()
-            if self.moveTarget~=self then 
+            if self.moveTarget~=self and LevelManager:getEntityAggro()==true then 
                 self:changeState('moveToTarget') 
                 return 
             end
@@ -405,7 +417,7 @@ behaviors.states.ally={
         --if target is a living enemy, move toward target to attack if attack
         --is off cooldown, otherwise relocate to another position near player.
         if self.moveTarget~=self and self.moveTarget.state~='dead' then 
-            if self.canAttack.flag then 
+            if self.canAttack.flag and LevelManager:getEntityAggro()==true then 
                 self:changeState('moveToTarget')
             else 
                 self:setNearPlayerMoveTarget()
@@ -418,7 +430,7 @@ behaviors.states.ally={
         if self.canQueryAttackTargets.flag then 
             self.canQueryAttackTargets.setOnCooldown()
             self.moveTarget=self:getNearestAllyAttackTarget()
-            if self.moveTarget~=self then 
+            if self.moveTarget~=self and LevelManager:getEntityAggro()==true then 
                 self:changeState('moveToTarget') 
                 return 
             end
@@ -455,7 +467,9 @@ behaviors.states.ally={
         end
     
         if getRectDistance(self,self.moveTarget)<self.attack.range then             
-            if self.canAttack.flag then self:changeState('attack') return 
+            if self.canAttack.flag and LevelManager:getEntityAggro()==true then 
+                self:changeState('attack') 
+                return 
             else self:changeState('idle') return
             end
         end
@@ -496,6 +510,7 @@ behaviors.states.ally={
             self.canQueryAttackTargets.setOnCooldown()
             local nearbyTarget=self:getNearestAllyAttackTarget()
             if nearbyTarget~=self 
+            and LevelManager:getEntityAggro()==true
             and abs(Player.center.x-self.center.x)<Player.allyReturnThreshold.x*0.7
             and abs(Player.center.y-self.center.y)<Player.allyReturnThreshold.y*0.7
             then
@@ -604,7 +619,10 @@ behaviors.states.enemy={
 
         --if target is a living skeleton and enemy can attack,
         --move toward the target in order to attack.
-        if self.moveTarget~=self and self.moveTarget.state~='dead' then 
+        if self.moveTarget~=self 
+        and LevelManager:getEntityAggro()==true
+        and self.moveTarget.state~='dead' 
+        then 
             if self.canAttack.flag 
             or getRectDistance(self,self.moveTarget)>self.attack.range 
             then self:changeState('moveToTarget') end 
@@ -615,7 +633,9 @@ behaviors.states.enemy={
         if self.canQueryAttackTargets.flag then
             self.canQueryAttackTargets.setOnCooldown()
             self.moveTarget=self:getNearestEnemyAttackTarget()
-            if self.moveTarget~=self then self:changeState('moveToTarget') end
+            if self.moveTarget~=self and LevelManager:getEntityAggro()==true then 
+                self:changeState('moveToTarget') 
+            end
             return
         end
 
@@ -638,6 +658,7 @@ behaviors.states.enemy={
         --is off cooldown, otherwise relocate to a different position.
         if self.moveTarget~=self and self.moveTarget.state~='dead' then 
             if self.canAttack.flag 
+            and LevelManager:getEntityAggro()==true
             and getRectDistance(self,self.moveTarget)>self.attack.range 
             then 
                 self:changeState('moveToTarget') 
@@ -652,7 +673,9 @@ behaviors.states.enemy={
         if self.canQueryAttackTargets.flag then
             self.canQueryAttackTargets.setOnCooldown()
             self.moveTarget=self:getNearestEnemyAttackTarget()
-            if self.moveTarget~=self then self:changeState('moveToTarget') end
+            if self.moveTarget~=self and LevelManager:getEntityAggro()==true then 
+                self:changeState('moveToTarget') 
+            end
         end
 
         --if idling for too long, wander around
@@ -674,6 +697,7 @@ behaviors.states.enemy={
             self.canQueryAttackTargets.setOnCooldown()
             self.target=self:getNearestEnemyAttackTarget()
             if self.target~=self 
+            and LevelManager:getEntityAggro()==true
             and getRectDistance(self,self.target)<self.attack.range 
             then self:changeState('attack') end 
         end
@@ -700,7 +724,9 @@ behaviors.states.enemy={
         
         --if target is within attack range, attack. Otherwise move toward it
         if getRectDistance(self,self.moveTarget)<self.attack.range then 
-            if self.canAttack.flag then self:changeState('attack') return 
+            if self.canAttack.flag and LevelManager:getEntityAggro()==true then 
+                self:changeState('attack') 
+                return 
             else self:changeState('idle') return 
             end  
         end
@@ -732,7 +758,7 @@ behaviors.states.enemy={
         if self.canQueryAttackTargets.flag and self.canAttack.flag then
             self.canQueryAttackTargets.setOnCooldown()
             local nearbyTarget=self:getNearestEnemyAttackTarget()
-            if nearbyTarget~=self then 
+            if nearbyTarget~=self and LevelManager:getEntityAggro()==true then 
                 self.moveTarget=nearbyTarget 
                 self:changeState('moveToTarget')
                 return

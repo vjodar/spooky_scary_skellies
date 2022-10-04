@@ -14,7 +14,7 @@ function PlayState:startGame()
         skeletonMageIce=0,
         skeletonMageElectric=0,
     }
-    LevelManager:buildLevel('test',allyCount)
+    LevelManager:buildLevel('testBossLevel',allyCount)
 end
 
 function PlayState:update()
@@ -65,13 +65,20 @@ function love.keyreleased(k)
         -- particles:emit(Player.center.x,Player.center.y)
     end
     if k=='l' then
-        for i=1,1 do Entities:new('headlessHorseman',Controls.getMousePosition()) end
+        -- LevelManager:setEntityAggro(not LevelManager:getEntityAggro())
+        -- for name,def in pairs(Entities.definitions) do             
+        --     if def.collider.class=='enemy' then 
+        --         Entities:new(name,rnd(200,600),rnd(100,400))
+        --     end
+        -- end
+        -- for i=1,1 do Entities:new('headlessHorseman',Controls.getMousePosition()) end
         -- local panObjects={
         --     {target={x=0,y=0},afterFn=function() print('hi there!') end,holdTime=0.5},
         --     {target={x=600,y=0},afterFn=function() print('hello!') end,holdTime=0.5},
         --     {target=Player.center}
         -- }
         -- PanState:panTo(panObjects)
+        Camera:move(50,50)
     end
 end
 --testing-------------------

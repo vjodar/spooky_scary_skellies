@@ -3,8 +3,7 @@ return {
         map='swamp3',
         waves={
             {
-                pumpkin=50,
-                ent=50,
+                pumpkin=10,
             },
             -- {
             --     spider=10,            
@@ -20,6 +19,26 @@ return {
         exit={name='swampWallHole',pos={x=245,y=26+31}}, --small swamp
         -- exit={name='swampWallHole',pos={x=288,y=26+31}}, --swamp boss
         -- exit={name='ladderUp'},
+        nextLevel='testBossLevel',
+    },
+    ['testBossLevel']={
+        map='swampBoss',
+        bossData={
+            wave=2, name='tombstone',
+            spawnPos={x=16,y=64},
+            spawnAnimDuration=2,
+            deathAnimDuration=3,
+        },
+        waves={
+            {
+                tombstone=1,
+            },
+            {
+                tombstone=1,
+            },
+        },
+        maxEnemies=100, --used to limit summoner enemies' minion spawns
+        exit={name='swampWallHole',pos={x=288,y=26+31}}, --swamp boss
         nextLevel='test',
     },
     ['swampL1']={

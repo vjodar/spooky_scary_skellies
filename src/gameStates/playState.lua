@@ -14,7 +14,7 @@ function PlayState:startGame()
         skeletonMageIce=0,
         skeletonMageElectric=0,
     }
-    LevelManager:buildLevel('testBossLevel',allyCount)
+    LevelManager:buildLevel('test',allyCount)
 end
 
 function PlayState:update()
@@ -78,7 +78,10 @@ function love.keyreleased(k)
         --     {target=Player.center}
         -- }
         -- PanState:panTo(panObjects)
-        Camera:move(50,50)
+        Camera:shake({
+            magnitude=20,
+            damping=3,
+        })
     end
 end
 --testing-------------------

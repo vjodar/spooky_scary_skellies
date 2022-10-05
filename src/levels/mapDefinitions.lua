@@ -121,13 +121,13 @@ return {
         bgColor=bgColors.swamp,
         boundaries={
             t={{x=0,y=61,w=640,class='solid'},}, 
-            b={{x=0,y=595,w=640,class='solid'},},
+            b={{x=0,y=495,w=640,class='solid'},},
             l={{x=8,y=0,h=512,class='solid'},},
             r={{x=631,y=0,h=512,class='solid'},},
         },
         foreground='swampBoss',
         spawnArea={x=16,y=64,w=608,h=416},
-        playerStartPos={x=256,y=224},
+        playerStartPos={x=288,y=368},
         terrain={},
         decorations={
             swampSmall=200,

@@ -3,7 +3,7 @@ return {
         map='swamp3',
         waves={
             {
-                pumpkin=10,
+                pumpkin=1,
             },
             -- {
             --     spider=10,            
@@ -24,17 +24,17 @@ return {
     ['testBossLevel']={
         map='swampBoss',
         bossData={
-            wave=2, name='tombstone',
-            spawnPos={x=16,y=64},
-            spawnAnimDuration=2,
+            wave=2, name='giantTombstone',
+            spawnPos={x=272,y=224},
+            spawnAnimDuration=5,
             deathAnimDuration=3,
         },
         waves={
             {
-                tombstone=1,
+                tombstone=5,
             },
             {
-                tombstone=1,
+                giantTombstone=1,
             },
         },
         maxEnemies=100, --used to limit summoner enemies' minion spawns

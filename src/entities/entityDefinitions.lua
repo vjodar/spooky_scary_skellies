@@ -912,6 +912,7 @@ return {
                 [0x575a88]=1,
             }
         },
+        deathShake={magnitude=10},
     },
     ['slimeMatron']={
         name='slimeMatron',
@@ -1028,7 +1029,7 @@ return {
         attack={
             range=100,  
             period=5, 
-            minion={name='zombie',spawnPoint='random'},
+            minion={name='zombie',spawnPoint='random',maxDistance=20},
         },
         health=5,
         kbResistance=100,
@@ -1288,6 +1289,7 @@ return {
                 [0x769fa6]=1,
             }
         },
+        deathShake={magnitude=10},
     },
     ['werebear']={
         name='werebear',
@@ -1343,6 +1345,7 @@ return {
                 [0x5d483c]=1,
             }
         },
+        deathShake={magnitude=10},
     },
     ['werewolf']={
         name='werewolf',
@@ -1639,6 +1642,7 @@ return {
                 [0xf6f0eb]=1,
             }
         },
+        deathShake={magnitude=10},
     },
     ['beholder']={
         name='beholder',
@@ -1697,6 +1701,68 @@ return {
                 [0xb24c4c]=2,
                 [0xf6f0eb]=1,
             }
+        },
+        deathShake={magnitude=10},
+    },
+    ['giantTombstone']={
+        name='giantTombstone',
+        moveSpeed=0,
+        attack={
+            range=600,  
+            period=7.5, 
+            minion={name='tombstone',spawnPoint='level',count=5},
+        },
+        health=200,
+        kbResistance=100,
+        collider={
+            w=42,
+            h=12,
+            class='enemy',
+            losFilter='solid',
+        },
+        drawData={
+            frameWidth=42,
+            frameHeight=42,
+            scaleX=1,
+        },
+        animations={
+            spawn={
+                frames='1-45',
+                row=1,
+                duration=0.1,
+                visibleFrame=19,
+            },
+            idle={
+                frames=45,
+                row=1,
+                duration=1,
+            },
+            attack={
+                frames=45,
+                row=1,
+                duration=0.1,
+                spawnMinionFrame=1,
+            },
+            dead={
+                frames=45,
+                row=1,
+                duration=2,
+            },
+        },
+        particles={
+            count=2000,
+            spread={x=21,y=21},
+            yOffset=21,
+            maxSpeed=40,
+            colors={
+                [0x918d8d]=4,
+                [0x735b42]=3,
+                [0x4c4b54]=1,
+            }
+        },
+        deathShake={
+            magnitude=25,
+            damping=3,
         },
     },
 }

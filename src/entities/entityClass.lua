@@ -116,10 +116,9 @@ entityClass.new=function(self,entity,x,y,startState) --constructor
     e.spawnMinionFrame=def.animations.attack.spawnMinionFrame or nil
 
     e.shadow=Shadows:new(e.name,e.w,e.h) --Shadow
-
-    e.status=Statuses:new() --status system
- 
+    e.status=Statuses:new() --status system 
     e.particles=self.particleEmitters[e.name] --particle emitter
+    e.deathShake=def.deathShake or {magnitude=5}
 
     --Cooldown flags, periods, and callbacks
     e.canAttack={flag=true,cooldownPeriod=def.attack.period}

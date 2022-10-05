@@ -107,7 +107,10 @@ local getEntityAggro=function(self) return self.currentLevel.entityAggro end
 local killEnemies=function(self) 
     for i=1,#Objects.table do 
         local o=Objects.table[i]
-        if o.collisionClass and o.collisionClass=='enemy' then o:die() end  
+        if o.collisionClass 
+        and o.collisionClass=='enemy' 
+        and o.state~='dead'
+        then o:die() end  
     end
 end
 

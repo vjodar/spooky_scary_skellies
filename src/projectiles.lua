@@ -90,7 +90,8 @@ local projectileDefinitions={
                 [0xe39347]=2,
                 [0xe56f4b]=1,
             }
-        }
+        },
+        shake={magnitude=10},
     },
     ['blueSpark']={
         name='blueSpark',
@@ -138,7 +139,8 @@ local projectileDefinitions={
                 [0xe39347]=3,
                 [0xe56f4b]=1,
             }
-        }
+        },
+        shake={magnitude=5},
     },
     ['blizzard']={
         name='blizzard',
@@ -212,7 +214,8 @@ local projectileDefinitions={
                 [0xe39347]=3,
                 [0xe56f4b]=1,
             }
-        }
+        },
+        shake={magnitude=10},
     },
 }
 
@@ -283,7 +286,9 @@ local projectileOnHitFunctions=function()
                     angle=getAngle(self.center,target.center),
                     textColor='red'
                 })
-                target.status:burn(self.attack.damage,3) --apply 3s burn
+                if target.state~='dead' then 
+                    target.status:burn(self.attack.damage,3) --apply 3sec burn
+                end 
                 return false
             end 
         end,
@@ -303,7 +308,9 @@ local projectileOnHitFunctions=function()
                     angle=getAngle(self.center,target.center),
                     textColor='blue'
                 })
-                target.status:freeze(target,1,0.5) --slow to half speed for 1s
+                if target.state~='dead' then 
+                    target.status:freeze(target,1,0.5) --slow to half speed for 1s
+                end
                 return false
             end 
         end,
@@ -360,9 +367,20 @@ local projectileOnHitFunctions=function()
                         angle=getAngle(self.center,targets[i].center),
                         textColor='red',
                     })
-                    target.status:burn(self.attack.damage*0.5,5) --burn for 5s
+                    if target.state~='dead' then 
+                        target.status:burn(self.attack.damage*0.5,5) --burn for 5s
+                    end
                 end
                 self.particles:emit(self.center.x,self.center.y)
+                if self.shake then 
+                    local shake=self.shake 
+                    Camera:shake({
+                        magnitude=shake.magnitude,
+                        period=shake.period,
+                        damping=shake.damping,
+                        stopThreshold=shake.stopThreshold,
+                    })
+                end
                 return false
             end 
         end,
@@ -415,7 +433,9 @@ local projectileOnHitFunctions=function()
                     angle=getAngle(self.center,target.center),
                     textColor='blue'
                 })
-                target.status:freeze(target,1,0.5) --slow to half speed for 1s
+                if target.state~='dead' then 
+                    target.status:freeze(target,1,0.5) --slow to half speed for 1s
+                end
                 return false
             end 
         end,
@@ -539,7 +559,9 @@ local projectileUpdateFunctions=function()
                             angle=getAngle(self.center,targets[i].center),
                             textColor='blue',
                         })
-                        target.status:freeze(target,0.5,0.25) --slow to 1/4 speed for 0.5s
+                        if target.state~='dead' then 
+                            target.status:freeze(target,0.5,0.25) --slow to 1/4 speed for 0.5s
+                        end
                     end
                     self.particles:emit(self.center.x,self.center.y)
                 end
@@ -663,9 +685,20 @@ local projectileUpdateFunctions=function()
                                 angle=getAngle(self.center,targets[i].center),
                                 textColor='red',
                             })
-                            target.status:burn(self.attack.damage*0.5,5) --burn for 5s
+                            if target.state~='dead' then 
+                                target.status:burn(self.attack.damage*0.5,5) --burn for 5s
+                            end
                         end
                         self.particles:emit(self.center.x,self.center.y)
+                        if self.shake then 
+                            local shake=self.shake 
+                            Camera:shake({
+                                magnitude=shake.magnitude,
+                                period=shake.period,
+                                damping=shake.damping,
+                                stopThreshold=shake.stopThreshold,
+                            })
+                        end
                         return false
                     end
                 end
@@ -819,6 +852,7 @@ return {
 
         --Particle emitter
         p.particles=self.particleEmitters[p.name]
+        p.shake=def.shake or nil
     
         --Methods (update and draw)
         p.onHit=self.onHitFunctions[p.name] or self.onHitFunctions.base 

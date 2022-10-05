@@ -34,13 +34,18 @@ behaviors.methods.common={
             moveToLocation='move',
             teleport='teleport',
         }
-        if self.animations[associatedAnimation[newState]] then 
+        if self.animations[associatedAnimation[newState]] then
             self.animations.current=self.animations[associatedAnimation[newState]]
         end
     end,
 
-    isBurning=function(self) return #self.status.table.burn>0 end,
-    isFrozen=function(self) return #self.status.table.freeze>0 end,
+    isBurning=function(self)
+        return #self.status.table.burn>0 
+    end,
+
+    isFrozen=function(self)
+        return #self.status.table.freeze>0
+    end,
 
     move=function(self)
         --apply a force in the entity's angle to move it
@@ -112,6 +117,8 @@ behaviors.methods.common={
     end,
 
     die=function(self)
+        self.status:clear()
+        self.animSpeed=self.animSpeedMax
         self:changeState('dead')
     end,
 
@@ -304,15 +311,32 @@ behaviors.methods.enemy={
         --spawn minion at a random point around the spawner
         if spawnPoint=='random' then 
             for i=1,count do 
-                local minion=Entities:new(minionName,self.x,self.y,startState) 
-                local angle=rnd()*pi*2
-                local distance=rnd()*self.w*2 
-                local goalX=self.x+(cos(angle)*distance)
-                local goalY=self.y+(sin(angle)*distance)
+                local minionDimensions=Entities.definitions[minionName].collider 
+                local minionHalfWidth=minionDimensions.w*0.5
+                local minionHalfHeight=minionDimensions.h*0.5
+                local minion=Entities:new(
+                    minionName,self.center.x-minionHalfWidth,
+                    self.center.y-minionHalfHeight,startState
+                ) 
+                local minDistance=(self.w*0.5)+minionHalfWidth
+                local maxDistance=self.attack.minion.maxDistance or 1
+                local angle=rnd()*2*pi
+                local distance=minDistance+rnd()*maxDistance
+                local goalX=minion.x+(cos(angle)*distance)
+                local goalY=minion.y+(sin(angle)*distance)
                 local realX,realY=World:move(minion,goalX,goalY,minion.collisionFilter)
                 minion.x,minion.y=realX,realY
             end
             return 
+        end
+
+        --Use the levelManager's gridClass to spawn minions throughout level's spawn area
+        if spawnPoint=='level' then 
+            local minionsToSpawn={}
+            minionsToSpawn[minionName]=count 
+            LevelManager.gridClass:generateEnemies(
+                minionsToSpawn,Entities,LevelManager.currentLevel.grid 
+            )
         end
     end,
 }
@@ -327,19 +351,26 @@ behaviors.states.common={
     end,
     
     dead=function(self) 
-        self.status:clear()
+        --if there's a death animation, wait for it to finish
         if self.animations.dead then
+            self.animSpeed=self.animSpeedMax
             local onLoop=self:updateAnimation()
-            if onLoop then 
-                self.particles:emit(self.center.x,self.center.y)
-                LevelManager:decreaseEntityCount(self.collisionClass,self.name)
-                return false
-            end
-        else
-            self.particles:emit(self.center.x,self.center.y)
-            LevelManager:decreaseEntityCount(self.collisionClass,self.name)
-            return false
+            if not onLoop then return end 
         end
+
+        --destroy enemy, emit particle explosion, shake camera
+        self.particles:emit(self.center.x,self.center.y)
+        LevelManager:decreaseEntityCount(self.collisionClass,self.name)
+        if self.deathShake then 
+            local shake=self.deathShake 
+            Camera:shake({
+                magnitude=shake.magnitude,
+                period=shake.period,
+                damping=shake.damping,
+                stopThreshold=shake.stopThreshold,
+            })
+        end
+        return false
     end,
 
     shoot=function(self)
@@ -612,6 +643,14 @@ behaviors.states.ally={
 }
 
 behaviors.states.enemy={
+    spawnGiantTombstone=function(self)
+        self:updatePosition()
+        self.status:update(self)
+        local onLoop=self:updateAnimation()
+        if onLoop then self:changeState('idle') end 
+        Camera:shake({magnitude=2}) --shake camera during spawn
+    end,
+
     idleMelee=function(self) 
         self:updateAnimation()
         self:updatePosition()
@@ -1078,6 +1117,12 @@ behaviors.AI={ --AI-------------------------------------------------------------
         teleport=behaviors.states.enemy.teleport,
         dead=behaviors.states.common.dead,
     },
+    ['giantTombstone']={        
+        spawn=behaviors.states.enemy.spawnGiantTombstone,
+        idle=behaviors.states.enemy.idleStationary,
+        attack=behaviors.states.enemy.spawnMinion,
+        dead=behaviors.states.common.dead,
+    }
 }
 --shared AI
 behaviors.AI['skeletonMageFire']=behaviors.AI.skeletonArcher

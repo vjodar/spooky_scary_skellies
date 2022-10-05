@@ -33,6 +33,7 @@ local shadowNames={
     'pyreFiend',
     'floatingEyeball',      --12x10
     'beholder',             --19x16
+    'giantTombstone',       --42x42
 
     --projectiles
     'arrow',

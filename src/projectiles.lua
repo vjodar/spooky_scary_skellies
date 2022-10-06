@@ -91,7 +91,7 @@ local projectileDefinitions={
                 [0xe56f4b]=1,
             }
         },
-        shake={magnitude=10},
+        shake={magnitude=5},
     },
     ['blueSpark']={
         name='blueSpark',
@@ -140,7 +140,7 @@ local projectileDefinitions={
                 [0xe56f4b]=1,
             }
         },
-        shake={magnitude=5},
+        shake={magnitude=2},
     },
     ['blizzard']={
         name='blizzard',
@@ -216,6 +216,35 @@ local projectileDefinitions={
             }
         },
         shake={magnitude=10},
+    },
+    ['obsidianFireball']={
+        name='obsidianFireball',
+        moveSpeed=150,
+        explosionRadius=50,
+        collider={
+            w=10,
+            h=8,
+            class='enemyProjectile',
+        },
+        animation={
+            frameWidth=16,
+            frameHeight=10,
+            frames='1-4',
+            durations=0.1,
+        },
+        particles={
+            count=300,
+            spread={x=6, y=5},
+            yOffset=18,
+            maxSpeed=12,
+            colors={
+                [0xeeb551]=1,
+                [0xe39347]=1,
+                [0xe56f4b]=1,
+                [0xb24c4c]=1,
+            }
+        },
+        shake={magnitude=5},
     },
 }
 
@@ -445,6 +474,7 @@ local projectileOnHitFunctions=function()
     onHitFunctions['blueSpark']=onHitFunctions.spark
     onHitFunctions['fireball']=onHitFunctions.explode
     onHitFunctions['pyre']=onHitFunctions.blizzard
+    onHitFunctions['obsidianFireball']=onHitFunctions.explode
 
     return onHitFunctions
 end

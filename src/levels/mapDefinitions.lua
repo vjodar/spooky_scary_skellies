@@ -126,7 +126,7 @@ return {
             r={{x=631,y=0,h=512,class='solid'},},
         },
         foreground='swampBoss',
-        spawnArea={x=16,y=64,w=608,h=416},
+        spawnArea={x=48,y=96,w=544,h=352},
         playerStartPos={x=288,y=368},
         terrain={},
         decorations={
@@ -231,7 +231,7 @@ return {
             },
         },
         spawnArea={x=128,y=192,w=608,h=416},
-        playerStartPos={x=432,y=368},
+        playerStartPos={x=416,y=400},
         terrain={},
         decorations={
             caveSmall=200,

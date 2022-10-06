@@ -17,9 +17,12 @@ behaviors.methods.common={
             nil,self.scaleX,1,self.xOrigin,self.yOrigin
         )
         love.graphics.setColor(1,1,1,1)
-        -- --testing------------------------
+        --testing------------------------
         -- love.graphics.circle('line',self.moveTarget.center.x,self.moveTarget.center.y,3)
-        -- --testing------------------------
+        -- love.graphics.rectangle(
+        --     'line',self.center.x-57,self.center.y-32,114,64
+        -- )
+        --testing------------------------
     end,
 
     changeState=function(self,newState)
@@ -33,6 +36,8 @@ behaviors.methods.common={
             moveToTarget='move',
             moveToLocation='move',
             teleport='teleport',
+            fireball='fireball',
+            groundslam='groundslam',
         }
         if self.animations[associatedAnimation[newState]] then
             self.animations.current=self.animations[associatedAnimation[newState]]
@@ -647,8 +652,20 @@ behaviors.states.enemy={
         self:updatePosition()
         self.status:update(self)
         local onLoop=self:updateAnimation()
-        if onLoop then self:changeState('idle') end 
-        Camera:shake({magnitude=2}) --shake camera during spawn
+        if onLoop then self:changeState('idle') end
+        Camera:shake({magnitude=20*dt,stopThreshold=0}) --shake camera during spawn
+    end,
+
+    spawnObsidianGolem=function(self)
+        self:updatePosition()
+        self.status:update(self)
+        local onLoop=self:updateAnimation()
+        if self.animations.current.position==15 then 
+            Camera:shake({magnitude=80*dt,damping=2}) --shake camera upon landing
+        end
+        if onLoop then 
+            self:changeState('idle') 
+        end
     end,
 
     idleMelee=function(self) 
@@ -1028,6 +1045,55 @@ behaviors.states.enemy={
             self:changeState('spawn') 
         end
     end,
+
+    obsidianGolemChooseAttack=function(self)
+        self:updatePosition()
+        self.status:update(self)
+
+        if self.nextAttack==nil then 
+            self.nextAttack='groundslam' --start with slam
+        else 
+            if LevelManager:maxEnemiesReached() then 
+                self.nextAttack='fireball'
+            else 
+                self.nextAttack=rnd(3)==3 and 'groundslam' or 'fireball'         
+            end
+        end
+
+        self:changeState(self.nextAttack)
+    end,
+
+    obsidianGolemGroundslam=function(self)
+        self:updatePosition()
+        self.status:update(self)
+        local onLoop=self:updateAnimation()
+        if onLoop then 
+            self.targetsAlreadyAttacked={}
+            self:changeState('idle') 
+        end 
+
+        if self:onDamagingFrames() and self.canAttack.flag then 
+            self.canAttack.setOnCooldown()
+            Camera:shake({magnitude=15})
+            local slam=self.attack.slam 
+            local w=slam.w 
+            local h=slam.h
+            local x=self.center.x-w*0.5
+            local y=self.center.y-h*0.5
+            local filter=World.queryFilters.ally
+            local targets=World:queryRect(x,y,w,h,filter)
+            for i=1,#targets do 
+                local target=targets[i]
+                target:takeDamage({
+                    damage=slam.damage,
+                    knockback=slam.knockback,
+                    angle=getAngle(self.center,target.center),
+                })
+                table.insert(self.targetsAlreadyAttacked,target)
+            end
+            self:spawnMinions()
+        end
+    end,
 }
 
 behaviors.AI={ --AI--------------------------------------------------------------------------------
@@ -1122,7 +1188,17 @@ behaviors.AI={ --AI-------------------------------------------------------------
         idle=behaviors.states.enemy.idleStationary,
         attack=behaviors.states.enemy.spawnMinion,
         dead=behaviors.states.common.dead,
-    }
+    },
+    ['obsidianGolem']={
+        spawn=behaviors.states.enemy.spawnObsidianGolem,
+        idle=behaviors.states.enemy.idleRanged,
+        moveToTarget=behaviors.states.enemy.moveToTarget,
+        moveToLocation=behaviors.states.enemy.moveToLocation,
+        attack=behaviors.states.enemy.obsidianGolemChooseAttack,
+        fireball=behaviors.states.common.shoot,
+        groundslam=behaviors.states.enemy.obsidianGolemGroundslam,
+        dead=behaviors.states.common.dead,
+    },
 }
 --shared AI
 behaviors.AI['skeletonMageFire']=behaviors.AI.skeletonArcher

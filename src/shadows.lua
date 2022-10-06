@@ -33,7 +33,8 @@ local shadowNames={
     'pyreFiend',
     'floatingEyeball',      --12x10
     'beholder',             --19x16
-    'giantTombstone',       --42x42
+    'giantTombstone',       --42x12
+    'obsidianGolem',        --38x16
 
     --projectiles
     'arrow',
@@ -55,6 +56,7 @@ local shadowNames={
     'pyre',
     'pyreTrail',
     'orb',
+    'obsidianFireball',
 }
 
 local sharedSprites={

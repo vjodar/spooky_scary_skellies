@@ -1729,8 +1729,8 @@ return {
             spawn={
                 frames='1-45',
                 row=1,
-                duration=0.1,
-                visibleFrame=19,
+                duration=0.08,
+                visibleFrame=21,
             },
             idle={
                 frames=45,
@@ -1765,4 +1765,87 @@ return {
             damping=3,
         },
     },
+    ['obsidianGolem']={
+        name='obsidianGolem',
+        moveSpeed=8*60,
+        kbResistance=100,
+        attack={
+            range=160,
+            damage=1,
+            period=3,
+            knockback=100,
+            projectile={name='obsidianFireball',xOffset=4,yOffset=-22,count=3,spread=0.75},
+            slam={
+                w=114,h=64,
+                damage=1,
+                knockback=1000,
+            },
+            minion={name='golem',spawnPoint='level',count=5},
+        },
+        health=200,
+        collider={
+            w=38,
+            h=16,
+            class='enemy',
+            losFilter='solid',
+        },
+        drawData={
+            frameWidth=72,
+            frameHeight=88,
+        },
+        animations={
+            spawn={
+                frames='1-16',
+                row=1,
+                duration=0.1,
+                visibleFrame=9,
+            },
+            idle={
+                frames='1-6',
+                row=2,
+                duration=0.1,
+            },
+            move={
+                frames='1-6',
+                row=3,
+                duration=0.1,
+            },
+            attack={                
+                firingFrame=13,             --for fireball attack
+                damagingFrames={5,6},       --for groundslam attack
+                frames=1,row=2,duration=1   --not used
+            },
+            fireball={
+                frames='1-16',
+                row=5,
+                duration=0.1,
+            },
+            groundslam={
+                frames='1-8',
+                row=4,
+                duration=0.1,
+            },   
+            dead={
+                frames='1-12',
+                row=5,
+                duration=0.15,
+            },
+        },
+        particles={
+            count=2000,
+            spread={x=6,y=8},
+            yOffset=18,
+            maxSpeed=40,
+            colors={
+                [0x41404a]=3,
+                [0x353540]=2,
+                [0xe56f4b]=1,
+                [0xb24c4c]=1,
+            }
+        },
+        deathShake={
+            magnitude=25,
+            damping=3,
+        },
+    }
 }

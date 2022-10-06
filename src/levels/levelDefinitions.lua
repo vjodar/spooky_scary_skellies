@@ -3,7 +3,7 @@ return {
         map='swamp3',
         waves={
             {
-                pumpkin=1,
+                tombstone=1,
             },
             -- {
             --     spider=10,            
@@ -19,27 +19,7 @@ return {
         exit={name='swampWallHole',pos={x=245,y=26+31}}, --small swamp
         -- exit={name='swampWallHole',pos={x=288,y=26+31}}, --swamp boss
         -- exit={name='ladderUp'},
-        nextLevel='testBossLevel',
-    },
-    ['testBossLevel']={
-        map='swampBoss',
-        bossData={
-            wave=2, name='giantTombstone',
-            spawnPos={x=272,y=224},
-            spawnAnimDuration=5,
-            deathAnimDuration=3,
-        },
-        waves={
-            {
-                tombstone=5,
-            },
-            {
-                giantTombstone=1,
-            },
-        },
-        maxEnemies=100, --used to limit summoner enemies' minion spawns
-        exit={name='swampWallHole',pos={x=288,y=26+31}}, --swamp boss
-        nextLevel='test',
+        nextLevel='caveBoss',
     },
     ['swampL1']={
         map='swamp3',
@@ -65,13 +45,19 @@ return {
     },
     ['swampBoss']={
         map='swampBoss',
+        bossData={
+            wave=1, name='giantTombstone',
+            spawnPos={x=288,y=192},
+            spawnAnimDuration=4,
+            deathAnimDuration=3,
+        },
         waves={
             {
-                pumpkin=1,
+                giantTombstone=1,
             },
         },
-        maxEnemies=10,
-        exit={name='swampWallHole',pos={x=288,y=26+31}},
+        maxEnemies=100,
+        exit={name='swampWallHole',pos={x=288,y=26+31}}, --swamp boss
         nextLevel='caveL1',
     },
     ['caveL1']={
@@ -98,12 +84,18 @@ return {
     },
     ['caveBoss']={
         map='caveBoss',
+        bossData={
+            wave=1, name='obsidianGolem',
+            spawnPos={x=413,y=240},
+            spawnAnimDuration=1.5,
+            deathAnimDuration=3,
+        },
         waves={
             {
-                pumpkin=1,
+                giantTombstone=1,
             },
         },
-        maxEnemies=10,
+        maxEnemies=100,
         exit={name='ladderUp'},
         nextLevel='dungeonL1',
     },

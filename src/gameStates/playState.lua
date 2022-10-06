@@ -71,17 +71,17 @@ function love.keyreleased(k)
         --         Entities:new(name,rnd(200,600),rnd(100,400))
         --     end
         -- end
-        -- for i=1,1 do Entities:new('headlessHorseman',Controls.getMousePosition()) end
+        for i=1,1 do Entities:new('obsidianGolem',Controls.getMousePosition()) end
         -- local panObjects={
         --     {target={x=0,y=0},afterFn=function() print('hi there!') end,holdTime=0.5},
         --     {target={x=600,y=0},afterFn=function() print('hello!') end,holdTime=0.5},
         --     {target=Player.center}
         -- }
         -- PanState:panTo(panObjects)
-        Camera:shake({
-            magnitude=20,
-            damping=3,
-        })
+        -- Camera:shake({
+        --     magnitude=20,
+        --     damping=3,
+        -- })
     end
 end
 --testing-------------------

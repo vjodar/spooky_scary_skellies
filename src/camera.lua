@@ -41,8 +41,8 @@ camera.update=function(self)
  end
 
  camera.shake=function(self,args) --args={magnitude,period,damping,stopThreshold}
-    local shake=self.shakeData 
-    shake.magnitude=args.magnitude or 5
+    local shake=self.shakeData
+    shake.magnitude=shake.magnitude+(args.magnitude or 5)
     shake.period=args.period or 0.01
     shake.damping=args.damping or 10
     shake.stopThreshold=args.stopThreshold or 0.5

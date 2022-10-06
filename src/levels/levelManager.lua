@@ -138,6 +138,7 @@ local buildLevel=function(self,lvl,skeletons)
     love.graphics.setBackgroundColor(map.bgColor)
 
     --move player to start position
+    Player.status:clear()
     Player.x,Player.y=startPos.x,startPos.y 
     World:update(Player,Player.x,Player.y)
     Camera:lookAt(startPos.x,startPos.y)

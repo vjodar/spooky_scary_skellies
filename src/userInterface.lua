@@ -26,7 +26,7 @@ local generateDamageSystem=function()
         local color=color or 'gray'
         local font=self.fonts[color]
         local d={
-            x=x+rnd(-8,8), y=y-rnd(10), val=val,
+            x=x+rnd(-8,8), y=y-rnd(20), val=val,
             vx=cos(angle)*moveSpeed,
             vy=sin(angle)*moveSpeed,
             font=font,

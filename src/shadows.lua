@@ -35,6 +35,8 @@ local shadowNames={
     'beholder',             --19x16
     'giantTombstone',       --42x12
     'obsidianGolem',        --38x16
+    'witch', 
+    'witchClone', 
 
     --projectiles
     'arrow',
@@ -57,6 +59,8 @@ local shadowNames={
     'pyreTrail',
     'orb',
     'obsidianFireball',
+    'fireballWitch',
+    'icicleWitch',
 }
 
 local sharedSprites={
@@ -75,11 +79,14 @@ local sharedSprites={
     gnasherDemon='player',
     poltergeist='ghost',
     pyreFiend='frankenstein',
+    witchClone='witch',
     
     darkArrow='arrow',
     blueSpark='spark',
     blizzard='jack-o-lantern',
     pyreTrail='pyre',
+    fireballWitch='fireball',
+    icicleWitch='icicle',
 }
 
 local generateShadowSprites=function()

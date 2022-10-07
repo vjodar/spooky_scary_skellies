@@ -22,6 +22,7 @@ player.attack={
     projectile={name='bone',yOffset=-10},
 }
 player.minionsPerSummon=1
+player.maxMinions=10
 player.nearbyEnemies={}
 player.aggroRange={w=600,h=450}
 player.allyReturnThreshold={x=220,y=150} --distance from player before skeletons run back
@@ -218,6 +219,7 @@ end
 function player:die()
     self.state='dead'
     self.status:clear()
+    self.animSpeed=self.animSpeedMax
     LevelManager:setEntityAggro(false)
 end
 
@@ -242,7 +244,7 @@ function player:summon(name)
 
         --move skeleton using world collision to a point around player
         local angle=rnd()*2*pi 
-        local distance=rnd()*50
+        local distance=rnd()*(50+self.maxMinions)
         local goalX=self.x+cos(angle)*distance
         local goalY=self.y+sin(angle)*distance
         local realX,realY=World:move(skelly,goalX,goalY,skelly.collisionFilter)

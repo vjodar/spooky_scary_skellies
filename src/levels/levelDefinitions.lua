@@ -1,9 +1,9 @@
 return {
     ['test']={
-        map='swamp3',
+        map='dungeonBoss',
         waves={
             {
-                tombstone=1,
+                witch=1,
             },
             -- {
             --     spider=10,            

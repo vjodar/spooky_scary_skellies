@@ -215,10 +215,10 @@ local projectileDefinitions={
                 [0xe56f4b]=1,
             }
         },
-        shake={magnitude=10},
+        shake={magnitude=5},
     },
-    ['obsidianFireball']={
-        name='obsidianFireball',
+    ['fireballObsidian']={
+        name='fireballObsidian',
         moveSpeed=150,
         explosionRadius=50,
         collider={
@@ -245,6 +245,43 @@ local projectileDefinitions={
             }
         },
         shake={magnitude=5},
+    },    
+    ['icicleWitch']={
+        name='icicleWitch',
+        moveSpeed=160,
+        collider={
+            w=3,
+            h=3,
+            class='enemyProjectile',
+        },
+    },
+    ['fireballWitch']={
+        name='fireballWitch',
+        moveSpeed=200,
+        explosionRadius=50,
+        collider={
+            w=6,
+            h=6,
+            class='enemyProjectile',
+        },
+        animation={
+            frameWidth=16,
+            frameHeight=10,
+            frames='1-4',
+            durations=0.1,
+        },
+        particles={
+            count=200,
+            spread={x=4, y=3},
+            yOffset=18,
+            maxSpeed=8,
+            colors={
+                [0x947a9d]=2,
+                [0x7c6d2a]=3,
+                [0x5a5888]=1,
+            }
+        },
+        shake={magnitude=2},
     },
 }
 
@@ -474,7 +511,9 @@ local projectileOnHitFunctions=function()
     onHitFunctions['blueSpark']=onHitFunctions.spark
     onHitFunctions['fireball']=onHitFunctions.explode
     onHitFunctions['pyre']=onHitFunctions.blizzard
-    onHitFunctions['obsidianFireball']=onHitFunctions.explode
+    onHitFunctions['fireballObsidian']=onHitFunctions.explode
+    onHitFunctions['fireballWitch']=onHitFunctions.explode
+    onHitFunctions['icicleWitch']=onHitFunctions.icicle
 
     return onHitFunctions
 end

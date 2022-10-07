@@ -1595,7 +1595,7 @@ return {
             period=3, 
             damage=1,
             knockback=100,
-            projectile={name='pyre',xOffset=0,yOffset=-14,count=3,spread=0.5},
+            projectile={name='pyre',xOffset=0,yOffset=-10,count=3,spread=0.5},
         },
         health=20,
         collider={
@@ -1774,7 +1774,7 @@ return {
             damage=1,
             period=3,
             knockback=100,
-            projectile={name='obsidianFireball',xOffset=4,yOffset=-22,count=3,spread=0.75},
+            projectile={name='fireballObsidian',xOffset=4,yOffset=-22,count=3,spread=0.75},
             slam={
                 w=114,h=64,
                 damage=1,
@@ -1847,5 +1847,203 @@ return {
             magnitude=25,
             damping=3,
         },
-    }
+    },
+    ['witch']={
+        name='witch',
+        moveSpeed=14*60,
+        health=100,
+        attack={
+            range=140,  
+            period=2,
+            damage=5, knockback=100, --specific to chainLightning
+            projectile={
+                fireball={
+                    name='fireballWitch',
+                    xOffset=0,yOffset=-16,
+                    spread=0,
+                    damage=1,
+                    knockback=300,
+                },                
+                icicle={
+                    name='icicleWitch',
+                    xOffset=0,yOffset=-16,
+                    spread=1,
+                    count=6,
+                    damage=1,
+                    knockback=50,
+                },
+            },
+            clone={name='witchClone',spawnPoint='center'},
+            demons={
+                {name='pyreFiend',spawnPoint='level',count=1},
+                {name='beholder',spawnPoint='level',count=1},
+                {name='gnasherDemon',spawnPoint='level',count=2},
+                {name='imp',spawnPoint='level',count=4},
+            },            
+        },
+        collider={
+            w=18,
+            h=8,
+            class='enemy',
+            linearDamping=5,
+            restitution=0.7,
+            collisionFilter='enemyFlying',
+            losFilter='solid',
+            moveFilter='solidOrBoundary',
+        },
+        drawData={
+            frameWidth=42,
+            frameHeight=38,
+        },
+        animations={
+            spawn={
+                frames='1-7',
+                row=1,
+                duration=0.1,
+                visibleFrame=4,
+            },
+            idle={
+                frames='1-8',
+                row=2,
+                duration=0.1,
+            },
+            move={
+                frames='1-8',
+                row=2,
+                duration=0.1,
+            },
+            attack={
+                frames=1,
+                row=2,
+                duration=0.4,
+                firingFrame=1
+            },
+            teleport={
+                frames='1-7',
+                row=3,
+                duration=0.1,
+            },
+            dead={
+                frames=1,
+                row=2,
+                duration=2,
+            },
+        },
+        particles={
+            count=2000,
+            spread={x=1, y=1},
+            maxSpeed=50,
+            yOffset=18,
+            colors={
+                [0xf6f0eb]=1, [0xd6cec7]=1, [0xede4da]=1, [0xbfb8b4]=1,
+                [0x918d8d]=1, [0x636167]=1, [0x4c4b54]=1, [0x41404a]=1, [0x353540]=1,
+                [0x302e38]=1, [0xd2c1b1]=1, [0xbdaa97]=1, [0x7e674c]=1, [0x86735b]=1,
+                [0x735b42]=1, [0x604b3d]=1, [0x5d483c]=1, [0x4d3f38]=1, [0xb24c4c]=1,
+                [0xca5954]=1, [0xe56f4b]=1, [0xe39347]=1, [0xeeb551]=1, [0xe3c25b]=1,
+                [0xbda351]=1, [0x8b9150]=1, [0x557d55]=1, [0x446350]=1, [0x3b5247]=1,
+                [0x80aaa7]=1, [0x6fa6a5]=1, [0x769fa6]=1, [0x668da9]=1, [0x5c699f]=1,
+                [0x5a5888]=1, [0x7c6da2]=1, [0x947a9d]=1, [0xbc87a5]=1, [0xd9a6a6]=1,
+            }
+        },
+        deathShake={
+            magnitude=25,
+            damping=2,
+        },
+    },
+    ['witchClone']={
+        name='witchClone',
+        moveSpeed=12*60,
+        health=50,
+        attack={
+            range=140,  
+            period=2,
+            damage=5, knockback=100, --specific to chainLightning
+            projectile={
+                fireball={
+                    name='fireballWitch',
+                    xOffset=0,yOffset=-16,
+                    spread=0,
+                    damage=1,
+                    knockback=300,
+                },                
+                icicle={
+                    name='icicleWitch',
+                    xOffset=0,yOffset=-16,
+                    spread=1,
+                    count=6,
+                    damage=1,
+                    knockback=50,
+                },
+            },
+            demons={
+                {name='gnasherDemon',spawnPoint='level',count=2},
+                {name='imp',spawnPoint='level',count=4},
+            },            
+        },
+        collider={
+            w=18,
+            h=8,
+            class='enemy',
+            linearDamping=5,
+            restitution=0.7,
+            collisionFilter='enemyFlying',
+            losFilter='solid',
+            moveFilter='solidOrBoundary',
+        },
+        drawData={
+            altSpriteSheets={
+                'witchClone2',
+                'witchClone3',
+                'witchClone4',
+                'witchClone5',
+                'witchClone6',
+            },
+            frameWidth=42,
+            frameHeight=38,
+        },
+        animations={
+            spawn={
+                frames='1-7',
+                row=1,
+                duration=0.1,
+                visibleFrame=4,
+            },
+            idle={
+                frames='1-8',
+                row=2,
+                duration=0.1,
+            },
+            move={
+                frames='1-8',
+                row=2,
+                duration=0.1,
+            },
+            attack={
+                frames=1,
+                row=2,
+                duration=0.4,
+                firingFrame=1
+            },
+            teleport={
+                frames='1-7',
+                row=3,
+                duration=0.1,
+            },
+        },
+        particles={
+            count=200,
+            spread={x=1, y=1},
+            yOffset=18,
+            colors={
+                [0xf6f0eb]=1, [0xd6cec7]=1, [0xede4da]=1, [0xbfb8b4]=1,
+                [0x918d8d]=1, [0x636167]=1, [0x4c4b54]=1, [0x41404a]=1, [0x353540]=1,
+                [0x302e38]=1, [0xd2c1b1]=1, [0xbdaa97]=1, [0x7e674c]=1, [0x86735b]=1,
+                [0x735b42]=1, [0x604b3d]=1, [0x5d483c]=1, [0x4d3f38]=1, [0xb24c4c]=1,
+                [0xca5954]=1, [0xe56f4b]=1, [0xe39347]=1, [0xeeb551]=1, [0xe3c25b]=1,
+                [0xbda351]=1, [0x8b9150]=1, [0x557d55]=1, [0x446350]=1, [0x3b5247]=1,
+                [0x80aaa7]=1, [0x6fa6a5]=1, [0x769fa6]=1, [0x668da9]=1, [0x5c699f]=1,
+                [0x5a5888]=1, [0x7c6da2]=1, [0x947a9d]=1, [0xbc87a5]=1, [0xd9a6a6]=1,
+            }
+        },
+    },
 }

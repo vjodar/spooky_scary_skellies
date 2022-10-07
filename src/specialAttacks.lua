@@ -24,7 +24,7 @@ local generateSprites=function(defs)
 end
 local sprites,animations=generateSprites(defs)
 
-local chainLightning=function(self,mage,targets)
+local chainLightning=function(self,mage,targets,primary,secondary)
     local damage=mage.attack.damage / #targets --split damage equally
     local knockback=mage.attack.knockback
     local points={mage.center}
@@ -33,7 +33,7 @@ local chainLightning=function(self,mage,targets)
         local t=targets[i]
         local prevPoint=points[#points]
         local currPoint=t.center 
-        local angle=getAngle(currPoint,prevPoint)
+        local angle=getAngle(prevPoint,currPoint)
         t:takeDamage({
             damage=damage, knockback=knockback, angle=angle, textColor='yellow'
         })
@@ -42,9 +42,9 @@ local chainLightning=function(self,mage,targets)
 
     local cl={
         points=points,
-        duration=0.1,
-        yellow=self.colors.yellow,
-        white=self.colors.white,
+        duration=0.2,
+        primaryColor=self.colors[primary] or self.colors.yellow,
+        secondaryColor=self.colors[secondary] or self.colors.white,
         width=GameScale,
         yOffset=-7,
         update=function(self)
@@ -58,10 +58,10 @@ local chainLightning=function(self,mage,targets)
             for i=1,#self.points-1 do 
                 local p1=self.points[i]
                 local p2=self.points[i+1]
-                love.graphics.setColor(self.yellow) --draw yellow border
+                love.graphics.setColor(self.primaryColor) --draw border
                 love.graphics.setLineWidth(self.width)
                 self.drawLine(p1,p2,self.yOffset)
-                love.graphics.setColor(self.white) --draw white inner line
+                love.graphics.setColor(self.secondaryColor) --draw inner line
                 love.graphics.setLineWidth(self.width*0.5)
                 self.drawLine(p1,p2,self.yOffset)
                 love.graphics.setColor(1,1,1) --reset color
@@ -143,6 +143,8 @@ return {
     colors={  
         yellow={227/255,194/255,91/255},
         white={237/255,228/255,218/255},
+        purple={188/255,135/255,165/255},
+        pink={217/255,166/255,166/255},
     },
 
     table={}, --holds specialAttack instances that aren't managed by Objects.lua

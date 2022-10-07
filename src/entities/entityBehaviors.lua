@@ -36,8 +36,11 @@ behaviors.methods.common={
             moveToTarget='move',
             moveToLocation='move',
             teleport='teleport',
-            fireball='fireball',
-            groundslam='groundslam',
+            fireball='fireball',                --obsidianGolem
+            groundslam='groundslam',            --obsidianGolem
+            projectile='projectile',            --witch
+            chainLightning='chainLightning',    --witch
+            clone='teleport',                   --witch
         }
         if self.animations[associatedAnimation[newState]] then
             self.animations.current=self.animations[associatedAnimation[newState]]
@@ -1094,6 +1097,142 @@ behaviors.states.enemy={
             self:spawnMinions()
         end
     end,
+
+    --Upon spawning, always summon demons.
+    --Starts with a 1/10 chance to perform a special attack (summonDemons or clone).
+    --Chance increases the more basic attacks are performed between specials.
+    --Specials will never roll when level's enemy limit is reached.
+    witchChooseAttack=function(self)
+        self:updatePosition()
+        self.status:update(self)
+
+        local nextAttack=rndElement({'projectile','chainLightning'}) --default
+
+        if self.basicAttackCounter==nil then --start fight with demons
+            self.basicAttackCounter=0
+            nextAttack='summonDemons'
+        else             
+            if not LevelManager:maxEnemiesReached() then 
+                if rnd(10-self.basicAttackCounter)==1 then 
+                    nextAttack=rndElement({'summonDemons','clone'})
+                end
+            end
+        end
+
+        --Keep track of basic attacks. Limit to 9 as it will guarentee a 
+        --special attack on next chance (unless level's enemy limit is reached)
+        if nextAttack=='projectile' or nextAttack=='chainLightning' then 
+            self.basicAttackCounter=min(self.basicAttackCounter+1,9)
+        else 
+            self.basicAttackCounter=0
+        end
+
+        self:changeState(nextAttack)
+    end,
+
+    --1/5 chance to summon demons unless level's enemy limit is reached
+    witchCloneChooseAttack=function(self)
+        local nextAttack=rndElement({'projectile','chainLightning'})
+        if not LevelManager:maxEnemiesReached() then 
+            if rnd(5)==5 then nextAttack='summonDemons' end 
+        end
+        self:changeState(nextAttack)
+    end,
+
+    witchProjectile=function(self)        
+        self:updatePosition()
+        self.status:update(self)
+        local onLoop=self:updateAnimation()
+        if onLoop then self:changeState(rndElement({'teleport','idle'})) end 
+
+        if self.canAttack.flag and self:onFiringFrame() then
+            self.canAttack.setOnCooldown()
+            --select a projectile to fire
+            local selection=rndElement({'fireball','icicle'})
+            local projectile={
+                name=self.attack.projectile[selection].name,
+                x=self.center.x+self.attack.projectile[selection].xOffset*self.scaleX,
+                y=self.center.y,yOffset=self.attack.projectile[selection].yOffset
+            }
+            local count=self.attack.projectile[selection].count or 1
+            local spread=self.attack.projectile[selection].spread or 0
+            for i=1,count do
+                local angleToTarget=getAngle(projectile,self.moveTarget.center)
+                if spread~=0 then 
+                    angleToTarget=angleToTarget+(rnd()*spread-spread*0.5)
+                end
+                Projectiles:new({
+                    x=projectile.x,y=projectile.y,name=projectile.name,
+                    damage=self.attack.projectile[selection].damage,
+                    knockback=self.attack.projectile[selection].knockback,
+                    angle=angleToTarget,yOffset=projectile.yOffset
+                })
+            end
+        end
+    end,
+
+    witchChainLightning=function(self)
+        self:updatePosition()
+        self.status:update(self)
+        local onLoop=self:updateAnimation()
+        if onLoop then self:changeState(rndElement({'teleport','idle'})) end 
+
+        if self.canAttack.flag and self:onFiringFrame() then
+            self.canAttack.setOnCooldown()
+            local targets={self.moveTarget}
+            local range=self.attack.range 
+            local queryFilter=World.queryFilters.ally 
+            for i=1,9 do --chains up to 9 additional targets
+                prevTarget=targets[#targets]
+                --query all enemies surrounding the last target
+                local nearbyEnemies=World:queryRect(
+                    prevTarget.center.x-range,
+                    prevTarget.center.y-range,
+                    range*2,range*2,queryFilter  
+                )
+                --filter out any duplicates from nearbyEnemies
+                for j,enemy in ipairs(nearbyEnemies) do 
+                    for k=1,#targets do 
+                        if enemy==targets[k] then 
+                            table.remove(nearbyEnemies,j) 
+                        end 
+                    end
+                end
+                table.insert(targets,rndElement(nearbyEnemies))
+            end
+            SpecialAttacks:chainLightning(self,targets,'purple','pink')
+        end
+    end,
+
+    witchSummonDemons=function(self)
+        self:updatePosition()
+        self.status:update(self)
+        local onLoop=self:updateAnimation()
+        if onLoop then self:changeState(rndElement({'teleport','idle'})) end 
+
+        if self.canAttack.flag and self:onFiringFrame() then 
+            self.canAttack.setOnCooldown()
+            local demonsToSpawn={}
+            local demonDef=self.attack.demons
+            for i=1,#demonDef do
+                local def=demonDef[i]
+                demonsToSpawn[def.name]=def.count
+            end
+            LevelManager.gridClass:generateEnemies(
+                demonsToSpawn,Entities,LevelManager.currentLevel.grid 
+            )
+        end        
+    end,
+
+    witchClone=function(self)
+        self:updatePosition()
+        self.status:update(self)
+        local onLoop=self:updateAnimation()
+        if onLoop then --summon clone
+            Entities:new(self.attack.clone.name,self.x,self.y)
+            self:changeState(rndElement({'teleport','idle'}))
+        end
+    end,
 }
 
 behaviors.AI={ --AI--------------------------------------------------------------------------------
@@ -1197,6 +1336,31 @@ behaviors.AI={ --AI-------------------------------------------------------------
         attack=behaviors.states.enemy.obsidianGolemChooseAttack,
         fireball=behaviors.states.common.shoot,
         groundslam=behaviors.states.enemy.obsidianGolemGroundslam,
+        dead=behaviors.states.common.dead,
+    },
+    ['witch']={
+        spawn=behaviors.states.common.spawn,
+        idle=behaviors.states.enemy.idleRanged,
+        moveToTarget=behaviors.states.enemy.moveToTarget,
+        moveToLocation=behaviors.states.enemy.moveToLocation,
+        attack=behaviors.states.enemy.witchChooseAttack,
+        projectile=behaviors.states.enemy.witchProjectile,
+        chainLightning=behaviors.states.enemy.witchChainLightning,
+        summonDemons=behaviors.states.enemy.witchSummonDemons,
+        clone=behaviors.states.enemy.witchClone,
+        teleport=behaviors.states.enemy.teleport,
+        dead=behaviors.states.common.dead,
+    },
+    ['witchClone']={
+        spawn=behaviors.states.common.spawn,
+        idle=behaviors.states.enemy.idleRanged,
+        moveToTarget=behaviors.states.enemy.moveToTarget,
+        moveToLocation=behaviors.states.enemy.moveToLocation,
+        attack=behaviors.states.enemy.witchCloneChooseAttack,
+        projectile=behaviors.states.enemy.witchProjectile,
+        chainLightning=behaviors.states.enemy.witchChainLightning,
+        summonDemons=behaviors.states.enemy.witchSummonDemons,
+        teleport=behaviors.states.enemy.teleport,
         dead=behaviors.states.common.dead,
     },
 }

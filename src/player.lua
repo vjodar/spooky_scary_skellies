@@ -140,6 +140,10 @@ function player:updatePosition()
 
         if other.collisionClass=='exit' then other:activateExit() end 
     end
+
+    if LevelManager:isEntityOutOfBounds(self) then 
+        LevelManager:returnEntityToLevel(self)
+    end
 end
 
 function player:move()

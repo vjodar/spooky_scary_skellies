@@ -58,7 +58,7 @@ local shadowNames={
     'pyre',
     'pyreTrail',
     'orb',
-    'obsidianFireball',
+    'fireballObsidian',
     'fireballWitch',
     'icicleWitch',
 }

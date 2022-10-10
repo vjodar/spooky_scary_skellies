@@ -97,6 +97,10 @@ behaviors.methods.common={
             end
         end
 
+        if LevelManager:isEntityOutOfBounds(self) then 
+            LevelManager:returnEntityToLevel(self)
+        end
+
         return cols --return the collisions this move produced
     end,
 

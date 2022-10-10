@@ -1768,7 +1768,7 @@ return {
     ['obsidianGolem']={
         name='obsidianGolem',
         moveSpeed=8*60,
-        kbResistance=100,
+        kbResistance=90,
         attack={
             range=160,
             damage=1,

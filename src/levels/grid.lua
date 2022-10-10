@@ -98,7 +98,7 @@ end
 local tileOccupiedKey={
     terrain={'player','terrain','border','decoration'},
     decoration={'terrain','decoration'},
-    enemy={'player','terrain'},
+    entity={'player','terrain'},
     exit={'player','terrain','border'},
 }
 
@@ -224,7 +224,7 @@ local generateEnemies=function(self,enemyWave,entitiesClass,grid)
     for name,count in pairs(enemyWave) do 
         local enemyColliderDef=entitiesClass.definitions[name].collider
         local enemyTileSize=self:getTileSize(enemyColliderDef)
-        local availableTiles=self:getAvailableTiles(grid,enemyTileSize,'enemy')
+        local availableTiles=self:getAvailableTiles(grid,enemyTileSize,'entity')
 
         for i=1,count do 
             if #availableTiles>0 then

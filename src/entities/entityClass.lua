@@ -52,8 +52,8 @@ end
 local generateParticleEmitters=function(defs)
     local emitters={}
     for name,def in pairs(defs) do
-        if def.particles~=nil then 
-            emitters[name]=ParticleSystem:generateEmitter(def.particles)
+        if def.particles then 
+            emitters[name]=ParticleSystem:generateEmitter(def.particles,def.collider.class)
         else print(name, 'has no particle definition') end
     end
     return emitters 

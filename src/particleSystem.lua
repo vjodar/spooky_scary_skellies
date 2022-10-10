@@ -56,14 +56,14 @@ local pSystem={ --The Module
         end
     end,
     draw=function(self) for i=1,#self.table do self.table[i]:draw() end end,
-    addParticles=function(self,x,y,count,maxSpeed,xSpread,ySpread,colors) --particle constructor
+    addParticles=function(self,x,y,count,maxSpeed,xSpread,ySpread,colors,class) --particle constructor
         for i=1,count do 
             local frameRate=60
             local angle=rnd()*2*pi 
             local speed=rnd()*maxSpeed 
             local vx=cos(angle)*speed*frameRate
             local vy=sin(angle)*speed*frameRate
-            local duration=0.1+speed*0.05
+            local duration=speed<3 and speed*0.2 or speed*0.05
             local linearDamping=5+rnd()*20
             local particle={
                 x=x+cos(angle)*rnd()*xSpread, 
@@ -72,13 +72,30 @@ local pSystem={ --The Module
                 linearDamping=linearDamping, 
                 color=rndElement(colors),
                 border={53/255,53/255,64/255},
+                class=class,             
                 update=function(self)
                     self.x=self.x+self.vx*dt
                     self.y=self.y+self.vy*dt 
                     self.vx=self.vx-(self.vx*self.linearDamping*dt)
                     self.vy=self.vy-(self.vy*self.linearDamping*dt)
                     self.duration=self.duration-dt 
-                    if self.duration<0 then return false end
+                    if self.duration<0 then 
+                        if self.class~='enemy' then return false end 
+                        self.speed=400
+                        self.update=self.travelToPlayer 
+                    end
+                end,
+                travelToPlayer=function(self)
+                    local target={x=Player.center.x, y=Player.center.y-10}
+                    if getDistance(self,target)<10 then 
+                        --TODO: heal player
+                        return false 
+                    end 
+                    local angle=getAngle(self,target)
+                    self.vx=cos(angle)*self.speed
+                    self.vy=sin(angle)*self.speed
+                    self.x=self.x+self.vx*dt 
+                    self.y=self.y+self.vy*dt
                 end,
                 draw=function(self)
                     love.graphics.setColor(self.border)
@@ -99,7 +116,7 @@ local pSystem={ --The Module
         end
     end,
 
-    generateEmitter=function(self,particlesDef) 
+    generateEmitter=function(self,particlesDef,class) 
         local def=particlesDef 
         return { --particle emitter constructor
             count=def.count,
@@ -108,10 +125,11 @@ local pSystem={ --The Module
             yOffset=def.yOffset,
             maxSpeed=def.maxSpeed or 10,
             colors=self:generateRGBColorTable(def.colors),
+            class=class,
             emit=function(self,x,y)
                 ParticleSystem:addParticles(
                     x,y-self.yOffset, self.count, self.maxSpeed,
-                    self.xSpread, self.ySpread, self.colors
+                    self.xSpread, self.ySpread, self.colors, self.class 
                 )
             end,
         }

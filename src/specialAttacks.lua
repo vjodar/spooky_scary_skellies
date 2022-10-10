@@ -42,7 +42,7 @@ local chainLightning=function(self,mage,targets,primary,secondary)
 
     local cl={
         points=points,
-        duration=0.2,
+        duration=0.1,
         primaryColor=self.colors[primary] or self.colors.yellow,
         secondaryColor=self.colors[secondary] or self.colors.white,
         width=GameScale,

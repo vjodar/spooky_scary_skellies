@@ -71,7 +71,7 @@ function love.keyreleased(k)
         --         Entities:new(name,rnd(200,600),rnd(100,400))
         --     end
         -- end
-        for i=1,1 do Entities:new('witch',Controls.getMousePosition()) end
+        -- for i=1,1 do Entities:new('skeletonWarrior',Controls.getMousePosition()) end        
         -- local panObjects={
         --     {target={x=0,y=0},afterFn=function() print('hi there!') end,holdTime=0.5},
         --     {target={x=600,y=0},afterFn=function() print('hello!') end,holdTime=0.5},
@@ -82,6 +82,9 @@ function love.keyreleased(k)
         --     magnitude=20,
         --     damping=3,
         -- })
+        -- local goalX,goalY=Controls.getMousePosition()
+        -- Player.x,Player.y=goalX,goalY 
+        -- World:update(Player,goalX,goalY)
     end
 end
 --testing-------------------

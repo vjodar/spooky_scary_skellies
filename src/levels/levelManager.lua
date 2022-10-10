@@ -35,7 +35,8 @@ local generateLevelBoundaries=function(boundaries)
         local boundary={
             x=b.x,y=b.y-boundaryThickness,
             w=b.w,h=boundaryThickness,
-            collisionClass=b.class or 'boundary'
+            collisionClass=b.class or 'boundary',
+            side='top',
         }
         World:addItem(boundary)
         table.insert(levelBoundaries,boundary)
@@ -45,7 +46,8 @@ local generateLevelBoundaries=function(boundaries)
         local boundary={
             x=b.x,y=b.y,
             w=b.w,h=boundaryThickness,
-            collisionClass=b.class or 'boundary'
+            collisionClass=b.class or 'boundary',
+            side='bottom',
         }
         World:addItem(boundary)
         table.insert(levelBoundaries,boundary)
@@ -55,7 +57,8 @@ local generateLevelBoundaries=function(boundaries)
         local boundary={
             x=b.x-boundaryThickness,y=b.y,
             w=boundaryThickness,h=b.h,
-            collisionClass=b.class or 'boundary'
+            collisionClass=b.class or 'boundary',
+            side='left',
         }
         World:addItem(boundary)
         table.insert(levelBoundaries,boundary)
@@ -65,12 +68,67 @@ local generateLevelBoundaries=function(boundaries)
         local boundary={
             x=b.x,y=b.y,
             w=boundaryThickness,h=b.h,
-            collisionClass=b.class or 'boundary'
+            collisionClass=b.class or 'boundary',
+            side='right',
         }
         World:addItem(boundary)
         table.insert(levelBoundaries,boundary)
     end
     return levelBoundaries
+end
+
+local isEntityOutOfBounds=function(self,entity)
+    local entityCollision=""
+    if entity.name=='player' then 
+        entityCollision='player'
+    else 
+        entityCollision=Entities.definitions[entity.name].collider.collisionFilter or entity.class
+    end
+    
+    --Go through each boundary in the current level. If the entity is outside any of the
+    --boundaries and that boundary is either of class 'boundary' or 'solid' or if the 
+    --boundary is a 'pit' and the entity can't fly, they are out of bounds.
+    local bounds=self.currentLevel.boundaries
+    for i=1,#bounds do 
+        boundary=bounds[i]
+        if (boundary.side=='top' and entity.y<boundary.y)
+        or (boundary.side=='bottom' and entity.y>boundary.y)
+        or (boundary.side=='left' and entity.x<boundary.x)
+        or (boundary.side=='right' and entity.x>boundary.x)
+        then 
+            if boundary.collisionClass=='boundary'
+            or boundary.collisionClass=='solid'
+            or (boundary.collisionClass=='pit' and entityCollision~='enemyFlying')
+            then 
+                return true 
+            end 
+        end
+    end
+
+    return false 
+end
+
+local returnEntityToLevel=function(self,entity)
+    local gridClass=self.gridClass
+    local levelGrid=self.currentLevel.grid
+    if entity.class=='enemy' then --don't move enemies near player
+        gridClass.clearPlayerTiles(levelGrid)
+        gridClass:markPlayerTiles(levelGrid,4)
+    end
+    local entityColliderDef={w=entity.w,h=entity.h}
+    -- if entity.name=='player' then 
+    --     entityColliderDef={w=Player.w,h=Player.h}
+    -- else 
+    --     entityColliderDef=Entities.definitions[entity.name].collider
+    -- end
+    local entityTileSize=gridClass:getTileSize(entityColliderDef)
+    local availableTiles=gridClass:getAvailableTiles(levelGrid,entityTileSize,'entity')
+    local selectedTile=rndElement(availableTiles)
+    local goalX,goalY=gridClass:throughoutTiles(
+        selectedTile.x,selectedTile.y,entityColliderDef.w,entityColliderDef.h,entityTileSize
+    )
+    entity.x,entity.y=goalX,goalY   --set entity to new position
+    World:update(entity,goalX,goalY) --set collider to new position
 end
 
 local increaseEntityCount=function(self,class,name)
@@ -348,6 +406,8 @@ return { --The Module
     foregrounds=foregrounds,
     currentLevel={},
     generateLevelBoundaries=generateLevelBoundaries,
+    isEntityOutOfBounds=isEntityOutOfBounds,
+    returnEntityToLevel=returnEntityToLevel,
     increaseEntityCount=increaseEntityCount,
     decreaseEntityCount=decreaseEntityCount,
     maxEnemiesReached=maxEnemiesReached,

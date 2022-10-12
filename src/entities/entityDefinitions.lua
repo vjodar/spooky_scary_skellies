@@ -349,7 +349,8 @@ return {
             colors={
                 [0xbda351]=3,
                 [0x8b9150]=1,
-            }
+            },
+            willHealPlayer=true,
         },
     },
     ['pumpkin']={
@@ -404,7 +405,8 @@ return {
             colors={
                 [0xe39347]=3,
                 [0x557d55]=1,
-            }
+            },
+            willHealPlayer=true,
         },
     },
     ['golem']={
@@ -460,7 +462,8 @@ return {
             yOffset=8,
             colors={
                 [0x918d8d]=1,
-            }
+            },
+            willHealPlayer=true,
         },
     },
     ['spider']={
@@ -515,7 +518,8 @@ return {
             colors={
                 [0x636167]=3,
                 [0xca5954]=1,
-            }
+            },
+            willHealPlayer=true,
         },
     },
     ['bat']={
@@ -572,7 +576,8 @@ return {
             colors={
                 [0xb24c4c]=3,
                 [0x636167]=1,
-            }
+            },
+            willHealPlayer=true,
         },
     },
     ['zombie']={
@@ -628,7 +633,8 @@ return {
                 [0x557d55]=4,
                 [0x3b5247]=1,
                 [0x737b42]=1,
-            }
+            },
+            willHealPlayer=true,
         },
     },
     ['possessedArcher']={
@@ -685,7 +691,8 @@ return {
                 [0x918d8d]=3,
                 [0xca5954]=1,
                 [0xeeb551]=1,
-            }
+            },
+            willHealPlayer=true,
         },
     },
     ['possessedKnight']={
@@ -741,7 +748,8 @@ return {
                 [0x636167]=3,
                 [0x918d8d]=3,
                 [0xeeb551]=1,
-            }
+            },
+            willHealPlayer=true,
         },
     },
     ['undeadMiner']={
@@ -797,7 +805,8 @@ return {
                 [0x557d55]=4,
                 [0xe39347]=2,
                 [0x575a88]=1,
-            }
+            },
+            willHealPlayer=true,
         },
     },    
     ['ent']={
@@ -854,7 +863,8 @@ return {
                 [0x446350]=1,
                 [0x735b42]=1,
                 [0x5d483c]=1,
-            }
+            },
+            willHealPlayer=true,
         },
     },
     ['headlessHorseman']={
@@ -910,7 +920,8 @@ return {
                 [0x4c4b54]=4,
                 [0xe56f4b]=1,
                 [0x575a88]=1,
-            }
+            },
+            willHealPlayer=true,
         },
         deathShake={magnitude=10},
     },
@@ -964,7 +975,8 @@ return {
             colors={
                 [0xbda351]=3,
                 [0x8b9150]=1,
-            }
+            },
+            willHealPlayer=true,
         },
     },
     ['vampire']={
@@ -1020,7 +1032,8 @@ return {
                 [0xb24c4c]=3,
                 [0xf6f0eb]=1,
                 [0x41404a]=1,
-            }
+            },
+            willHealPlayer=true,
         },
     },
     ['tombstone']={
@@ -1175,7 +1188,8 @@ return {
             colors={
                 [0xe56f4b]=3,
                 [0x5d483c]=1,
-            }
+            },
+            willHealPlayer=true,
         },
     },
     ['gnasherDemon']={
@@ -1230,7 +1244,8 @@ return {
             colors={
                 [0xe56f4b]=3,
                 [0xf6f0eb]=1,
-            }
+            },
+            willHealPlayer=true,
         },
     },
     ['frankenstein']={
@@ -1287,7 +1302,8 @@ return {
                 [0x557d55]=2,
                 [0x735b42]=2,
                 [0x769fa6]=1,
-            }
+            },
+            willHealPlayer=true,
         },
         deathShake={magnitude=10},
     },
@@ -1343,7 +1359,8 @@ return {
             colors={
                 [0x735b42]=3,
                 [0x5d483c]=1,
-            }
+            },
+            willHealPlayer=true,
         },
         deathShake={magnitude=10},
     },
@@ -1398,7 +1415,8 @@ return {
             colors={
                 [0x735b42]=3,
                 [0x5d483c]=1,
-            }
+            },
+            willHealPlayer=true,
         },
     },
     ['ghost']={
@@ -1461,7 +1479,8 @@ return {
             yOffset=10,
             colors={
                 [0xd6cec7]=1,
-            }
+            },
+            willHealPlayer=true,
         },
     },
     ['poltergeist']={
@@ -1524,7 +1543,8 @@ return {
             yOffset=10,
             colors={
                 [0xd6cec7]=1,
-            }
+            },
+            willHealPlayer=true,
         },
     },
     ['floatingEyeball']={
@@ -1583,7 +1603,8 @@ return {
                 [0xd6cec7]=2,
                 [0xca5954]=2,
                 [0x668da9]=1,
-            }
+            },
+            willHealPlayer=true,
         },
     },
     ['pyreFiend']={
@@ -1640,7 +1661,8 @@ return {
                 [0xe56f4b]=3,
                 [0xb24c4c]=2,
                 [0xf6f0eb]=1,
-            }
+            },
+            willHealPlayer=true,
         },
         deathShake={magnitude=10},
     },
@@ -1700,7 +1722,8 @@ return {
                 [0xe56f4b]=3,
                 [0xb24c4c]=2,
                 [0xf6f0eb]=1,
-            }
+            },
+            willHealPlayer=true,
         },
         deathShake={magnitude=10},
     },
@@ -1758,7 +1781,8 @@ return {
                 [0x918d8d]=4,
                 [0x735b42]=3,
                 [0x4c4b54]=1,
-            }
+            },
+            willHealPlayer=true,
         },
         deathShake={
             magnitude=25,
@@ -1841,7 +1865,8 @@ return {
                 [0x353540]=2,
                 [0xe56f4b]=1,
                 [0xb24c4c]=1,
-            }
+            },
+            willHealPlayer=true,
         },
         deathShake={
             magnitude=25,
@@ -1943,7 +1968,8 @@ return {
                 [0xbda351]=1, [0x8b9150]=1, [0x557d55]=1, [0x446350]=1, [0x3b5247]=1,
                 [0x80aaa7]=1, [0x6fa6a5]=1, [0x769fa6]=1, [0x668da9]=1, [0x5c699f]=1,
                 [0x5a5888]=1, [0x7c6da2]=1, [0x947a9d]=1, [0xbc87a5]=1, [0xd9a6a6]=1,
-            }
+            },
+            willHealPlayer=true,
         },
         deathShake={
             magnitude=25,
@@ -2043,7 +2069,8 @@ return {
                 [0xbda351]=1, [0x8b9150]=1, [0x557d55]=1, [0x446350]=1, [0x3b5247]=1,
                 [0x80aaa7]=1, [0x6fa6a5]=1, [0x769fa6]=1, [0x668da9]=1, [0x5c699f]=1,
                 [0x5a5888]=1, [0x7c6da2]=1, [0x947a9d]=1, [0xbc87a5]=1, [0xd9a6a6]=1,
-            }
+            },
+            willHealPlayer=true,
         },
     },
 }

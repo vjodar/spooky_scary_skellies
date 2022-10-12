@@ -30,6 +30,7 @@ function love.load()
     Statuses=require 'src/statuses'
     ParticleSystem=require 'src/particleSystem'
     Player=require 'src/player'
+    Hud=require 'src/hud/hud'
     LevelManager=require 'src/levels/levelManager'
     Entities=require 'src/entities/entityClass'
     Projectiles=require 'src/projectiles' 

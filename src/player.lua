@@ -13,7 +13,7 @@ player.collisionClass='ally'
 player.collisionFilter=World.collisionFilters[player.collisionClass]
 
 --General Data
-player.health={current=100,max=100}
+player.health={current=1,max=500}
 player.kbResistance=0
 player.attack={
     period=0.5, 
@@ -60,7 +60,7 @@ player.canTurn.setOnCooldown=Timer:giveCooldownCallbacks(player.canTurn)
 player.canAttack={flag=true,cooldownPeriod=player.attack.period}
 player.canAttack.setOnCooldown=Timer:giveCooldownCallbacks(player.canAttack)
 
-player.canSummon={flag=true,cooldownPeriod=0.2}
+player.canSummon={flag=true,cooldownPeriod=1}
 player.canSummon.setOnCooldown=Timer:giveCooldownCallbacks(player.canSummon)
 
 player.canQueryAttackTargets={flag=true,cooldownPeriod=0.5}
@@ -83,9 +83,9 @@ function player:update()
             self.canAttack.setOnCooldown()
         end
         if self.canSummon.flag then 
-            if Controls.down.btn1 then self:summon('skeletonWarrior') end 
-            if Controls.down.btn2 then self:summon('skeletonArcher') end 
-            if Controls.down.btn3 then 
+            if Controls.down.btn1 then self:summon('skeletonWarrior') 
+            elseif Controls.down.btn2 then self:summon('skeletonArcher') 
+            elseif Controls.down.btn3 then 
                 local mages={'Fire','Ice','Electric'}
                 self:summon('skeletonMage'..rndElement(mages)) 
             end 
@@ -107,10 +107,10 @@ function player:draw()
     -- --testing------------------------------------------
     -- love.graphics.print(self.center.x,self.x-10,self.y-10)
     -- love.graphics.print(self.center.y,self.x-10,self.y)
-    love.graphics.print('states: '..#gameStates,self.x-10,self.y-30)
+    love.graphics.print('STATES: '..#gameStates,self.x-10,self.y-30)
     -- love.graphics.print('objects: '..#Objects.table,self.x-10,self.y-60)
     -- love.graphics.print('items: '..World:countItems(),self.x-10,self.y-90)
-    love.graphics.print('enemies: '..LevelManager.currentLevel.enemyCount,self.x-10,self.y-90)
+    love.graphics.print('ENEMIES: '..LevelManager.currentLevel.enemyCount,self.x-10,self.y-60)
     -- --testing------------------------------------------
 end
 
@@ -207,8 +207,6 @@ function player:takeDamage(args)
     local knockback=args.knockback
     local kbAngle=args.angle
     knockback=knockback-knockback*(self.kbResistance/100)
-    
-    self.health.current=max(self.health.current-damage,0)
 
     --Apply knockback force
     self.vx=self.vx+cos(kbAngle)*knockback
@@ -217,7 +215,15 @@ function player:takeDamage(args)
     local damageTextColor=args.textColor or 'gray'
     UI.damage:new(self.center.x,self.center.y,floor(damage),damageTextColor)
 
-    if self.health.current==0 then self:die() end
+    self:updateHealth(-damage)
+end
+
+function player:updateHealth(val)
+    local newHealth=min(max(self.health.current+val,0),self.health.max)
+    self.health.current=newHealth 
+    Hud.health:calculateHeartPieces()
+
+    if self.health.current==0 then self:die() end 
 end
 
 function player:die()

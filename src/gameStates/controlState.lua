@@ -10,10 +10,10 @@ end
 
 local function defaultKeyMappings() --default keyboard mappings
     return {
-        dirUp={'w','up'},
-        dirDown={'s','down'},
-        dirLeft={'a','left'},
-        dirRight={'d','right'},
+        dirUp={'w'},
+        dirDown={'s'},
+        dirLeft={'a'},
+        dirRight={'d'},
         btn1={'1'},
         btn2={'2'},
         btn3={'3'},

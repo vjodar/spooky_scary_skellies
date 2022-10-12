@@ -1,6 +1,6 @@
 return {
     ['test']={
-        map='swamp3',
+        map='dungeonBoss',
         waves={
             {
                 pumpkin=1,

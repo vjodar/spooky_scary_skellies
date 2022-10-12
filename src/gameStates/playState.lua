@@ -8,7 +8,7 @@ function PlayState:startGame()
     Camera.target=Player.center
 
     local allyCount={
-        skeletonWarrior=100,
+        skeletonWarrior=0,
         skeletonArcher=0,
         skeletonMageFire=0,
         skeletonMageIce=0,
@@ -24,6 +24,7 @@ function PlayState:update()
     SpecialAttacks:update()
     ParticleSystem:update()
     UI:update()
+    Hud:update()
 end
 
 function PlayState:draw()
@@ -33,6 +34,7 @@ function PlayState:draw()
     LevelManager:drawForeground()
     ParticleSystem:draw()
     UI:draw()
+    Hud:draw()
 end
 
 --testing-------------------
@@ -85,6 +87,7 @@ function love.keyreleased(k)
         -- local goalX,goalY=Controls.getMousePosition()
         -- Player.x,Player.y=goalX,goalY 
         -- World:update(Player,goalX,goalY)
+        -- Player.canSummon.cooldownPeriod=0.1
     end
 end
 --testing-------------------

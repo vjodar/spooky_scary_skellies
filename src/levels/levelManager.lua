@@ -116,11 +116,6 @@ local returnEntityToLevel=function(self,entity)
         gridClass:markPlayerTiles(levelGrid,4)
     end
     local entityColliderDef={w=entity.w,h=entity.h}
-    -- if entity.name=='player' then 
-    --     entityColliderDef={w=Player.w,h=Player.h}
-    -- else 
-    --     entityColliderDef=Entities.definitions[entity.name].collider
-    -- end
     local entityTileSize=gridClass:getTileSize(entityColliderDef)
     local availableTiles=gridClass:getAvailableTiles(levelGrid,entityTileSize,'entity')
     local selectedTile=rndElement(availableTiles)

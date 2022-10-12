@@ -47,8 +47,9 @@ local generateRGBColorTable=function(self,colorsDef)
 end
 
 local pSystem={ --The Module
-    table={}, --holds all particles
+    table={},
     palette=generatePalette(paletteInHex),
+    borderColor={53/255,53/255,64/255},
     generateRGBColorTable=generateRGBColorTable,
     update=function(self)
         for i,p in ipairs(self.table) do 
@@ -56,7 +57,48 @@ local pSystem={ --The Module
         end
     end,
     draw=function(self) for i=1,#self.table do self.table[i]:draw() end end,
-    addParticles=function(self,x,y,count,maxSpeed,xSpread,ySpread,colors,class) --particle constructor
+    particleUpdate=function(self)
+        self.x=self.x+self.vx*dt
+        self.y=self.y+self.vy*dt 
+        self.vx=self.vx-(self.vx*self.linearDamping*dt)
+        self.vy=self.vy-(self.vy*self.linearDamping*dt)
+        self.duration=self.duration-dt 
+        if self.duration<0 then 
+            if self.willHealPlayer then
+                self.speed=300
+                self.update=self.travelToPlayer 
+                return
+            end 
+            return false 
+        end
+    end,
+    particleTravelToPlayer=function(self)
+        local target={x=Player.center.x, y=Player.center.y-8}
+        if getDistance(self,target)<10 then 
+            Player:updateHealth(0.1) --heal the player
+            return false 
+        end 
+        local angle=getAngle(self,target)
+        self.vx=cos(angle)*self.speed
+        self.vy=sin(angle)*self.speed
+        self.x=self.x+self.vx*dt 
+        self.y=self.y+self.vy*dt
+    end,
+    particleDraw=function(self)
+        love.graphics.setColor(self.borderColor)
+        self:drawBorder()
+        love.graphics.setColor(self.color)
+        love.graphics.points(self.x,self.y)
+        love.graphics.setColor(1,1,1)
+    end,
+    particleDrawBorder=function(self)
+        for i=-1,1 do 
+            for j=-1,1 do 
+                love.graphics.points(self.x+i,self.y+j)
+            end
+        end
+    end,
+    addParticles=function(self,x,y,count,maxSpeed,xSpread,ySpread,colors,willHealPlayer)
         for i=1,count do 
             local frameRate=60
             local angle=rnd()*2*pi 
@@ -71,53 +113,19 @@ local pSystem={ --The Module
                 vx=vx, vy=vy, duration=duration,
                 linearDamping=linearDamping, 
                 color=rndElement(colors),
-                border={53/255,53/255,64/255},
-                class=class,             
-                update=function(self)
-                    self.x=self.x+self.vx*dt
-                    self.y=self.y+self.vy*dt 
-                    self.vx=self.vx-(self.vx*self.linearDamping*dt)
-                    self.vy=self.vy-(self.vy*self.linearDamping*dt)
-                    self.duration=self.duration-dt 
-                    if self.duration<0 then 
-                        if self.class~='enemy' then return false end 
-                        self.speed=400
-                        self.update=self.travelToPlayer 
-                    end
-                end,
-                travelToPlayer=function(self)
-                    local target={x=Player.center.x, y=Player.center.y-10}
-                    if getDistance(self,target)<10 then 
-                        --TODO: heal player
-                        return false 
-                    end 
-                    local angle=getAngle(self,target)
-                    self.vx=cos(angle)*self.speed
-                    self.vy=sin(angle)*self.speed
-                    self.x=self.x+self.vx*dt 
-                    self.y=self.y+self.vy*dt
-                end,
-                draw=function(self)
-                    love.graphics.setColor(self.border)
-                    self:drawBorder()
-                    love.graphics.setColor(self.color)
-                    love.graphics.points(self.x,self.y)
-                    love.graphics.setColor(1,1,1)
-                end,
-                drawBorder=function(self)
-                    for i=-1,1 do 
-                        for j=-1,1 do 
-                            love.graphics.points(self.x+i,self.y+j)
-                        end
-                    end
-                end,
+                borderColor=self.borderColor,
+                willHealPlayer=willHealPlayer,             
+                update=self.particleUpdate,
+                travelToPlayer=self.particleTravelToPlayer,
+                draw=self.particleDraw,
+                drawBorder=self.particleDrawBorder,
             }
             table.insert(self.table,particle)
         end
     end,
 
-    generateEmitter=function(self,particlesDef,class) 
-        local def=particlesDef 
+    generateEmitter=function(self,particlesDef) 
+        local def=particlesDef
         return { --particle emitter constructor
             count=def.count,
             xSpread=def.spread.x,
@@ -125,11 +133,11 @@ local pSystem={ --The Module
             yOffset=def.yOffset,
             maxSpeed=def.maxSpeed or 10,
             colors=self:generateRGBColorTable(def.colors),
-            class=class,
+            willHealPlayer=def.willHealPlayer,
             emit=function(self,x,y)
                 ParticleSystem:addParticles(
                     x,y-self.yOffset, self.count, self.maxSpeed,
-                    self.xSpread, self.ySpread, self.colors, self.class 
+                    self.xSpread, self.ySpread, self.colors, self.willHealPlayer
                 )
             end,
         }

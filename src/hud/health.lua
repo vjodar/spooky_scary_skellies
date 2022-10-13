@@ -1,6 +1,6 @@
-local health={x=0,y=0}
-
 local getImage=function(name) return love.graphics.newImage('assets/hud/'..name..'.png') end 
+
+local health={x=0,y=0,}
 
 health.sprites={
     full=getImage('heartFull'),
@@ -18,14 +18,14 @@ health.piecesToSprite={
 }
 
 health.particlesDef={
-    count=300,
-    spread={x=5,y=4},
-    yOffset=0,
-    maxSpeed=5,
-    colors={
-        [0xca5954]=1,
-    }
+    count=500,
+    spread={x=5,y=8},
+    yOffset=8,
+    maxSpeed=15,
+    colors={[0xca5954]=1},
 }
+
+health.particles=ParticleSystem:generateEmitter(health.particlesDef)
 
 health.update=function(self,x,y)
     self.x=x-256
@@ -34,21 +34,21 @@ end
 
 health.draw=function(self)
     for i=1,self.maxHearts do --draw heart borders
-        love.graphics.draw(self.sprites.empty,self.x+(i*11),self.y+10)
+        love.graphics.draw(self.sprites.empty,self.x+(i*15),self.y+10)
     end
 
     for i=1,self.maxHearts do --fill hearts
         if self.heartPieces>=4*i then 
-            love.graphics.draw(self.sprites.full,self.x+(i*11),self.y+10)
+            love.graphics.draw(self.sprites.full,self.x+(i*15),self.y+10)
         else --not enough for full heart, fill with remaining pieces
             local pieces=self.heartPieces-(4*(i-1))
             if pieces<4 and pieces>0 then 
                 love.graphics.draw(
                     self.sprites[self.piecesToSprite[pieces]],
-                    self.x+(i*11),self.y+10
+                    self.x+(i*15),self.y+10
                 )
             end
-            break --subsequent hearts will be emtpy, break out of loop
+            break --subsequent hearts will be empty, break out of loop
         end
     end
 end
@@ -65,13 +65,12 @@ health.calculateHeartPieces=function(self)
 
     --lost a heart piece, emit particles
     if previousCount and self.heartPieces<previousCount then 
-        local heartNum=ceil(previousCount/4)
-        self.particles:emit(self.x+heartNum*11,self.y+14)
+        self.particles:emit(Player.center.x,Player.center.y)
+        Camera:shake({magnitude=10})
     end
 end
 
 health:calculateMaxHearts()
 health:calculateHeartPieces()
-health.particles=ParticleSystem:generateEmitter(health.particlesDef)
 
 return health 

@@ -1,35 +1,27 @@
-local hud={}
+return {
+    buttons=require 'src/hud/buttons',
+    health=require 'src/hud/health',
 
-hud.buttons=require 'src/hud/buttons'
-hud.health=require 'src/hud/health'
+    x=0,y=0,
+    skeletonTotal=0,
+    minionLimitReached=false,
+    font=UI.fonts.white,
 
-hud.x,hud.y=0,0
-hud.skeletonCount=0
+    update=function(self)
+        self.x,self.y=Camera.x,Camera.y 
+        self.buttons:update(self.x,self.y)
+        self.health:update(self.x,self.y)
+        self.skeletonTotal=LevelManager.currentLevel.allyTotal 
+        self.minionLimitReached=self.skeletonTotal>=Player.maxMinions
+        self.font=self.minionLimitReached and UI.fonts.red or UI.fonts.white
+    end,
 
-hud.update=function(self)
-    self.x,self.y=Camera.x,Camera.y 
-    self.buttons:update(self.x,self.y)
-    self.health:update(self.x,self.y)
-    self.skeletonTotal=self.getSkeletonCount()
-end
-
-hud.draw=function(self)
-    self.buttons:draw()
-    self.health:draw()
-    love.graphics.print(
-        "Skeletons: "..self.skeletonTotal.."/"..Player.maxMinions,
-        self.x-248,self.y-168
-    )
-end
-
-hud.getSkeletonCount=function()
-    local count=LevelManager.currentLevel.allyCount
-    local w=count.skeletonWarrior
-    local a=count.skeletonArcher 
-    local f=count.skeletonMageFire 
-    local i=count.skeletonMageIce
-    local e=count.skeletonMageElectric 
-    return w+a+f+i+e
-end
-
-return hud
+    draw=function(self)
+        self.buttons:draw()
+        self.health:draw()
+        love.graphics.printf(
+            "Skeletons: "..self.skeletonTotal.."/"..Player.maxMinions,
+            self.font,self.x-250,self.y+138,500,'center'
+        )
+    end
+}

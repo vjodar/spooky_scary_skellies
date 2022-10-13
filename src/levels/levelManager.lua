@@ -130,6 +130,7 @@ local increaseEntityCount=function(self,class,name)
     local level=self.currentLevel 
     if class=='ally' then
         level.allyCount[name]=level.allyCount[name]+1
+        level.allyTotal=level.allyTotal+1
     else
         level.enemyCount=level.enemyCount+1
     end
@@ -139,6 +140,7 @@ local decreaseEntityCount=function(self,class,name)
     local level=self.currentLevel 
     if class=='ally' then
         level.allyCount[name]=level.allyCount[name]-1
+        level.allyTotal=level.allyTotal-1
     else
         level.enemyCount=level.enemyCount-1
     end
@@ -157,11 +159,11 @@ end
 local setEntityAggro=function(self,bool) self.currentLevel.entityAggro=bool end
 local getEntityAggro=function(self) return self.currentLevel.entityAggro end 
 
-local killEnemies=function(self) 
+local killEntities=function(self,class) 
     for i=1,#Objects.table do 
         local o=Objects.table[i]
         if o.collisionClass 
-        and o.collisionClass=='enemy' 
+        and o.collisionClass==class
         and o.state~='dead'
         then o:die() end  
     end
@@ -229,6 +231,7 @@ local buildLevel=function(self,lvl,skeletons)
             skeletonMageIce=0,
             skeletonMageElectric=0,
         },
+        allyTotal=0,
         enemyCount=0,
         currentWave=0,
         bossData=levelDef.bossData or nil,
@@ -241,8 +244,8 @@ local buildLevel=function(self,lvl,skeletons)
 
     --spawn in the skeleton minions
     for name,count in pairs(skeletons) do 
-        local summonSkeleton=function() Player:summon(name) end 
-        for i=1,count do Timer:after(0.5,summonSkeleton) end
+        local summonSkeletons=function() Player:summon(name,count) end
+        Timer:after(0.5,summonSkeletons)
     end
 
     self.update=self.wait --wait until any fading/camera panning is done
@@ -356,7 +359,7 @@ local updateBoss=function(self)
 
     if level.boss.state=='dead' then 
         level.complete=true
-        self:killEnemies() --destroy any other enemies
+        self:killEntities('enemy') --destroy any other enemies
 
         --if level exit pos isn't specified, generate it using gridClass
         local spawnPos=level.exit.pos or self.gridClass:generateExitSpawnPosition(
@@ -413,7 +416,7 @@ return { --The Module
     startNextLevel=startNextLevel,
     buildLevel=buildLevel,
     spawnExit=spawnExit,
-    killEnemies=killEnemies,
+    killEntities=killEntities,
     wait=wait,
     updateStandard=updateStandard,
     updateBoss=updateBoss,

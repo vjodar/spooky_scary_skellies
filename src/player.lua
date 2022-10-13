@@ -13,7 +13,7 @@ player.collisionClass='ally'
 player.collisionFilter=World.collisionFilters[player.collisionClass]
 
 --General Data
-player.health={current=1,max=500}
+player.health={current=1,max=300}
 player.kbResistance=0
 player.attack={
     period=0.5, 
@@ -21,7 +21,7 @@ player.attack={
     knockback=400,
     projectile={name='bone',yOffset=-10},
 }
-player.minionsPerSummon=1
+player.minionsPerSummon=3
 player.maxMinions=10
 player.nearbyEnemies={}
 player.aggroRange={w=600,h=450}
@@ -67,6 +67,8 @@ player.canQueryAttackTargets={flag=true,cooldownPeriod=0.5}
 player.canQueryAttackTargets.setOnCooldown=Timer:giveCooldownCallbacks(player.canQueryAttackTargets)
 
 function player:update()
+    if self.state=='dead' then return end 
+
     self.animations.current:update(dt*self.animSpeed)
     self:updatePosition() --also handles collisions
     self.status:update(self)
@@ -83,11 +85,11 @@ function player:update()
             self.canAttack.setOnCooldown()
         end
         if self.canSummon.flag then 
-            if Controls.down.btn1 then self:summon('skeletonWarrior') 
-            elseif Controls.down.btn2 then self:summon('skeletonArcher') 
-            elseif Controls.down.btn3 then 
+            if Controls.pressed.btn1 then self:summonMinions('skeletonWarrior')
+            elseif Controls.pressed.btn2 then self:summonMinions('skeletonArcher')
+            elseif Controls.pressed.btn3 then 
                 local mages={'Fire','Ice','Electric'}
-                self:summon('skeletonMage'..rndElement(mages)) 
+                self:summonMinions('skeletonMage'..rndElement(mages)) 
             end 
         end
     else 
@@ -96,6 +98,8 @@ function player:update()
 end
 
 function player:draw()
+    if self.state=='dead' then return false end 
+
     self.shadow:draw(self.x,self.y)
     if self:isBurning() then love.graphics.setColor(1,0.8,0.8,1) end
     if self:isFrozen() then love.graphics.setColor(0.8,0.9,1,1) end 
@@ -230,7 +234,12 @@ function player:die()
     self.state='dead'
     self.status:clear()
     self.animSpeed=self.animSpeedMax
+    Camera:shake({magnitude=20,damping=2})    
     LevelManager:setEntityAggro(false)
+    Timer:after(2,function()
+        LevelManager:killEntities('ally')
+    end)
+    --TODO: do a game over thing here
 end
 
 function player:launchBone()
@@ -247,11 +256,12 @@ function player:launchBone()
     self.canTurn.setOnCooldown()
 end
 
-function player:summon(name)
-    for i=1,self.minionsPerSummon do
+--Actually summons skeletal minions
+function player:summon(name,count)
+    for i=1,count do
         --spawn directly under player
         local skelly=Entities:new(name,self.x,self.y)
-
+        
         --move skeleton using world collision to a point around player
         local angle=rnd()*2*pi 
         local distance=rnd()*(50+self.maxMinions)
@@ -260,7 +270,23 @@ function player:summon(name)
         local realX,realY=World:move(skelly,goalX,goalY,skelly.collisionFilter)
         skelly.x,skelly.y=realX,realY
     end
+end
 
+--Uses summon() to summon minions, amount is definied by minionsPerSummon
+--and limited by maxMinions and the canSummon cooldown
+function player:summonMinions(name)
+    if self.canSummon.flag==false then return end 
+
+    local currentMinionCount=LevelManager.currentLevel.allyTotal
+    local availableMinionSlots=self.maxMinions-currentMinionCount
+
+    if availableMinionSlots==0 then 
+        --TODO: say "Max minions reached!" message
+        return 
+    end
+
+    local summonCount=min(self.minionsPerSummon,availableMinionSlots)
+    self:summon(name,summonCount)
     self.canSummon.setOnCooldown()
 end
 

@@ -73,6 +73,7 @@ local pSystem={ --The Module
         end
     end,
     particleTravelToPlayer=function(self)
+        if Player.state=='dead' then return false end 
         local target={x=Player.center.x, y=Player.center.y-8}
         if getDistance(self,target)<10 then 
             Player:updateHealth(0.1) --heal the player
@@ -85,45 +86,47 @@ local pSystem={ --The Module
         self.y=self.y+self.vy*dt
     end,
     particleDraw=function(self)
-        love.graphics.setColor(self.borderColor)
-        self:drawBorder()
-        love.graphics.setColor(self.color)
-        love.graphics.points(self.x,self.y)
-        love.graphics.setColor(1,1,1)
-    end,
-    particleDrawBorder=function(self)
+        love.graphics.setColor(self.borderColor)     
         for i=-1,1 do 
             for j=-1,1 do 
                 love.graphics.points(self.x+i,self.y+j)
             end
         end
+        love.graphics.setColor(self.color)
+        love.graphics.points(self.x,self.y)
+        love.graphics.setColor(1,1,1)
     end,
-    addParticles=function(self,x,y,count,maxSpeed,xSpread,ySpread,colors,willHealPlayer)
-        for i=1,count do 
-            local frameRate=60
+    addParticles=function(self,args)
+        for i=1,args.count do 
             local angle=rnd()*2*pi 
-            local speed=rnd()*maxSpeed 
-            local vx=cos(angle)*speed*frameRate
-            local vy=sin(angle)*speed*frameRate
+            local speed=rnd()*args.maxSpeed 
+            local startX=args.x+cos(angle)*rnd()*args.xSpread
+            local startY=args.y+sin(angle)*rnd()*args.ySpread
+            local vx=cos(angle)*speed*60
+            local vy=sin(angle)*speed*60
             local duration=speed<3 and speed*0.2 or speed*0.05
             local linearDamping=5+rnd()*20
             local particle={
-                x=x+cos(angle)*rnd()*xSpread, 
-                y=y+sin(angle)*rnd()*ySpread, 
+                x=startX, y=startY, 
                 vx=vx, vy=vy, duration=duration,
                 linearDamping=linearDamping, 
-                color=rndElement(colors),
+                color=rndElement(args.colors),
                 borderColor=self.borderColor,
-                willHealPlayer=willHealPlayer,             
+                willHealPlayer=args.willHealPlayer,             
                 update=self.particleUpdate,
                 travelToPlayer=self.particleTravelToPlayer,
                 draw=self.particleDraw,
-                drawBorder=self.particleDrawBorder,
             }
             table.insert(self.table,particle)
         end
     end,
-
+    emitParticles=function(self,x,y)
+        ParticleSystem:addParticles({
+            x=x, y=y-self.yOffset, count=self.count, maxSpeed=self.maxSpeed,
+            xSpread=self.xSpread, ySpread=self.ySpread, colors=self.colors, 
+            willHealPlayer=self.willHealPlayer,
+        })
+    end,
     generateEmitter=function(self,particlesDef) 
         local def=particlesDef
         return { --particle emitter constructor
@@ -134,12 +137,7 @@ local pSystem={ --The Module
             maxSpeed=def.maxSpeed or 10,
             colors=self:generateRGBColorTable(def.colors),
             willHealPlayer=def.willHealPlayer,
-            emit=function(self,x,y)
-                ParticleSystem:addParticles(
-                    x,y-self.yOffset, self.count, self.maxSpeed,
-                    self.xSpread, self.ySpread, self.colors, self.willHealPlayer
-                )
-            end,
+            emit=self.emitParticles,
         }
     end,
 }

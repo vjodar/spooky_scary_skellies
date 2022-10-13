@@ -3,7 +3,7 @@ return {
         map='dungeonBoss',
         waves={
             {
-                pumpkin=1,
+                spider=20,
             },
             -- {
             --     spider=10,            

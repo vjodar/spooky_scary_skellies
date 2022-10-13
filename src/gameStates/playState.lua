@@ -8,7 +8,7 @@ function PlayState:startGame()
     Camera.target=Player.center
 
     local allyCount={
-        skeletonWarrior=0,
+        skeletonWarrior=10,
         skeletonArcher=0,
         skeletonMageFire=0,
         skeletonMageIce=0,
@@ -88,6 +88,7 @@ function love.keyreleased(k)
         -- Player.x,Player.y=goalX,goalY 
         -- World:update(Player,goalX,goalY)
         -- Player.canSummon.cooldownPeriod=0.1
+        -- Player:updateHealth(-1)
     end
 end
 --testing-------------------

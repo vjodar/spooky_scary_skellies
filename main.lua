@@ -28,6 +28,7 @@ function love.load()
     Objects=require 'src/objects'
     Shadows=require 'src/shadows'
     Statuses=require 'src/statuses'
+    Upgrades=require 'src/upgrades'
     ParticleSystem=require 'src/particleSystem'
     Player=require 'src/player'
     Hud=require 'src/hud/hud'

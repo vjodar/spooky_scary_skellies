@@ -622,10 +622,10 @@ local projectileUpdateFunctions=function()
                     )
                     for i=1,#targets do 
                         local target=targets[i]                  
-                        target:takeDamage({                 
+                        target:takeDamage({ --damage and pull enemies into blizzard
                             damage=self.attack.damage,
-                            knockback=0,
-                            angle=getAngle(self.center,targets[i].center),
+                            knockback=self.attack.knockback*0.25,
+                            angle=getAngle(targets[i].center,self.center),
                             textColor='blue',
                         })
                         if target.state~='dead' then 

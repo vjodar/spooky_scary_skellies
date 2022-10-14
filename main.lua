@@ -28,7 +28,6 @@ function love.load()
     Objects=require 'src/objects'
     Shadows=require 'src/shadows'
     Statuses=require 'src/statuses'
-    Upgrades=require 'src/upgrades'
     ParticleSystem=require 'src/particleSystem'
     Player=require 'src/player'
     Hud=require 'src/hud/hud'
@@ -36,6 +35,7 @@ function love.load()
     Entities=require 'src/entities/entityClass'
     Projectiles=require 'src/projectiles' 
     SpecialAttacks=require 'src/specialAttacks'
+    Upgrades=require 'src/upgrades'
     
     table.insert(gameStates,Timer) --timer first
     table.insert(gameStates,Controls) --controls second

@@ -5,7 +5,7 @@ player.x,player.y=0,0
 player.w,player.h=12,7
 player.center=getCenter(player)
 player.vx,player.vy=0,0
-player.moveSpeedMax=17*60 --17units/sec at 60fps 
+player.moveSpeedMax=12*60 --12units/sec at 60fps 
 player.moveSpeed=player.moveSpeedMax 
 player.linearDamping=10
 player.stopThreshold=3*60 --speed slow enough to consider stopped (at 60FPS)
@@ -13,19 +13,38 @@ player.collisionClass='ally'
 player.collisionFilter=World.collisionFilters[player.collisionClass]
 
 --General Data
-player.health={current=1,max=300}
+player.health={current=300,max=300}
 player.kbResistance=0
 player.attack={
     period=0.5, 
-    damage=1,
-    knockback=400,
+    damage=10,
+    knockback=100,
     projectile={name='bone',yOffset=-10},
 }
-player.minionsPerSummon=3
-player.maxMinions=10
+player.minionsPerSummon=1
+player.maxMinions=1
+player.selectedMage='Fire'
 player.nearbyEnemies={}
 player.aggroRange={w=600,h=450}
 player.allyReturnThreshold={x=220,y=150} --distance from player before skeletons run back
+
+player.upgrades={
+    skeletonWarrior=true,
+    skeletonArcher=false,
+    skeletonMageFire=false,
+    skeletonMageIce=false,
+    skeletonMageElectric=false,
+    boneShield=false,
+}
+
+local calculateBoneShieldAngles=function()
+    local angles={}
+    local boneCount=16
+    local fraction=(2*pi)/boneCount 
+    for i=1,boneCount do table.insert(angles,i*fraction) end
+    return angles
+end
+player.boneShieldAngles=calculateBoneShieldAngles()
 
 --Draw data
 player.spriteSheet=love.graphics.newImage('assets/entities/player.png')
@@ -60,14 +79,14 @@ player.canTurn.setOnCooldown=Timer:giveCooldownCallbacks(player.canTurn)
 player.canAttack={flag=true,cooldownPeriod=player.attack.period}
 player.canAttack.setOnCooldown=Timer:giveCooldownCallbacks(player.canAttack)
 
-player.canSummon={flag=true,cooldownPeriod=1}
+player.canSummon={flag=true,cooldownPeriod=10}
 player.canSummon.setOnCooldown=Timer:giveCooldownCallbacks(player.canSummon)
 
 player.canQueryAttackTargets={flag=true,cooldownPeriod=0.5}
 player.canQueryAttackTargets.setOnCooldown=Timer:giveCooldownCallbacks(player.canQueryAttackTargets)
 
 function player:update()
-    if self.state=='dead' then return end 
+    if self.state=='dead' then return false end 
 
     self.animations.current:update(dt*self.animSpeed)
     self:updatePosition() --also handles collisions
@@ -88,8 +107,7 @@ function player:update()
             if Controls.pressed.btn1 then self:summonMinions('skeletonWarrior')
             elseif Controls.pressed.btn2 then self:summonMinions('skeletonArcher')
             elseif Controls.pressed.btn3 then 
-                local mages={'Fire','Ice','Electric'}
-                self:summonMinions('skeletonMage'..rndElement(mages)) 
+                self:summonMinions('skeletonMage'..self.selectedMage) 
             end 
         end
     else 
@@ -220,6 +238,16 @@ function player:takeDamage(args)
     UI.damage:new(self.center.x,self.center.y,floor(damage),damageTextColor)
 
     self:updateHealth(-damage)
+
+    if self.upgrades.boneShield then
+        for i=1,#self.boneShieldAngles do 
+            Projectiles:new({
+                x=self.center.x,y=self.center.y,name=self.attack.projectile.name,
+                damage=self.attack.damage,knockback=self.attack.knockback,
+                angle=self.boneShieldAngles[i],yOffset=self.attack.projectile.yOffset,
+            })
+        end
+    end
 end
 
 function player:updateHealth(val)
@@ -275,12 +303,18 @@ end
 --Uses summon() to summon minions, amount is definied by minionsPerSummon
 --and limited by maxMinions and the canSummon cooldown
 function player:summonMinions(name)
-    if self.canSummon.flag==false then return end 
+    if self.canSummon.flag==false then return end
+
+    if not self.upgrades[name] then 
+        --TODO: say "Can't summon that yet" message 
+        print("can't summon",name)
+        return
+    end
 
     local currentMinionCount=LevelManager.currentLevel.allyTotal
     local availableMinionSlots=self.maxMinions-currentMinionCount
 
-    if availableMinionSlots==0 then 
+    if availableMinionSlots<1 then 
         --TODO: say "Max minions reached!" message
         return 
     end

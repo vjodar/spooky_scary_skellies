@@ -1,13 +1,13 @@
 return {
     ['skeletonWarrior']={
         name='skeletonWarrior',
-        moveSpeed=20*60,
-        health=6,
+        moveSpeed=15*60,
+        health=60,
         attack={
             range=40,
             period=2,
-            damage=1,
-            knockback=220,
+            damage=10,
+            knockback=100,
             lungeForce=500,
         },
         collider={
@@ -59,13 +59,13 @@ return {
     },
     ['skeletonArcher']={
         name='skeletonArcher',
-        moveSpeed=19*60,
-        health=3,
+        moveSpeed=14*60,
+        health=30,
         attack={
             range=200,  
             period=1, 
-            damage=1,
-            knockback=200,
+            damage=10,
+            knockback=75,
             projectile={name='arrow',xOffset=12,yOffset=-10},
         },
         collider={
@@ -119,13 +119,13 @@ return {
     },
     ['skeletonMageFire']={
         name='skeletonMageFire',
-        moveSpeed=18*60,  
-        health=3,
+        moveSpeed=13*60,  
+        health=30,
         attack={
             range=150,  
             period=1.5,   
-            damage=1, 
-            knockback=150,
+            damage=5, 
+            knockback=50,
             projectile={name='flame',xOffset=6,yOffset=-7,spread=0.3},
         },
         collider={
@@ -179,13 +179,13 @@ return {
     },
     ['skeletonMageIce']={
         name='skeletonMageIce',
-        moveSpeed=18*60,
-        health=3,
+        moveSpeed=13*60,
+        health=30,
         attack={
             range=150,  
             period=1,   
-            damage=1, 
-            knockback=150,
+            damage=5, 
+            knockback=50,
             projectile={name='icicle',xOffset=6,yOffset=-7,spread=0.3},
         },
         collider={
@@ -239,13 +239,13 @@ return {
     },
     ['skeletonMageElectric']={
         name='skeletonMageElectric',
-        moveSpeed=18*60,    
-        health=3,
+        moveSpeed=13*60,    
+        health=30,
         attack={
             range=100,
             period=1,
-            damage=1,
-            knockback=100,
+            damage=5,
+            knockback=50,
             projectile={name='spark',xOffset=6,yOffset=-7,count=2,spread=0.5},
         },
         collider={
@@ -299,12 +299,12 @@ return {
     },
     ['slime']={
         name='slime',
-        moveSpeed=15*60,
-        health=3,
+        moveSpeed=10*60,
+        health=30,
         attack={
             range=40,
             period=1.5,
-            damage=1,
+            damage=10,
             knockback=200,
             lungeForce=500,
         },
@@ -355,12 +355,12 @@ return {
     },
     ['pumpkin']={
         name='pumpkin',
-        moveSpeed=15*60,
-        health=3,
+        moveSpeed=10*60,
+        health=30,
         attack={
             range=40,        
             period=2,
-            damage=1,
+            damage=5,
             knockback=200,
             lungeForce=400,            
         },
@@ -411,13 +411,13 @@ return {
     },
     ['golem']={
         name='golem',
-        moveSpeed=10*60,
+        moveSpeed=7*60,
         kbResistance=70,
-        health=10,
+        health=100,
         attack={
             range=70,        
             period=3,
-            damage=1,
+            damage=15,
             knockback=700,
             lungeForce=800,
         },
@@ -468,12 +468,12 @@ return {
     },
     ['spider']={
         name='spider',
-        moveSpeed=18*60,
-        health=3,
+        moveSpeed=12*60,
+        health=30,
         attack={
             range=50,        
             period=1,
-            damage=1,
+            damage=5,
             knockback=100,
             lungeForce=800,
         },
@@ -524,12 +524,12 @@ return {
     },
     ['bat']={
         name='bat',
-        moveSpeed=17*60,
-        health=3,
+        moveSpeed=11*60,
+        health=30,
         attack={
             range=30,        
             period=1,
-            damage=1,
+            damage=5,
             knockback=100,
             lungeForce=500,
         },
@@ -582,12 +582,12 @@ return {
     },
     ['zombie']={
         name='zombie',
-        moveSpeed=8*60,
-        health=3,
+        moveSpeed=5*60,
+        health=50,
         attack={
             range=30,        
             period=2,
-            damage=1,
+            damage=10,
             knockback=100,
             lungeForce=500,            
         },
@@ -639,12 +639,12 @@ return {
     },
     ['possessedArcher']={
         name='possessedArcher',
-        moveSpeed=15*60,     
-        health=3,
+        moveSpeed=13*60,     
+        health=100,
         attack={
             range=140,  
             period=2, 
-            damage=1,
+            damage=20,
             knockback=300,
             projectile={name='darkArrow',xOffset=12,yOffset=-10,spread=0.3},
         },
@@ -697,12 +697,12 @@ return {
     },
     ['possessedKnight']={
         name='possessedKnight',
-        moveSpeed=20*60,
-        health=6,
+        moveSpeed=16*60,
+        health=120,
         attack={
             range=40,        
             period=1.5,
-            damage=1,
+            damage=10,
             knockback=500,
             lungeForce=700,
         },
@@ -754,15 +754,15 @@ return {
     },
     ['undeadMiner']={
         name='undeadMiner',
-        moveSpeed=10*60,
+        health=30,
+        moveSpeed=8*60,
         attack={
             range=100,  
             period=2, 
-            damage=1,
+            damage=10,
             knockback=150,
             projectile={name='pickaxe',xOffset=10,yOffset=-10,spread=0.8},
         },
-        health=3,
         collider={
             w=10,
             h=6,
@@ -812,11 +812,11 @@ return {
     ['ent']={
         name='ent',
         moveSpeed=10*60,     
-        health=3,
+        health=60,
         attack={
             range=90,  
             period=2.5, 
-            damage=1,
+            damage=10,
             knockback=150,
             projectile={name='apple',xOffset=10,yOffset=-10,spread=1},            
         },
@@ -869,15 +869,15 @@ return {
     },
     ['headlessHorseman']={
         name='headlessHorseman',
-        moveSpeed=15*60,
+        health=500,
+        moveSpeed=20*60,
         attack={
             range=120,  
             period=4, 
-            damage=1,
+            damage=100,
             knockback=600,
             projectile={name='jack-o-lantern',xOffset=0,yOffset=-24},
         },
-        health=5,
         collider={
             w=27,
             h=10,
@@ -927,13 +927,13 @@ return {
     },
     ['slimeMatron']={
         name='slimeMatron',
+        health=100,
         moveSpeed=10*60,
         attack={
             range=130,  
             period=5, 
             minion={name='slime',spawnPoint='facing'},
         },
-        health=5,
         collider={
             w=14,
             h=5,
@@ -981,13 +981,13 @@ return {
     },
     ['vampire']={
         name='vampire',
-        moveSpeed=14*60,
+        moveSpeed=13*60,
+        health=100,
         attack={
             range=160,  
             period=3, 
             minion={name='bat',count=2,spawnPoint='facing',startState='idle'},
         },
-        health=5,
         collider={
             w=12,
             h=7,
@@ -1038,13 +1038,13 @@ return {
     },
     ['tombstone']={
         name='tombstone',
+        health=50,
         moveSpeed=0,
         attack={
             range=100,  
             period=5, 
             minion={name='zombie',spawnPoint='random',maxDistance=20},
         },
-        health=5,
         kbResistance=100,
         collider={
             w=19,
@@ -1091,7 +1091,7 @@ return {
     ['spiderEgg']={
         name='spiderEgg',
         moveSpeed=0,
-        health=5,
+        health=50,
         kbResistance=100,
         attack={
             range=120,  
@@ -1140,11 +1140,11 @@ return {
     ['imp']={
         name='imp',
         moveSpeed=15*60,
-        health=3,
+        health=80,
         attack={
             range=50,
             period=1.5,
-            damage=1,
+            damage=10,
             knockback=200,
             lungeForce=500,
         },
@@ -1195,11 +1195,11 @@ return {
     ['gnasherDemon']={
         name='gnasherDemon',
         moveSpeed=20*60,
-        health=6,
+        health=160,
         attack={
             range=70,
             period=1,
-            damage=1,
+            damage=20,
             knockback=200,
             lungeForce=1000,
         },
@@ -1250,13 +1250,13 @@ return {
     },
     ['frankenstein']={
         name='frankenstein',
-        moveSpeed=10*60,     
+        moveSpeed=9*60,     
         kbResistance=70,
-        health=5,
+        health=1000,
         attack={
             range=90,  
             period=2, 
-            damage=1,
+            damage=10,
             knockback=200,
             projectile={name='blueSpark',xOffset=0,yOffset=-7,count=6,spread=6.3},
         },
@@ -1309,13 +1309,13 @@ return {
     },
     ['werebear']={
         name='werebear',
-        moveSpeed=12*60,
+        moveSpeed=10*60,
         kbResistance=65,
-        health=100,
+        health=700,
         attack={
             range=55,        
             period=2,
-            damage=1,
+            damage=20,
             knockback=700,
             lungeForce=800,
         },
@@ -1366,12 +1366,12 @@ return {
     },
     ['werewolf']={
         name='werewolf',
-        moveSpeed=15*60,
-        health=3,
+        moveSpeed=12*60,
+        health=200,
         attack={
             range=45,
             period=1.5,
-            damage=1,
+            damage=10,
             knockback=200,
             lungeForce=700,
         },
@@ -1422,11 +1422,11 @@ return {
     ['ghost']={
         name='ghost',
         moveSpeed=5*60,
-        health=3,
+        health=50,
         attack={
             range=50,
             period=2,
-            damage=1,
+            damage=10,
             knockback=150,
             lungeForce=500,
         },
@@ -1485,12 +1485,12 @@ return {
     },
     ['poltergeist']={
         name='poltergeist',
-        moveSpeed=5*60,
-        health=3,
+        moveSpeed=6*60,
+        health=100,
         attack={
             range=120,  
             period=2, 
-            damage=1,
+            damage=20,
             knockback=250,
             projectile={name={'mug','bottle','candle'},xOffset=0,yOffset=-14,spread=0.5},            
         },
@@ -1549,12 +1549,12 @@ return {
     },
     ['floatingEyeball']={
         name='floatingEyeball',
-        moveSpeed=9*60,     
-        health=3,
+        moveSpeed=7*60,     
+        health=100,
         attack={
             range=140,  
             period=2, 
-            damage=1,
+            damage=20,
             knockback=300,
             projectile={name='laser',xOffset=0,yOffset=-10,spread=0.3},
         },
@@ -1609,16 +1609,16 @@ return {
     },
     ['pyreFiend']={
         name='pyreFiend',
+        health=500,
         moveSpeed=12*60,
         kbResistance=50,
         attack={
             range=80,  
             period=3, 
-            damage=1,
+            damage=10,
             knockback=100,
             projectile={name='pyre',xOffset=0,yOffset=-10,count=3,spread=0.5},
         },
-        health=20,
         collider={
             w=20,
             h=11,
@@ -1668,16 +1668,16 @@ return {
     },
     ['beholder']={
         name='beholder',
-        moveSpeed=9*60,
+        health=500,
+        moveSpeed=10*60,
         kbResistance=50,
         attack={
             range=180,  
             period=2, 
-            damage=1,
+            damage=50,
             knockback=100,
             projectile={name='orb',xOffset=0,yOffset=-16,count=3,spread=1},
         },
-        health=20,
         collider={
             w=19,
             h=16,
@@ -1729,13 +1729,13 @@ return {
     },
     ['giantTombstone']={
         name='giantTombstone',
+        health=5000,
         moveSpeed=0,
         attack={
             range=600,  
             period=7.5, 
             minion={name='tombstone',spawnPoint='level',count=5},
         },
-        health=200,
         kbResistance=100,
         collider={
             w=42,
@@ -1791,22 +1791,22 @@ return {
     },
     ['obsidianGolem']={
         name='obsidianGolem',
+        health=10000,
         moveSpeed=8*60,
         kbResistance=90,
         attack={
             range=160,
-            damage=1,
+            damage=20,
             period=3,
             knockback=100,
             projectile={name='fireballObsidian',xOffset=4,yOffset=-22,count=3,spread=0.75},
             slam={
                 w=114,h=64,
-                damage=1,
+                damage=100,
                 knockback=1000,
             },
             minion={name='golem',spawnPoint='level',count=5},
         },
-        health=200,
         collider={
             w=38,
             h=16,
@@ -1876,17 +1876,17 @@ return {
     ['witch']={
         name='witch',
         moveSpeed=14*60,
-        health=100,
+        health=50000,
         attack={
             range=140,  
             period=2,
-            damage=5, knockback=100, --specific to chainLightning
+            damage=400, knockback=100, --specific to chainLightning
             projectile={
                 fireball={
                     name='fireballWitch',
                     xOffset=0,yOffset=-16,
                     spread=0,
-                    damage=1,
+                    damage=300,
                     knockback=300,
                 },                
                 icicle={
@@ -1894,7 +1894,7 @@ return {
                     xOffset=0,yOffset=-16,
                     spread=1,
                     count=6,
-                    damage=1,
+                    damage=100,
                     knockback=50,
                 },
             },
@@ -1978,18 +1978,18 @@ return {
     },
     ['witchClone']={
         name='witchClone',
-        moveSpeed=12*60,
-        health=50,
+        moveSpeed=10*60,
+        health=1000,
         attack={
             range=140,  
             period=2,
-            damage=5, knockback=100, --specific to chainLightning
+            damage=200, knockback=100, --specific to chainLightning
             projectile={
                 fireball={
                     name='fireballWitch',
                     xOffset=0,yOffset=-16,
                     spread=0,
-                    damage=1,
+                    damage=150,
                     knockback=300,
                 },                
                 icicle={
@@ -1997,7 +1997,7 @@ return {
                     xOffset=0,yOffset=-16,
                     spread=1,
                     count=6,
-                    damage=1,
+                    damage=50,
                     knockback=50,
                 },
             },

@@ -8,7 +8,7 @@ function PlayState:startGame()
     Camera.target=Player.center
 
     local allyCount={
-        skeletonWarrior=10,
+        skeletonWarrior=0,
         skeletonArcher=0,
         skeletonMageFire=0,
         skeletonMageIce=0,
@@ -47,13 +47,9 @@ function love.keyreleased(k)
         )
     end
     if k=='p' then 
+        -- for i=1,5 do Upgrades:unlock('increaseAttackSpeed') end 
+        Upgrades:unlock('increaseMinionRange')
         -- FadeState:fadeBoth({fadeTime=2,afterFn=function() print('done') end, holdTime=1})
-        Entities.behaviors.AI.skeletonMageElectric.attack=Entities.behaviors.states.ally.chainLightning
-        Entities.definitions.skeletonMageFire.attack.projectile.name='fireball'
-        Entities.definitions.skeletonMageFire.attack.knockback=600
-        Entities.definitions.skeletonMageFire.attack.range=200
-        Entities.definitions.skeletonMageIce.attack.projectile.name='blizzard'
-        Entities.definitions.skeletonMageIce.attack.projectile.yOffset=-15
         -- local particles=ParticleSystem:generateEmitter({
         --     count=200,
         --     spread={x=30, y=10},

@@ -10,9 +10,9 @@ buttons.sprites={
     warriorIcon=getImage('iconWarrior'),
     archerIcon=getImage('iconArcher'),
     mageIcon={
-        fire=getImage('iconMageFire'),
-        ice=getImage('iconMageIce'),
-        electric=getImage('iconMageElectric'),
+        Fire=getImage('iconMageFire'),
+        Ice=getImage('iconMageIce'),
+        Electric=getImage('iconMageElectric'),
     }
 }
 
@@ -73,9 +73,13 @@ buttons.draw=function(self)
     --draw icons when summon is off cooldown (and skeleton type has been unlocked )
     if Player.canSummon.flag then 
         love.graphics.draw(self.sprites.warriorIcon,self.x,self.y+self.warriorSpriteIndex-1)
-        --TODO: only draw icon when archer and/or mage is unlocked-------
-        love.graphics.draw(self.sprites.archerIcon,self.x,self.y+self.archerSpriteIndex-1)
-        love.graphics.draw(self.sprites.mageIcon['fire'],self.x,self.y+self.mageSpriteIndex-1)
+        if Player.upgrades.skeletonArcher then 
+            love.graphics.draw(self.sprites.archerIcon,self.x,self.y+self.archerSpriteIndex-1)
+        end
+        local mage=Player.selectedMage 
+        if Player.upgrades['skeletonMage'..mage] then 
+            love.graphics.draw(self.sprites.mageIcon[mage],self.x,self.y+self.mageSpriteIndex-1)
+        end
     end
 
     --draw cooldown progress bar

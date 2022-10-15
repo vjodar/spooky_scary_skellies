@@ -336,6 +336,63 @@ local projectileOnHitFunctions=function()
                 return false
             end 
         end,
+
+        ['arrow']=function(self,target,touch)
+            if target.collisionClass=='solid' 
+            or target.collisionClass=='exit' 
+            then 
+                if Player.upgrades.bounceArrow then                     
+                    local angle=getAngle(touch,self)
+                    self.vx=cos(angle)*self.moveSpeed 
+                    self.vy=sin(angle)*self.moveSpeed
+                    self.angle=angle
+                    return
+                else return false end 
+            end
+
+            if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
+            or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
+            then 
+                target:takeDamage({
+                    damage=self.attack.damage,
+                    knockback=self.attack.knockback,
+                    angle=getAngle(self.center,target.center),
+                }) 
+                if target.state~='dead' then 
+                    if Player.upgrades.archerFire then 
+                        target.status:burn(self.attack.damage*0.5,3) --apply 3sec burn                        
+                    end
+                    if Player.upgrades.archerIce then 
+                        target.status:freeze(target,1,0.5) --slow to half speed for 1s
+                    end
+                end
+                if Player.upgrades.archerElectric then 
+                    local targets={target}
+                    local range=100 --half base range of archer
+                    local queryFilter=World.queryFilters.enemy 
+                    for i=1,2 do --chains up to 2 additional targets
+                        prevTarget=targets[#targets]
+                        --query all enemies surrounding the last target
+                        local nearbyEnemies=World:queryRect(
+                            prevTarget.center.x-range,
+                            prevTarget.center.y-range,
+                            range*2,range*2,queryFilter  
+                        )
+                        --filter out the last target from nearbyEnemies
+                        for j,enemy in ipairs(nearbyEnemies) do 
+                            for k=1,#targets do 
+                                if enemy==targets[k] then 
+                                    table.remove(nearbyEnemies,j) 
+                                end 
+                            end
+                        end
+                        table.insert(targets,rndElement(nearbyEnemies))
+                    end
+                    SpecialAttacks:chainLightning(self,targets)
+                end
+                return false
+            end 
+        end,
     
         --damages and sets targets on fire, destroys upon hitting solids
         ['flame']=function(self,target,touch)
@@ -353,7 +410,7 @@ local projectileOnHitFunctions=function()
                     textColor='red'
                 })
                 if target.state~='dead' then 
-                    target.status:burn(self.attack.damage,3) --apply 3sec burn
+                    target.status:burn(self.attack.damage*0.5,3) --apply 3sec burn
                 end 
                 return false
             end 

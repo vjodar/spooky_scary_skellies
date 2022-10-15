@@ -21,7 +21,7 @@ player.attack={
     knockback=100,
     projectile={name='bone',yOffset=-10},
 }
-player.minionsPerSummon=1
+player.minionsPerSummon=10
 player.maxMinions=1
 player.selectedMage='Fire'
 player.nearbyEnemies={}
@@ -35,6 +35,12 @@ player.upgrades={
     skeletonMageIce=false,
     skeletonMageElectric=false,
     boneShield=false,
+    warriorIce=false,
+    warriorElectric=false,
+    bounceArrow=false,
+    archerFire=false,
+    archerIce=false,
+    archerElectric=false,
 }
 
 local calculateBoneShieldAngles=function()

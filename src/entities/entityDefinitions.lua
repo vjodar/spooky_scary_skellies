@@ -123,7 +123,7 @@ return {
         health=30,
         attack={
             range=150,  
-            period=1.5,   
+            period=1,   
             damage=5, 
             knockback=50,
             projectile={name='flame',xOffset=6,yOffset=-7,spread=0.3},
@@ -874,7 +874,7 @@ return {
         attack={
             range=120,  
             period=4, 
-            damage=100,
+            damage=50,
             knockback=600,
             projectile={name='jack-o-lantern',xOffset=0,yOffset=-24},
         },
@@ -1256,7 +1256,7 @@ return {
         attack={
             range=90,  
             period=2, 
-            damage=10,
+            damage=20,
             knockback=200,
             projectile={name='blueSpark',xOffset=0,yOffset=-7,count=6,spread=6.3},
         },
@@ -1311,7 +1311,7 @@ return {
         name='werebear',
         moveSpeed=10*60,
         kbResistance=65,
-        health=700,
+        health=1500,
         attack={
             range=55,        
             period=2,
@@ -1367,7 +1367,7 @@ return {
     ['werewolf']={
         name='werewolf',
         moveSpeed=12*60,
-        health=200,
+        health=150,
         attack={
             range=45,
             period=1.5,

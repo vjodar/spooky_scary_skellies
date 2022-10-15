@@ -1,8 +1,6 @@
-local buttons={}
-
 local getImage=function(name) return love.graphics.newImage('assets/hud/'..name..'.png') end 
 
-buttons.sprites={
+local sprites={
     panel=getImage('buttonsPanel'),
     warriorButton={getImage('buttonWarriorUp'), getImage('buttonWarriorDown')},
     archerButton={getImage('buttonArcherUp'), getImage('buttonArcherDown')},
@@ -16,13 +14,7 @@ buttons.sprites={
     }
 }
 
-buttons.x,buttons.y=0,0
-buttons.halfWidth=buttons.sprites.panel:getWidth()*0.5
-buttons.warriorSpriteIndex=1 --used to draw the appropriate button sprite
-buttons.archerSpriteIndex=1
-buttons.mageSpriteIndex=1
-
-buttons.cooldownBar={ --used to show when player can summon again
+local cooldownBar={ --used to show when player can summon again
     x=0, y=0,
     color={237/255,228/255,218/255},
     active=false,
@@ -31,7 +23,7 @@ buttons.cooldownBar={ --used to show when player can summon again
     length=60,
 }
 
-buttons.update=function(self,x,y)
+local update=function(self,x,y)
     self.x=x-self.halfWidth
     self.y=y+146
     self.cooldownBar.x=self.x+6
@@ -64,7 +56,7 @@ buttons.update=function(self,x,y)
     end
 end
 
-buttons.draw=function(self)
+local draw=function(self)
     love.graphics.draw(self.sprites.panel,self.x,self.y)
     love.graphics.draw(self.sprites.warriorButton[self.warriorSpriteIndex],self.x,self.y)
     love.graphics.draw(self.sprites.archerButton[self.archerSpriteIndex],self.x,self.y)
@@ -89,4 +81,14 @@ buttons.draw=function(self)
     love.graphics.setColor(1,1,1)
 end
 
-return buttons
+return { --The Module
+    sprites=sprites,
+    x=0, y=0,
+    halfWidth=sprites.panel:getWidth()*0.5,
+    warriorSpriteIndex=1,
+    archerSpriteIndex=1,
+    mageSpriteIndex=1,
+    cooldownBar=cooldownBar,
+    update=update,
+    draw=draw,
+}

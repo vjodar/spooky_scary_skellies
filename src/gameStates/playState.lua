@@ -14,7 +14,7 @@ function PlayState:startGame()
         skeletonMageIce=0,
         skeletonMageElectric=0,
     }
-    LevelManager:buildLevel('test',allyCount)
+    LevelManager:buildLevel('swampL7',allyCount)
 end
 
 function PlayState:update()
@@ -47,8 +47,8 @@ function love.keyreleased(k)
         )
     end
     if k=='p' then 
-        -- for i=1,5 do Upgrades:unlock('increaseAttackSpeed') end 
-        Upgrades:unlock('increaseMinionRange')
+        -- for i=1,10 do Upgrades:unlock('increaseMovespeed') end 
+        Upgrades:unlock('increaseMinionCapacity')
         -- FadeState:fadeBoth({fadeTime=2,afterFn=function() print('done') end, holdTime=1})
         -- local particles=ParticleSystem:generateEmitter({
         --     count=200,

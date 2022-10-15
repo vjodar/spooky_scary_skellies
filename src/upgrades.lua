@@ -1,21 +1,19 @@
-local upgrades={}
-
-upgrades.definitions={
+ local definitions={
     --General------------------------------------------------------------------
     ['increaseMinionCapacity']={
-        name="Undead Expansion +5",
+        name="Undead Army +5",
         desc="Command up to 5 additional skeletons",
-        recurring=true,
+        count=100,
     },
     ['increaseMinionsPerSummon']={
         name="Multi-Summon",
         desc="Raise an additional skeleton each summon",
-        recurring=true,
+        count=5,
     },
     ['decreaseSummonCooldown']={
         name='Necromantic Agility',
         desc="Decrease cooldown of summoning",
-        recurring=true,
+        count=9,
     },
     ['boneShield']={
         name="Bone Sheild",
@@ -25,27 +23,27 @@ upgrades.definitions={
     ['increaseHealth']={
         name="Undead Vitality",
         desc="Increase health of all allies",
-        recurring=true,
+        count=100,
     },
     ['increaseKnockback']={
         name="Undead Strength",
         desc="Increase knockback of all allies",
-        recurring=true,
+        count=10,
     },
     ['increaseDamage']={
         name="Undead Power",
         desc="Increase damage of all allies",
-        recurring=true,
+        count=100,
     },
     ['increaseAttackSpeed']={
         name="Undead Vigor",
         desc="Increase attack speed of all allies",
-        recurring=true,
+        count=5,
     },
     ['increaseMovespeed']={
         name="Undead Speed",
         desc="Increase movespeed of all allies",
-        recurring=true,
+        count=10,
     },
     ['warriorFire']={
         name="Kamakaze",
@@ -131,7 +129,7 @@ upgrades.definitions={
     },
 }
 
-upgrades.activationFunctions={
+local activationFunctions={
     --General
     ['increaseMinionCapacity']=function()        
         Player.maxMinions=Player.maxMinions+5
@@ -169,7 +167,7 @@ upgrades.activationFunctions={
     ['increaseKnockback']=function() 
         --increase player and all allies' knockback by their base values
         local increaseKnockback=function(name,val)
-            local atk=Entities.definitions[name]
+            local atk=Entities.definitions[name].attack
             atk.knockback=atk.knockback+val 
         end
         Player.attack.knockback=Player.attack.knockback+100
@@ -201,23 +199,23 @@ upgrades.activationFunctions={
             local atk=Entities.definitions[name].attack
             atk.period=max(0.5,atk.period-val)
         end
-        decreaseAttackPeriod('skeletonWarrior',0.5)
-        decreaseAttackPeriod('skeletonArcher',0.5)
-        decreaseAttackPeriod('skeletonMageFire',0.5)
-        decreaseAttackPeriod('skeletonMageIce',0.5)
-        decreaseAttackPeriod('skeletonMageElectric',0.5)
+        decreaseAttackPeriod('skeletonWarrior',0.2)
+        decreaseAttackPeriod('skeletonArcher',0.2)
+        decreaseAttackPeriod('skeletonMageFire',0.1)
+        decreaseAttackPeriod('skeletonMageIce',0.1)
+        decreaseAttackPeriod('skeletonMageElectric',0.1)
 
         --decrease archer's firing animation frame duration
         local attackAnim=Entities.definitions.skeletonArcher.animations.attack
-        attackAnim.duration[3]=max(0.05,attackAnim.duration[3]-0.1)
+        attackAnim.duration[3]=max(0.1,attackAnim.duration[3]-0.05)
     end,
     ['increaseMovespeed']=function() 
-        --increase player and allies' movespeed by 1 unit/s
+        --increase player and allies' movespeed by 2 unit/s
         local increaseMovespeed=function(name,val)
             local def=Entities.definitions[name]
             def.moveSpeed=def.moveSpeed+val
         end
-        local moveBonus=1*60 --framerate sensitive
+        local moveBonus=2*60 --framerate sensitive
         Player.moveSpeedMax=Player.moveSpeedMax+moveBonus
         Player.moveSpeed=Player.moveSpeedMax
         increaseMovespeed('skeletonWarrior',moveBonus)
@@ -226,15 +224,28 @@ upgrades.activationFunctions={
         increaseMovespeed('skeletonMageIce',moveBonus)
         increaseMovespeed('skeletonMageElectric',moveBonus)
     end,
-    ['warriorFire']=function() end,
-    ['warriorIce']=function() end,
-    ['warriorElectric']=function() end,
+    ['warriorFire']=function()
+        pDef={
+            count=300,
+            spread={x=4, y=8},
+            yOffset=7,
+            colors={[0xede4da]=1,[0xca5954]=2,}
+        }
+        Entities.particleEmitters.skeletonWarrior=ParticleSystem:generateEmitter(pDef)
+        Entities.behaviors.AI.skeletonWarrior.dead=Entities.behaviors.states.ally.kamakaze 
+    end,
+    ['warriorIce']=function()
+        Player.upgrades.warriorIce=true 
+    end,
+    ['warriorElectric']=function()
+        Player.upgrades.warriorElectric=true         
+    end,
     
     --Archer    
     ['skeletonArcher']=function()
         Player.upgrades.skeletonArcher=true
     end,
-    ['increaseMinionRange']=function(self) 
+    ['increaseMinionRange']=function() 
         --Increases all allies' attack range by their base values
         --also increases warrior lungeForce by base value
         local increaseRange=function(name,val) 
@@ -250,11 +261,26 @@ upgrades.activationFunctions={
         increaseRange('skeletonMageIce',150)
         increaseRange('skeletonMageElectric',150) 
     end,
-    ['spreadShot']=function() end,
-    ['bounceArrow']=function() end,
-    ['archerFire']=function() end,
-    ['archerIce']=function() end,
-    ['archerElectric']=function() end,
+    ['spreadShot']=function() 
+        --Increase projectile count by 3 and projectile spread by 0.2
+        projectileDef=Entities.definitions.skeletonArcher.attack.projectile
+        local count=projectileDef.count or 0
+        local spread=projectileDef.spread or 0 
+        projectileDef.count=count+3
+        projectileDef.spread=spread+0.2
+    end,
+    ['bounceArrow']=function()
+        Player.upgrades.bounceArrow=true 
+    end,
+    ['archerFire']=function()
+        Player.upgrades.archerFire=true         
+    end,
+    ['archerIce']=function() 
+        Player.upgrades.archerIce=true         
+    end,
+    ['archerElectric']=function() 
+        Player.upgrades.archerElectric=true         
+    end,
 
     --Mage    
     ['skeletonMageFire']=function()
@@ -298,35 +324,50 @@ upgrades.activationFunctions={
     end,
 }
 
-upgrades.unlock=function(self,name) 
-    self.activationFunctions[name](self)
+local unlock=function(self,name) 
     self.tally[name]=self.tally[name]+1
-    self:updatePool()
+    self.activationFunctions[name]()
+    --testing-------------------------
+    self:updatePool() --pool will actually update when chest is spawned or activated
+    --testing-------------------------
 end 
 
---Go through upgrade definitions, if all required upgrades have been unlocked,
---add upgrade to pool. Will ignore upgrades that are already unlocked or in pool
-upgrades.updatePool=function(self)
-    for name,def in pairs(self.definitions) do 
-        if def.req and self.tally[name]==0 then --has req and isn't unlocked
-            local alreadyInPool=false    
-            for i=1,#self.pool do 
-                if self.pool[i]==name then alreadyInPool=true end 
-            end
+--Go through upgrade definitions, check level, reqs, and limits
+--to rebuild the pool of available upgrades for current level chest
+local updatePool=function(self)
+    local isUnlocked=function(name) return self.tally[name]>0 end 
+    self.pool={} --clear pool
 
-            if not alreadyInPool then 
-                local unlockedAllReqs=true 
-                for i=1,#def.req do 
-                    if self.tally[def.req[i]]==0 then unlockedAllReqs=false end 
-                end
-    
-                if unlockedAllReqs then
-                    table.insert(self.pool,name) 
-                    print('added to pool',name) 
-                end 
+    for name,def in pairs(self.definitions) do 
+        local correctLevel,hasAllReqs,belowLimit=true,true,true
+
+        if def.count then --recurring upgrade, check limit
+            if self.tally[name]>=def.count then belowLimit=false end 
+        else --not recurring, check if already unlocked 
+            if isUnlocked(name) then belowLimit=false end 
+        end
+
+        if def.level then --check if current level matches level requirement
+            if LevelManager.currentLevel.name~=def.level then 
+                correctLevel=false
+            end 
+        end
+
+        if def.req then --check upgrade requirements
+            for i=1,#def.req do 
+                if not isUnlocked(def.req[i]) then hasAllReqs=false end 
             end
         end
+
+        if correctLevel and hasAllReqs and belowLimit then 
+            table.insert(self.pool,name) 
+        end 
     end
+
+    --testing------------------------------------
+    print('New Pool------------------------------')
+    for i=1,#self.pool do print(self.pool[i]) end 
+    --testing------------------------------------
 end
 
 --the tally is keep track of how many of each upgrade the player has obtained
@@ -335,7 +376,7 @@ local generateTally=function(defs)
     for name,_ in pairs(defs) do tally[name]=0 end 
     return tally 
 end
-upgrades.tally=generateTally(upgrades.definitions)
+local tally=generateTally(definitions)
 
 --current pool of available upgrades. Changes as the player unlocks more
 local generateInitialPool=function(defs)
@@ -347,6 +388,13 @@ local generateInitialPool=function(defs)
     end
     return pool 
 end
-upgrades.pool=generateInitialPool(upgrades.definitions)
+local pool=generateInitialPool(definitions)
 
-return upgrades 
+return { --The Module
+    definitions=definitions,
+    activationFunctions=activationFunctions,
+    tally=tally,
+    pool=pool,
+    unlock=unlock,
+    updatePool=updatePool,
+} 

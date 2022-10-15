@@ -125,6 +125,18 @@ behaviors.methods.common={
         local damageTextColor=args.textColor or 'gray'
         UI.damage:new(self.center.x,self.center.y,floor(damage),damageTextColor)
 
+        if self.name=='skeletonWarrior' 
+        and Player.upgrades.warriorElectric 
+        then --discharge
+            for i=1,4 do 
+                Projectiles:new({
+                    x=self.center.x,y=self.center.y,name='spark',
+                    damage=self.attack.damage*0.25,knockback=self.attack.knockback*0.25,
+                    angle=rnd()*2*pi,yOffset=-7,
+                })
+            end
+        end
+
         if self.health.current==0 then self:die() end
     end,
 
@@ -614,6 +626,9 @@ behaviors.states.ally={
                         knockback=self.attack.knockback,
                         angle=getAngle(self.center,other.center),
                     })
+                    if other.state~='dead' and Player.upgrades.warriorIce then 
+                        other.status:freeze(other,1,0.5) --slow to half speed for 1s
+                    end 
                     table.insert(self.targetsAlreadyAttacked,other)
                 end
             end    
@@ -651,6 +666,56 @@ behaviors.states.ally={
             end
             SpecialAttacks:chainLightning(self,targets)
         end
+    end,
+    
+    kamakaze=function(self) 
+        --if there's a death animation, wait for it to finish
+        if self.animations.dead then
+            self.animSpeed=self.animSpeedMax
+            local onLoop=self:updateAnimation()
+            if not onLoop then return end 
+        end
+
+        --destroy enemy, emit particle explosion, shake camera
+        self.particles:emit(self.center.x,self.center.y)
+        LevelManager:decreaseEntityCount(self.collisionClass,self.name)
+        if self.deathShake then 
+            local shake=self.deathShake 
+            Camera:shake({
+                magnitude=shake.magnitude,
+                period=shake.period,
+                damping=shake.damping,
+                stopThreshold=shake.stopThreshold,
+            })
+        end
+        
+        local explosionRadius=50 --same explosion radius as fireball
+        local explosionDamage=self.health.max --damage equal to max health
+        local queryData={
+            x=self.x-explosionRadius*0.5,
+            y=self.y-explosionRadius*0.5,
+            w=explosionRadius,h=explosionRadius
+        }
+        local filter=World.queryFilters.enemy
+        local targets=World:queryRect(
+            queryData.x,queryData.y,queryData.w,queryData.h,filter
+        )
+        for i=1,#targets do 
+            local target=targets[i]
+            target:takeDamage({                 
+                damage=explosionDamage,
+                knockback=self.attack.knockback*2,
+                angle=getAngle(self.center,targets[i].center),
+                textColor='red',
+            })
+            if target.state~='dead' then 
+                target.status:burn(explosionDamage*0.5,5) --burn for 5s
+            end
+        end
+
+        Camera:shake({magnitude=10})
+
+        return false
     end,
 }
 

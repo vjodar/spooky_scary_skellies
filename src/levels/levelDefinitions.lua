@@ -27,6 +27,13 @@ return {
             {
                 pumpkin=1,
             },
+            {
+                pumpkin=2,
+            },
+            {
+                pumpkin=2,
+                ghost=1
+            },
         },
         maxEnemies=10,
         exit={name='swampWallHole',pos={x=245,y=26+31}},
@@ -37,9 +44,134 @@ return {
         waves={
             {
                 pumpkin=1,
+                spider=3,
+            },
+            {
+                spider=3,
+                bat=3,
+            },
+            {
+                spider=3,
+                spiderEgg=3,
             },
         },
         maxEnemies=10,
+        exit={name='swampWallHole',pos={x=373,y=26+31}},
+        nextLevel='swampL3',
+    },
+    ['swampL3']={
+        map='swamp2',
+        waves={
+            {
+                zombie=5,
+            },
+            {
+                zombie=10,
+            },
+            {
+                zombie=10,
+                tombstone=5,
+            },
+        },
+        maxEnemies=20,
+        exit={name='swampWallHole',pos={x=373,y=26+31}},
+        nextLevel='swampL4',
+    },
+    ['swampL4']={
+        map='swamp2',
+        waves={
+            {
+                ghost=3,
+                pumpkin=3,
+                werewolf=3
+            },
+            {
+                werewolf=3,
+                bat=3,
+                spiderEgg=3,
+            },
+            {
+                werewolf=5,
+                ent=5,
+            },
+        },
+        maxEnemies=20,
+        exit={name='swampWallHole',pos={x=373,y=26+31}},
+        nextLevel='swampL5',
+    },
+    ['swampL5']={
+        map='swamp2',
+        waves={
+            {
+                ghost=5,
+                pumpkin=5,
+                bats=5,
+                spider=5,
+            },
+            {
+                werewolf=5,
+                ent=5,
+                spiderEgg=5,
+                tombstone=5,
+            },
+        },
+        maxEnemies=20,
+        exit={name='swampWallHole',pos={x=373,y=26+31}},
+        nextLevel='swampL6',
+    },
+    ['swampL6']={
+        map='swamp2',
+        waves={
+            {
+                pumpkin=5,
+            },
+            {
+                pumpkin=15,
+            },
+            {
+                headlessHorseman=1,
+            },
+        },
+        maxEnemies=20,
+        exit={name='swampWallHole',pos={x=373,y=26+31}},
+        nextLevel='swampL7',
+    },
+    ['swampL7']={
+        map='swamp2',
+        waves={
+            {
+                zombie=10,
+            },
+            {
+                zombie=20,
+            },
+            {
+                frankenstein=1,
+            },
+        },
+        maxEnemies=20,
+        exit={name='swampWallHole',pos={x=373,y=26+31}},
+        nextLevel='swampL8',
+    },
+    ['swampL8']={
+        map='swamp2',
+        waves={
+            {
+                pumpkin=5,
+                headlessHorseman=1,
+            },
+            {
+                zombie=5,
+                frankenstein=1,
+            },
+            {
+                pumpkin=10,
+                zombie=10,
+                frankenstein=1,
+                headlessHorseman=1
+            },
+        },
+        maxEnemies=20,
         exit={name='swampWallHole',pos={x=373,y=26+31}},
         nextLevel='swampBoss',
     },
@@ -56,7 +188,7 @@ return {
                 giantTombstone=1,
             },
         },
-        maxEnemies=100,
+        maxEnemies=50,
         exit={name='swampWallHole',pos={x=288,y=26+31}}, --swamp boss
         nextLevel='caveL1',
     },

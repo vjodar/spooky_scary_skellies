@@ -391,6 +391,7 @@ end
 local pool=generateInitialPool(definitions)
 
 return { --The Module
+    chests=require 'src/upgrades/chests',
     definitions=definitions,
     activationFunctions=activationFunctions,
     tally=tally,

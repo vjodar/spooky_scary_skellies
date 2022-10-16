@@ -99,7 +99,7 @@ local tileOccupiedKey={
     terrain={'player','terrain','border','decoration'},
     decoration={'terrain','decoration'},
     entity={'player','terrain'},
-    exit={'player','terrain','border'},
+    object={'player','terrain','border'},
 }
 
 --checks if any element of key is in tile.occupiedBy
@@ -246,16 +246,17 @@ local generateEnemies=function(self,enemyWave,entitiesClass,grid)
     end
 end
 
-local generateExitSpawnPosition=function(self,exitName,exitsClass,grid)
+local generateObjectSpawnPosition=function(self,objectName,objectClass,grid)
+    --finds available tiles to spawn chest or level object
     self.clearPlayerTiles(grid)
     self:markPlayerTiles(grid,2)    
-    local exitColliderDef=exitsClass.definitions[exitName]
-    local exitTileSize=self:getTileSize(exitColliderDef)
-    local availableTiles=self:getAvailableTiles(grid,exitTileSize,'exit')
+    local objectColliderDef=objectClass.definitions[objectName]
+    local objectTileSize=self:getTileSize(objectColliderDef)
+    local availableTiles=self:getAvailableTiles(grid,objectTileSize,'object')
     local selectedTile=rndElement(availableTiles)
     local spawnX,spawnY=self:throughoutTiles(
         selectedTile.x,selectedTile.y,
-        exitColliderDef.w,exitColliderDef.h,exitTileSize
+        objectColliderDef.w,objectColliderDef.h,objectTileSize
     )
     return {x=spawnX,y=spawnY}
 end
@@ -276,5 +277,5 @@ return { --The Module
     generateTerrain=generateTerrain,
     generateDecorations=generateDecorations,
     generateEnemies=generateEnemies,
-    generateExitSpawnPosition=generateExitSpawnPosition,
+    generateObjectSpawnPosition=generateObjectSpawnPosition,
 }

@@ -16,6 +16,7 @@ return {
             -- },
         },
         maxEnemies=100, --used to limit summoner enemies' minion spawns
+        chest={name='chestSmall'},
         exit={name='swampWallHole',pos={x=245,y=26+31}}, --small swamp
         -- exit={name='swampWallHole',pos={x=288,y=26+31}}, --swamp boss
         -- exit={name='ladderUp'},
@@ -36,6 +37,7 @@ return {
             },
         },
         maxEnemies=10,
+        chest={name='chestSmall'},
         exit={name='swampWallHole',pos={x=245,y=26+31}},
         nextLevel='swampL2',
     },
@@ -56,6 +58,7 @@ return {
             },
         },
         maxEnemies=10,
+        chest={name='chestSmall'},
         exit={name='swampWallHole',pos={x=373,y=26+31}},
         nextLevel='swampL3',
     },
@@ -74,6 +77,7 @@ return {
             },
         },
         maxEnemies=20,
+        chest={name='chestSmall'},
         exit={name='swampWallHole',pos={x=373,y=26+31}},
         nextLevel='swampL4',
     },
@@ -96,6 +100,7 @@ return {
             },
         },
         maxEnemies=20,
+        chest={name='chestSmall'},
         exit={name='swampWallHole',pos={x=373,y=26+31}},
         nextLevel='swampL5',
     },
@@ -105,7 +110,7 @@ return {
             {
                 ghost=5,
                 pumpkin=5,
-                bats=5,
+                bat=5,
                 spider=5,
             },
             {
@@ -116,6 +121,7 @@ return {
             },
         },
         maxEnemies=20,
+        chest={name='chestSmall'},
         exit={name='swampWallHole',pos={x=373,y=26+31}},
         nextLevel='swampL6',
     },
@@ -133,6 +139,7 @@ return {
             },
         },
         maxEnemies=20,
+        chest={name='chestSmall'},
         exit={name='swampWallHole',pos={x=373,y=26+31}},
         nextLevel='swampL7',
     },
@@ -150,6 +157,7 @@ return {
             },
         },
         maxEnemies=20,
+        chest={name='chestSmall'},
         exit={name='swampWallHole',pos={x=373,y=26+31}},
         nextLevel='swampL8',
     },
@@ -172,6 +180,7 @@ return {
             },
         },
         maxEnemies=20,
+        chest={name='chestSmall'},
         exit={name='swampWallHole',pos={x=373,y=26+31}},
         nextLevel='swampBoss',
     },
@@ -189,6 +198,7 @@ return {
             },
         },
         maxEnemies=50,
+        chest={name='chestSmall'},
         exit={name='swampWallHole',pos={x=288,y=26+31}}, --swamp boss
         nextLevel='caveL1',
     },

@@ -238,6 +238,7 @@ local buildLevel=function(self,lvl,skeletons)
         entityAggro=true, --used to enable/disable entity aggression
         canCheckWaveCompletion=true,
         complete=false,
+        chest=levelDef.chest,
         exit=levelDef.exit,
         nextLevel=levelDef.nextLevel,
     }        
@@ -255,24 +256,30 @@ end
 local spawnExit=function()
     local level=LevelManager.currentLevel 
 
+    local chestPos=level.chest.pos or LevelManager.gridClass:generateObjectSpawnPosition(
+        level.chest.name,Upgrades.chests,level.grid
+    )
+    local chestDef=Upgrades.chests.definitions[level.chest.name]
+    local chestCenter={x=chestPos.x+chestDef.w*0.5,y=chestPos.y+chestDef.h*0.5}
+
     --if level exit pos isn't specified, generate it using gridClass
-    local spawnPos=level.exit.pos or LevelManager.gridClass:generateExitSpawnPosition(
+    local exitPos=level.exit.pos or LevelManager.gridClass:generateObjectSpawnPosition(
         level.exit.name,LevelManager.exitsClass,level.grid
     )
     local exitDef=LevelManager.exitsClass.definitions[level.exit.name]
-    local exitCenter={x=spawnPos.x+exitDef.w*0.5,y=spawnPos.y+exitDef.h*0.5}
+    local exitCenter={x=exitPos.x+exitDef.w*0.5,y=exitPos.y+exitDef.h*0.5}
     local panObjects={
-        -- { 
-        --     target={x=0,y=0}, --pan to chest
-        --     afterFn=function() --spawn chest
-        --         print('this is where the chest would be IF I HAD ONE!')
-        --     end,
-        --     holdTime=1.3 --hold for spawn anim duration
-        -- }, 
+        { 
+            target=chestCenter, --pan to chest
+            afterFn=function() --spawn chest
+                Upgrades.chests:new(level.chest.name,chestPos.x,chestPos.y)
+            end,
+            holdTime=1.3 --hold for spawn anim duration
+        }, 
         { 
             target=exitCenter, --pan to exit pos (center)
             afterFn=function() --spawn level exit
-                LevelManager.exitsClass:new(level.exit.name,spawnPos.x,spawnPos.y)
+                LevelManager.exitsClass:new(level.exit.name,exitPos.x,exitPos.y)
             end,
             holdTime=1.3 --hold for spawn anim duration
         }, 

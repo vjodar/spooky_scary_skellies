@@ -166,7 +166,8 @@ function player:updatePosition()
             other.vy=other.vy+sin(angle)*self.moveSpeed*2*dt
         end
 
-        if other.collisionClass=='exit' then other:activateExit() end 
+        if other.name=='exit' then other:activateExit() end 
+        if other.name=='chest' then other:activateChest() end 
     end
 
     if LevelManager:isEntityOutOfBounds(self) then 

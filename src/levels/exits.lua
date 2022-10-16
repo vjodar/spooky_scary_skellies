@@ -75,7 +75,7 @@ local exitDrawFunction=function(self)
 end
 
 local activateExitFunction=function(self) 
-    self.collisionClass='solid'
+    self.name='activatedExit'
     LevelManager:startNextLevel() 
 end
 
@@ -89,12 +89,13 @@ return { --The Module
     new=function(self,name,x,y) --constructor        
         local def=self.definitions[name]
         local exit={
+            name='exit',
             x=x, y=y, w=def.w, h=def.h,            
             xOffset=def.xOffset or 0,
             yOffset=def.yOffset or 0,
             sprite=self.sprites[name],
             anim=self.animations[name]:clone(),
-            collisionClass='exit',
+            collisionClass='solid',
             update=self.exitUpdateFunction,
             draw=self.exitDrawFunction,
             activateExit=self.activateExitFunction,

@@ -14,7 +14,7 @@ function PlayState:startGame()
         skeletonMageIce=0,
         skeletonMageElectric=0,
     }
-    LevelManager:buildLevel('swampL7',allyCount)
+    LevelManager:buildLevel('swampL1',allyCount)
 end
 
 function PlayState:update()
@@ -85,6 +85,7 @@ function love.keyreleased(k)
         -- World:update(Player,goalX,goalY)
         -- Player.canSummon.cooldownPeriod=0.1
         -- Player:updateHealth(-1)
+        Upgrades.chests:new('chestLarge',Controls.getMousePosition())
     end
 end
 --testing-------------------

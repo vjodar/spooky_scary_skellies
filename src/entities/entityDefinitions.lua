@@ -123,7 +123,7 @@ return {
         health=30,
         attack={
             range=150,  
-            period=1,   
+            period=1.5,   
             damage=5, 
             knockback=50,
             projectile={name='flame',xOffset=6,yOffset=-7,spread=0.3},
@@ -183,7 +183,7 @@ return {
         health=30,
         attack={
             range=150,  
-            period=1,   
+            period=1.5,   
             damage=5, 
             knockback=50,
             projectile={name='icicle',xOffset=6,yOffset=-7,spread=0.3},
@@ -300,7 +300,7 @@ return {
     ['slime']={
         name='slime',
         moveSpeed=10*60,
-        health=30,
+        health=50,
         attack={
             range=40,
             period=1.5,
@@ -413,11 +413,11 @@ return {
         name='golem',
         moveSpeed=7*60,
         kbResistance=70,
-        health=100,
+        health=200,
         attack={
             range=70,        
             period=3,
-            damage=15,
+            damage=20,
             knockback=700,
             lungeForce=800,
         },
@@ -754,12 +754,12 @@ return {
     },
     ['undeadMiner']={
         name='undeadMiner',
-        health=30,
+        health=60,
         moveSpeed=8*60,
         attack={
             range=100,  
             period=2, 
-            damage=10,
+            damage=20,
             knockback=150,
             projectile={name='pickaxe',xOffset=10,yOffset=-10,spread=0.8},
         },
@@ -982,7 +982,7 @@ return {
     ['vampire']={
         name='vampire',
         moveSpeed=13*60,
-        health=100,
+        health=120,
         attack={
             range=160,  
             period=3, 
@@ -1295,7 +1295,7 @@ return {
             },
         },
         particles={
-            count=160,
+            count=200,
             spread={x=10, y=14},
             yOffset=14,
             colors={
@@ -1367,7 +1367,7 @@ return {
     ['werewolf']={
         name='werewolf',
         moveSpeed=12*60,
-        health=150,
+        health=100,
         attack={
             range=45,
             period=1.5,

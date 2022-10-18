@@ -61,6 +61,10 @@ local shadowNames={
     'fireballObsidian',
     'fireballWitch',
     'icicleWitch',
+
+    --chests
+    'chestSmall',
+    'chestLarge',
 }
 
 local sharedSprites={

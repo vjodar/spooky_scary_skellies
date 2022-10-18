@@ -16,13 +16,12 @@ player.collisionFilter=World.collisionFilters[player.collisionClass]
 player.health={current=300,max=300}
 player.kbResistance=0
 player.attack={
-    period=0.5, 
     damage=10,
     knockback=100,
     projectile={name='bone',yOffset=-10},
 }
-player.minionsPerSummon=10
-player.maxMinions=1
+player.minionsPerSummon=1
+player.maxMinions=3
 player.selectedMage='Fire'
 player.nearbyEnemies={}
 player.aggroRange={w=600,h=450}
@@ -82,10 +81,10 @@ player.status=Statuses:new()
 player.canTurn={flag=true,cooldownPeriod=0.2}
 player.canTurn.setOnCooldown=Timer:giveCooldownCallbacks(player.canTurn)
 
-player.canAttack={flag=true,cooldownPeriod=player.attack.period}
+player.canAttack={flag=true,cooldownPeriod=0.5}
 player.canAttack.setOnCooldown=Timer:giveCooldownCallbacks(player.canAttack)
 
-player.canSummon={flag=true,cooldownPeriod=10}
+player.canSummon={flag=true,cooldownPeriod=6}
 player.canSummon.setOnCooldown=Timer:giveCooldownCallbacks(player.canSummon)
 
 player.canQueryAttackTargets={flag=true,cooldownPeriod=0.5}
@@ -135,10 +134,10 @@ function player:draw()
     -- --testing------------------------------------------
     -- love.graphics.print(self.center.x,self.x-10,self.y-10)
     -- love.graphics.print(self.center.y,self.x-10,self.y)
-    love.graphics.print('STATES: '..#gameStates,self.x-10,self.y-30)
+    -- love.graphics.print('STATES: '..#gameStates,self.x-10,self.y-30)
     -- love.graphics.print('objects: '..#Objects.table,self.x-10,self.y-60)
     -- love.graphics.print('items: '..World:countItems(),self.x-10,self.y-90)
-    love.graphics.print('ENEMIES: '..LevelManager.currentLevel.enemyCount,self.x-10,self.y-60)
+    -- love.graphics.print('ENEMIES()[]: '..LevelManager.currentLevel.enemyCount,self.x-10,self.y-60)
     -- --testing------------------------------------------
 end
 

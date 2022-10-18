@@ -60,6 +60,7 @@ local sprites,animations=generateDrawData(definitions)
 
 local chestUpdate=function(self) self.stateMachine[self.state](self) end
 local chestDraw=function(self)
+    self.shadow:draw(self.x,self.y)
     self.animations.current:draw(
         self.sprite,self.x-self.xOffset,self.y-self.yOffset
     )
@@ -80,10 +81,13 @@ local chestOpen=function(self)
     local onLoop=self.animations.current:update(dt)
     if onLoop then 
         self.animations.current:pauseAtEnd()
-        print('choose an upgrade!!!')
-        --TODO-----------------------------
-        --Update upgrade pool, start upgrade selection state
-        --TODO-----------------------------
+        
+        --Start upgrade selection state with 3 cards for normal levels,
+        --5 cards for boss levels
+        local level=LevelManager.currentLevel.name 
+        local largeChest=(level=='swampBoss' or level=='caveBoss')
+        local cardCount=largeChest and 5 or 3
+        UpgradeSelectionState:presentCards(cardCount)
     end
 end
 
@@ -120,6 +124,7 @@ return { --The Module
             sprite=self.sprites[name],
             collisionClass='solid',
             animations=animations,
+            shadow=Shadows:new(name,def.w,def.h),
             update=self.chestUpdate,
             draw=self.chestDraw,
             stateMachine=self.chestStateMachine,

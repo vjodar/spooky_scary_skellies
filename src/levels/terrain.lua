@@ -74,7 +74,6 @@ local definitions={
     moundSwampLarge={
         w=50,h=53,class='solid',
         sprites={
-            'moundSwamp5',
             'moundSwamp6',
             'moundSwamp7',
         }
@@ -136,7 +135,6 @@ local definitions={
         sprites={
             'pitCave1',
             'pitCave2',
-            'pitCave3',
             'pitCave4',
         }
     },
@@ -145,20 +143,21 @@ local definitions={
         sprites={
             'pitCave5',
             'pitCave6',
-            'pitCave7',
-            'pitCave8',
         }
     },
     moundCaveSmall={
         w=34,h=37,class='solid',
         sprites={
             'moundCave1',
+            'moundCave2',
         }
     },
     moundCaveLarge={
         w=50,h=53,class='solid',
         sprites={
             'moundCave5',
+            'moundCave6',
+            'moundCave7',
         }
     },
     pitLava1={

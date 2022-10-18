@@ -6,8 +6,8 @@ function love.load()
     love.graphics.setDefaultFilter('nearest','nearest') --set pixelated look
     love.graphics.setLineStyle('rough') --pixelated lines
 
-    --common math functions
-    generateCommonMaths()
+    Fonts=generateFonts() --fonts
+    generateCommonMaths() --common math functions
     
     --Libraries
     bump=require 'src/libraries/bump'
@@ -20,6 +20,7 @@ function love.load()
     PlayState=require 'src/gameStates/playState'  
     FadeState=require 'src/gameStates/fadeState'
     PanState=require 'src/gameStates/panState'
+    UpgradeSelectionState=require 'src/gameStates/upgradeSelectionState'
 
     --Modules
     UI=require 'src/userInterface'
@@ -63,6 +64,26 @@ function love.draw()
     end
     Camera.curtain:draw()
     Camera:detach()
+end
+
+function generateFonts()
+    local fonts={}
+
+    local glyphs=(
+        " abcdefghijklmnopqrstuvwxyz"..
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"..
+        "1234567890.:!,'+-/()[]"
+    )
+
+    local colors={'white','yellow','gray','blue','red','green','big'}
+    for i=1,#colors do
+        local path='assets/fonts/'..colors[i]..'.png'
+        fonts[colors[i]]=love.graphics.newImageFont(path,glyphs)
+    end
+
+    love.graphics.setFont(fonts.white) --default to white
+
+    return fonts 
 end
 
 function generateCommonMaths()

@@ -5,7 +5,8 @@ return {
     x=0,y=0,
     skeletonTotal=0,
     minionLimitReached=false,
-    font=UI.fonts.white,
+    white=Fonts.white,
+    red=Fonts.red,    
 
     update=function(self)
         self.x,self.y=Camera.x,Camera.y 
@@ -13,7 +14,7 @@ return {
         self.health:update(self.x,self.y)
         self.skeletonTotal=LevelManager.currentLevel.allyTotal 
         self.minionLimitReached=self.skeletonTotal>=Player.maxMinions
-        self.font=self.minionLimitReached and UI.fonts.red or UI.fonts.white
+        self.font=self.minionLimitReached and self.red or self.white
     end,
 
     draw=function(self)

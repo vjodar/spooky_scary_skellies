@@ -1,25 +1,4 @@
-local generateFonts=function()
-    local fonts={}
-
-    local glyphs=(
-        " abcdefghijklmnopqrstuvwxyz"..
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"..
-        "1234567890.:!,'+-/()"
-    )
-
-    local colors={'white','yellow','gray','blue','red','green'}
-    for i=1,#colors do
-        local path='assets/fonts/'..colors[i]..'.png'
-        fonts[colors[i]]=love.graphics.newImageFont(path,glyphs)
-    end
-
-    love.graphics.setFont(fonts.white) --default to white
-
-    return fonts 
-end
-local fonts=generateFonts()
-
-local generateDamageSystem=function()
+local generateDamageSystem=function(fonts)
     local new=function(self,x,y,val,color) --damage object constructor
         local angle=-pi*(0.3+rnd()*0.4) --angle=[0.3pi,0.7pi]
         local moveSpeed=(3+(rnd()*3))*60 --speed=[3,6]
@@ -77,14 +56,11 @@ local generateDamageSystem=function()
     }
 end
 
-return {
-    fonts=fonts,
-    damage=generateDamageSystem(fonts),
-
-    update=function(self)
+return { --The Module
+    damage=generateDamageSystem(Fonts),
+    update=function(self) 
         self.damage:update()
     end,
-
     draw=function(self)
         self.damage:draw()
     end,

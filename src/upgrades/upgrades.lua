@@ -1,19 +1,20 @@
  local definitions={
     --General------------------------------------------------------------------
     ['increaseMinionCapacity']={
-        name="Undead Army +5",
-        desc="Command up to 5 additional skeletons",
+        name="Undead Army +3",
+        desc="Command up to 3 additional skeletons",
         count=100,
     },
     ['increaseMinionsPerSummon']={
         name="Multi-Summon",
         desc="Raise an additional skeleton each summon",
+        req={'increaseMinionCapacity'},
         count=5,
     },
     ['decreaseSummonCooldown']={
         name='Necromantic Agility',
         desc="Decrease cooldown of summoning",
-        count=9,
+        count=5,
     },
     ['boneShield']={
         name="Bone Sheild",
@@ -21,14 +22,14 @@
     },
     --Warrior------------------------------------------------------------------
     ['increaseHealth']={
-        name="Undead Vitality",
+        name="Undead   Vitality",
         desc="Increase health of all allies",
         count=100,
     },
     ['increaseKnockback']={
         name="Undead Strength",
         desc="Increase knockback of all allies",
-        count=10,
+        count=3,
     },
     ['increaseDamage']={
         name="Undead Power",
@@ -62,7 +63,7 @@
     },
     --Archer-------------------------------------------------------------------
     ['skeletonArcher']={
-        name="Summon Skeleton Archer",
+        name="Summon  Skeleton  Archer",
         desc="Summon accurate, long range skeletal archers",
         level="swampBoss",
     },
@@ -123,7 +124,7 @@
         level="caveBoss",
     },
     ['mageElectricUpgrade']={
-        name="Chain Lightning",
+        name="Chain   Lightning",
         desc="Skeleton electric mages zap up to 5 enemies at once",
         req={"skeletonMageElectric"},
     },
@@ -132,7 +133,7 @@
 local activationFunctions={
     --General
     ['increaseMinionCapacity']=function()        
-        Player.maxMinions=Player.maxMinions+5
+        Player.maxMinions=Player.maxMinions+3
     end,
     ['increaseMinionsPerSummon']=function()
         Player.minionsPerSummon=Player.minionsPerSummon+1
@@ -165,17 +166,17 @@ local activationFunctions={
         increaseHealth('skeletonMageElectric',30)
     end,
     ['increaseKnockback']=function() 
-        --increase player and all allies' knockback by their base values
+        --increase player and all allies' knockback by 3x base values
         local increaseKnockback=function(name,val)
             local atk=Entities.definitions[name].attack
             atk.knockback=atk.knockback+val 
         end
-        Player.attack.knockback=Player.attack.knockback+100
-        increaseKnockback('skeletonWarrior',100)
-        increaseKnockback('skeletonArcher',75)
-        increaseKnockback('skeletonMageFire',50)
-        increaseKnockback('skeletonMageIce',50)
-        increaseKnockback('skeletonMageElectric',50)
+        Player.attack.knockback=Player.attack.knockback+300
+        increaseKnockback('skeletonWarrior',300)
+        increaseKnockback('skeletonArcher',225)
+        increaseKnockback('skeletonMageFire',150)
+        increaseKnockback('skeletonMageIce',150)
+        increaseKnockback('skeletonMageElectric',150)
     end,
     ['increaseDamage']=function()
         --increase player and all allies' damage by their base values
@@ -191,8 +192,7 @@ local activationFunctions={
         increaseDamage('skeletonMageElectric',5)
     end,
     ['increaseAttackSpeed']=function() 
-        --decrease player and allies' attack period by 0.1 for player, 0.5 for
-        --allies. Enfore limit periods. Also decrease archer animation duration
+        --decrease player and allies' attack period, enforce period limits.
         local playerAtk=Player.canAttack
         playerAtk.cooldownPeriod=max(0.1,playerAtk.cooldownPeriod-0.1)
         local decreaseAttackPeriod=function(name,val)
@@ -327,30 +327,21 @@ local activationFunctions={
 local unlock=function(self,name) 
     self.tally[name]=self.tally[name]+1
     self.activationFunctions[name]()
-    --testing-------------------------
-    self:updatePool() --pool will actually update when chest is spawned or activated
-    --testing-------------------------
 end 
 
---Go through upgrade definitions, check level, reqs, and limits
+--Go through upgrade definitions, check pre reqs and count limits
 --to rebuild the pool of available upgrades for current level chest
 local updatePool=function(self)
     local isUnlocked=function(name) return self.tally[name]>0 end 
     self.pool={} --clear pool
 
     for name,def in pairs(self.definitions) do 
-        local correctLevel,hasAllReqs,belowLimit=true,true,true
+        local hasAllReqs,belowLimit,levelSpecific=true,true,false 
 
         if def.count then --recurring upgrade, check limit
             if self.tally[name]>=def.count then belowLimit=false end 
         else --not recurring, check if already unlocked 
             if isUnlocked(name) then belowLimit=false end 
-        end
-
-        if def.level then --check if current level matches level requirement
-            if LevelManager.currentLevel.name~=def.level then 
-                correctLevel=false
-            end 
         end
 
         if def.req then --check upgrade requirements
@@ -359,15 +350,12 @@ local updatePool=function(self)
             end
         end
 
-        if correctLevel and hasAllReqs and belowLimit then 
+        if def.level then levelSpecific=true end 
+
+        if hasAllReqs and belowLimit and not levelSpecific then 
             table.insert(self.pool,name) 
         end 
     end
-
-    --testing------------------------------------
-    print('New Pool------------------------------')
-    for i=1,#self.pool do print(self.pool[i]) end 
-    --testing------------------------------------
 end
 
 --the tally is keep track of how many of each upgrade the player has obtained
@@ -390,12 +378,53 @@ local generateInitialPool=function(defs)
 end
 local pool=generateInitialPool(definitions)
 
+--returns a table of all level specific upgrades
+local getLevelSpecificUpgrades=function(self,level)
+    local levelUpgrades={}
+    for name,def in pairs(self.definitions) do 
+        if def.level and def.level==level then 
+            table.insert(levelUpgrades,name) 
+        end 
+    end
+    return levelUpgrades
+end
+
+--selects count number of upgrades from pool to present as upgrade cards
+local pickUpgrades=function(self,count)
+    Upgrades:updatePool()
+
+    local currentLevel=LevelManager.currentLevel.name
+    local levelUpgrades=self:getLevelSpecificUpgrades(currentLevel)
+
+    local moveElement=function(insertTable,removeTable,index)
+        table.insert(insertTable,removeTable[index])
+        table.remove(removeTable,index)
+    end
+
+    --selected upgrades from either levelUpgrades or self.pool
+    local selectedUpgrades={}
+    for i=1,count do
+        local index=rnd(#self.pool)
+        local removeTable=self.pool 
+        --always select an available level specific upgrade
+        if #levelUpgrades>0 then 
+            index=rnd(#levelUpgrades)
+            removeTable=levelUpgrades 
+        end
+        moveElement(selectedUpgrades,removeTable,index)
+    end
+
+    return selectedUpgrades
+end
+
 return { --The Module
     chests=require 'src/upgrades/chests',
     definitions=definitions,
     activationFunctions=activationFunctions,
     tally=tally,
     pool=pool,
+    getLevelSpecificUpgrades=getLevelSpecificUpgrades,
+    pickUpgrades=pickUpgrades,
     unlock=unlock,
     updatePool=updatePool,
 } 

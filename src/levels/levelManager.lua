@@ -274,7 +274,7 @@ local spawnExit=function()
             afterFn=function() --spawn chest
                 Upgrades.chests:new(level.chest.name,chestPos.x,chestPos.y)
             end,
-            holdTime=1.3 --hold for spawn anim duration
+            holdTime=1 --hold for spawn anim duration
         }, 
         { 
             target=exitCenter, --pan to exit pos (center)
@@ -368,28 +368,34 @@ local updateBoss=function(self)
         level.complete=true
         self:killEntities('enemy') --destroy any other enemies
 
-        --if level exit pos isn't specified, generate it using gridClass
-        local spawnPos=level.exit.pos or self.gridClass:generateExitSpawnPosition(
-            level.exit.name,self.exitsClass,level.grid
+        local chestPos=level.chest.pos or LevelManager.gridClass:generateObjectSpawnPosition(
+            level.chest.name,Upgrades.chests,level.grid
         )
-        local exitDef=self.exitsClass.definitions[level.exit.name]
-        local exitCenter={x=spawnPos.x+exitDef.w*0.5,y=spawnPos.y+exitDef.h*0.5}
+        local chestDef=Upgrades.chests.definitions[level.chest.name]
+        local chestCenter={x=chestPos.x+chestDef.w*0.5,y=chestPos.y+chestDef.h*0.5}
+    
+        --if level exit pos isn't specified, generate it using gridClass
+        local exitPos=level.exit.pos or LevelManager.gridClass:generateObjectSpawnPosition(
+            level.exit.name,LevelManager.exitsClass,level.grid
+        )
+        local exitDef=LevelManager.exitsClass.definitions[level.exit.name]
+        local exitCenter={x=exitPos.x+exitDef.w*0.5,y=exitPos.y+exitDef.h*0.5}
         local panObjects={
             { --watch boss death animation
                 target=level.boss.center,
                 holdTime=level.bossData.deathAnimDuration,
             },
-            -- { 
-            --     target={x=0,y=0}, --pan to chest
-            --     afterFn=function() --spawn chest
-            --         print('this is where the chest would be IF I HAD ONE!')
-            --     end,
-            --     holdTime=1.3 --hold for spawn anim duration
-            -- }, 
+            { 
+                target=chestCenter, --pan to chest
+                afterFn=function() --spawn chest
+                    Upgrades.chests:new(level.chest.name,chestPos.x,chestPos.y)
+                end,
+                holdTime=1 --hold for spawn anim duration
+            }, 
             { 
                 target=exitCenter, --pan to exit pos (center)
                 afterFn=function() --spawn level exit
-                    LevelManager.exitsClass:new(level.exit.name,spawnPos.x,spawnPos.y)
+                    LevelManager.exitsClass:new(level.exit.name,exitPos.x,exitPos.y)
                 end,
                 holdTime=1.3 --hold for spawn anim duration
             }, 

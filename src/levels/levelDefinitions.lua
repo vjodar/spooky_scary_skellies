@@ -198,7 +198,7 @@ return {
             },
         },
         maxEnemies=50,
-        chest={name='chestSmall'},
+        chest={name='chestLarge'},
         exit={name='swampWallHole',pos={x=288,y=26+31}}, --swamp boss
         nextLevel='caveL1',
     },
@@ -206,10 +206,18 @@ return {
         map='cave2',
         waves={
             {
-                pumpkin=1,
+                slime=10,
+            },
+            {
+                slime=20,
+            },
+            {
+                slime=10,
+                slimeMatron=10,
             },
         },
-        maxEnemies=10,
+        maxEnemies=50,
+        chest={name='chestSmall'},
         exit={name='caveWallHole',pos={x=380,y=32+26}},
         nextLevel='caveL2',
     },
@@ -217,10 +225,81 @@ return {
         map='cave2',
         waves={
             {
-                pumpkin=1,
+                slimeMatron=3,
+                undeadMiner=10,
+            },
+            {
+                undeadMiner=20,
+                frankenstein=2,
             },
         },
-        maxEnemies=10,
+        maxEnemies=30,
+        chest={name='chestSmall'},
+        exit={name='ladderDown'},
+        nextLevel='caveL3',
+    },
+    ['caveL3']={
+        map='cave2',
+        waves={
+            {
+                spiderEgg=30,
+                ghost=10,
+            },
+        },
+        maxEnemies=30,
+        chest={name='chestSmall'},
+        exit={name='ladderDown'},
+        nextLevel='caveL4',
+    },
+    ['caveL4']={
+        map='cave2',
+        waves={
+            {
+                bat=30,
+            },
+            {
+                vampire=10,
+            },
+        },
+        maxEnemies=40,
+        chest={name='chestSmall'},
+        exit={name='ladderDown'},
+        nextLevel='caveL5',
+    },
+    ['caveL5']={
+        map='cave2',
+        waves={
+            {
+                werewolf=10,
+            },
+            {
+                werewolf=10,
+                werebear=3,
+            },
+        },
+        maxEnemies=40,
+        chest={name='chestSmall'},
+        exit={name='ladderDown'},
+        nextLevel='caveL6',
+    },
+    ['caveL6']={
+        map='cave2',
+        waves={
+            {
+                undeadMiner=10,
+                golem=5,
+            },
+            {
+                slimeMatron=5,
+                golem=5,
+            },
+            {
+                werebear=5,
+                golem=10,
+            },
+        },
+        maxEnemies=40,
+        chest={name='chestSmall'},
         exit={name='ladderDown'},
         nextLevel='caveBoss',
     },
@@ -234,10 +313,11 @@ return {
         },
         waves={
             {
-                giantTombstone=1,
+                obsidianGolem=1,
             },
         },
-        maxEnemies=100,
+        maxEnemies=50,
+        chest={name='chestLarge'},
         exit={name='ladderUp'},
         nextLevel='dungeonL1',
     },
@@ -249,6 +329,7 @@ return {
             },
         },
         maxEnemies=10,
+        chest={name='chestSmall'},
         exit={name='dungeonStairs'},
         nextLevel='dungeonL2',
     },
@@ -260,10 +341,11 @@ return {
             },
         },
         maxEnemies=10,
+        chest={name='chestSmall'},
         exit={name='dungeonStairs'},
         nextLevel='dungeonBoss',
     },
-    ['dungeonL2']={
+    ['dungeonBoss']={
         map='dungeonBoss',
         waves={
             {

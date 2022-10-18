@@ -47,8 +47,8 @@ function love.keyreleased(k)
         )
     end
     if k=='p' then 
-        -- for i=1,10 do Upgrades:unlock('increaseMovespeed') end 
-        Upgrades:unlock('increaseMinionCapacity')
+        -- Upgrades:unlock('increaseKnockback')
+        UpgradeSelectionState:presentCards(5)
         -- FadeState:fadeBoth({fadeTime=2,afterFn=function() print('done') end, holdTime=1})
         -- local particles=ParticleSystem:generateEmitter({
         --     count=200,

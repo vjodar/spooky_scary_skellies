@@ -40,13 +40,17 @@ camera.update=function(self)
     if shake.magnitude<shake.stopThreshold*dt then shake.magnitude=0 end 
  end
 
- camera.shake=function(self,args) --args={magnitude,period,damping,stopThreshold}
+ camera.shake=function(self,args,bypass) --args={magnitude,period,damping,stopThreshold}
     local shake=self.shakeData
+    if not bypass and shake.magnitude>1 then return end --prevent overshake
     shake.magnitude=shake.magnitude+(args.magnitude or 5)
     shake.period=args.period or 0.01
     shake.damping=args.damping or 10
     shake.stopThreshold=args.stopThreshold or 0.5
     shake.stopThreshold=shake.stopThreshold*60 --frameRate sensitive
  end
+
+ --shake camera and bypass the overshake prevention (for bosses mainly)
+ camera.shakeBypass=function(self,args) self:shake(args,true) end 
 
 return camera

@@ -99,7 +99,7 @@ local tileOccupiedKey={
     terrain={'player','terrain','border','decoration'},
     decoration={'terrain','decoration'},
     entity={'player','terrain'},
-    object={'player','terrain','border'},
+    object={'player','terrain','border','object'},
 }
 
 --checks if any element of key is in tile.occupiedBy
@@ -258,6 +258,15 @@ local generateObjectSpawnPosition=function(self,objectName,objectClass,grid)
         selectedTile.x,selectedTile.y,
         objectColliderDef.w,objectColliderDef.h,objectTileSize
     )
+    --occupy tile with exit/chest object
+    local tileX,tileY=self:getTileCoords(selectedTile)
+    for j=0,objectTileSize.w-1 do 
+        for k=0,objectTileSize.h-1 do   
+            if grid[tileX+j][tileY+k] then --some exits don't exist on grid tiles     
+                table.insert(grid[tileX+j][tileY+k].occupiedBy,'object')
+            end
+        end
+    end
     return {x=spawnX,y=spawnY}
 end
 

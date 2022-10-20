@@ -238,7 +238,6 @@ local buildLevel=function(self,lvl,skeletons)
         entityAggro=true, --used to enable/disable entity aggression
         canCheckWaveCompletion=true,
         complete=false,
-        chest=levelDef.chest,
         exit=levelDef.exit,
         nextLevel=levelDef.nextLevel,
     }        
@@ -252,15 +251,23 @@ local buildLevel=function(self,lvl,skeletons)
     self.update=self.wait --wait until any fading/camera panning is done
 end
 
+--finds a open space in a level grid for a chest to spawn in, then returns
+--that position and the chests' center (for camera panning)
+local getChestSpawnPos=function(self,chestName,grid)    
+    local chestPos=self.gridClass:generateObjectSpawnPosition(
+        chestName,Upgrades.chests,self.currentLevel.grid
+    )
+    local chestDef=Upgrades.chests.definitions[chestName]
+    local chestCenter={x=chestPos.x+chestDef.w*0.5,y=chestPos.y+chestDef.h*0.5}
+    return chestPos,chestCenter 
+end
+
 --spawns level chest and exit, pans to both in sequence
-local spawnExit=function()
+local spawnExit=function() --callback function, no arguments
     local level=LevelManager.currentLevel 
 
-    local chestPos=level.chest.pos or LevelManager.gridClass:generateObjectSpawnPosition(
-        level.chest.name,Upgrades.chests,level.grid
-    )
-    local chestDef=Upgrades.chests.definitions[level.chest.name]
-    local chestCenter={x=chestPos.x+chestDef.w*0.5,y=chestPos.y+chestDef.h*0.5}
+    local chestName='chestSmall'
+    local chestPos,chestCenter=LevelManager:getChestSpawnPos(chestName,level.grid)
 
     --if level exit pos isn't specified, generate it using gridClass
     local exitPos=level.exit.pos or LevelManager.gridClass:generateObjectSpawnPosition(
@@ -272,7 +279,7 @@ local spawnExit=function()
         { 
             target=chestCenter, --pan to chest
             afterFn=function() --spawn chest
-                Upgrades.chests:new(level.chest.name,chestPos.x,chestPos.y)
+                Upgrades.chests:new(chestName,chestPos.x,chestPos.y)
             end,
             holdTime=1 --hold for spawn anim duration
         }, 
@@ -367,18 +374,25 @@ local updateBoss=function(self)
     if level.boss.state=='dead' then 
         level.complete=true
         self:killEntities('enemy') --destroy any other enemies
+        if level.name=='dungeonBoss' then 
+            print("Happy Halloween!!!")
+            --TODO: pan to witch to watch death, end the game
+            return 
+        end
 
-        local chestPos=level.chest.pos or LevelManager.gridClass:generateObjectSpawnPosition(
-            level.chest.name,Upgrades.chests,level.grid
-        )
-        local chestDef=Upgrades.chests.definitions[level.chest.name]
-        local chestCenter={x=chestPos.x+chestDef.w*0.5,y=chestPos.y+chestDef.h*0.5}
+        --One large and two small chests for boss levels
+        local chest1='chestLarge'
+        local chest2='chestSmall'
+        local chest3='chestSmall'
+        local chestPos1,chestCenter1=self:getChestSpawnPos(chest1,level.grid)
+        local chestPos2,chestCenter2=self:getChestSpawnPos(chest2,level.grid)
+        local chestPos3,chestCenter3=self:getChestSpawnPos(chest3,level.grid)
     
         --if level exit pos isn't specified, generate it using gridClass
-        local exitPos=level.exit.pos or LevelManager.gridClass:generateObjectSpawnPosition(
-            level.exit.name,LevelManager.exitsClass,level.grid
+        local exitPos=level.exit.pos or self.gridClass:generateObjectSpawnPosition(
+            level.exit.name,self.exitsClass,level.grid
         )
-        local exitDef=LevelManager.exitsClass.definitions[level.exit.name]
+        local exitDef=self.exitsClass.definitions[level.exit.name]
         local exitCenter={x=exitPos.x+exitDef.w*0.5,y=exitPos.y+exitDef.h*0.5}
         local panObjects={
             { --watch boss death animation
@@ -386,16 +400,30 @@ local updateBoss=function(self)
                 holdTime=level.bossData.deathAnimDuration,
             },
             { 
-                target=chestCenter, --pan to chest
+                target=chestCenter1, --pan to chest
                 afterFn=function() --spawn chest
-                    Upgrades.chests:new(level.chest.name,chestPos.x,chestPos.y)
+                    Upgrades.chests:new(chest1,chestPos1.x,chestPos1.y)
+                end,
+                holdTime=1 --hold for spawn anim duration
+            }, 
+            { 
+                target=chestCenter2, --pan to chest
+                afterFn=function() --spawn chest
+                    Upgrades.chests:new(chest2,chestPos2.x,chestPos2.y)
+                end,
+                holdTime=1 --hold for spawn anim duration
+            }, 
+            { 
+                target=chestCenter3, --pan to chest
+                afterFn=function() --spawn chest
+                    Upgrades.chests:new(chest3,chestPos3.x,chestPos3.y)
                 end,
                 holdTime=1 --hold for spawn anim duration
             }, 
             { 
                 target=exitCenter, --pan to exit pos (center)
                 afterFn=function() --spawn level exit
-                    LevelManager.exitsClass:new(level.exit.name,exitPos.x,exitPos.y)
+                    self.exitsClass:new(level.exit.name,exitPos.x,exitPos.y)
                 end,
                 holdTime=1.3 --hold for spawn anim duration
             }, 
@@ -431,6 +459,7 @@ return { --The Module
     spawnExit=spawnExit,
     killEntities=killEntities,
     wait=wait,
+    getChestSpawnPos=getChestSpawnPos,
     updateStandard=updateStandard,
     updateBoss=updateBoss,
     update=updateStandard,
@@ -453,19 +482,20 @@ return { --The Module
         --         love.graphics.rectangle('line',tile.x,tile.y,16,16)
         --         if #tile.occupiedBy>0 then 
         --             local o=tile.occupiedBy[1]
-        --             if o=='player' then love.graphics.setColor(1,0,0)
+        --             if o=='object' then love.graphics.setColor(1,0,0)
         --             elseif o=='terrain' then love.graphics.setColor(0,1,0)
         --             elseif o=='border' then love.graphics.setColor(0,0,1)
         --             elseif o=='decoration' then love.graphics.setColor(0,1,1)
         --             end
         --             love.graphics.rectangle('line',tile.x,tile.y,16,16)
+        --             love.graphics.setColor(1,1,1)
         --         end
         --     end
         -- end
-        for i=1,#level.boundaries do 
-            local b=level.boundaries[i]
-            love.graphics.rectangle('line',b.x,b.y,b.w,b.h)
-        end
+        -- for i=1,#level.boundaries do 
+        --     local b=level.boundaries[i]
+        --     love.graphics.rectangle('line',b.x,b.y,b.w,b.h)
+        -- end
         --testing------------------------------------------------------
     end,
 }

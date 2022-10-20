@@ -13,7 +13,7 @@ player.collisionClass='ally'
 player.collisionFilter=World.collisionFilters[player.collisionClass]
 
 --General Data
-player.health={current=300,max=300}
+player.health={current=500,max=500}
 player.kbResistance=0
 player.attack={
     damage=10,
@@ -21,8 +21,9 @@ player.attack={
     projectile={name='bone',yOffset=-10},
 }
 player.minionsPerSummon=1
-player.maxMinions=3
+player.maxMinions=5
 player.selectedMage='Fire'
+player.healthPerParticle=0.1
 player.nearbyEnemies={}
 player.aggroRange={w=600,h=450}
 player.allyReturnThreshold={x=220,y=150} --distance from player before skeletons run back
@@ -34,6 +35,9 @@ player.upgrades={
     skeletonMageIce=false,
     skeletonMageElectric=false,
     boneShield=false,
+    bounceBone=false,
+    corpseExplosion=false,
+    panicSummon=false,
     warriorIce=false,
     warriorElectric=false,
     bounceArrow=false,
@@ -165,8 +169,10 @@ function player:updatePosition()
             other.vy=other.vy+sin(angle)*self.moveSpeed*2*dt
         end
 
-        if other.name=='exit' then other:activateExit() end 
-        if other.name=='chest' then other:activateChest() end 
+        if acceptInput then --wait for all other above states to close
+            if other.name=='exit' then other:activateExit() end 
+            if other.name=='chest' then other:activateChest() end 
+        end
     end
 
     if LevelManager:isEntityOutOfBounds(self) then 
@@ -247,10 +253,12 @@ function player:takeDamage(args)
 
     if self.upgrades.boneShield then
         for i=1,#self.boneShieldAngles do 
+            local damage=self.attack.damage*0.25
+            local knockback=self.attack.knockback*2
             Projectiles:new({
                 x=self.center.x,y=self.center.y,name=self.attack.projectile.name,
-                damage=self.attack.damage,knockback=self.attack.knockback,
-                angle=self.boneShieldAngles[i],yOffset=self.attack.projectile.yOffset,
+                damage=damage,knockback=knockback,angle=self.boneShieldAngles[i],
+                yOffset=self.attack.projectile.yOffset,
             })
         end
     end

@@ -64,6 +64,15 @@ local calculateHeartPieces=function(self)
     if self.heartPieces<previousCount then 
         self.particles:emit(Player.center.x,Player.center.y)
         Camera:shake({magnitude=10})
+        if Player.upgrades.panicSummon then 
+            local skellies={'skeletonWarrior','skeletonWarrior','skeletonWarrior'}
+            local unlocked=Player.upgrades
+            if unlocked.skeletonArcher then skellies[2]='skeletonArcher' end 
+            if unlocked.skeletonMageFire then skellies[3]='skeletonMageFire' end 
+            if unlocked.skeletonMageIce then skellies[3]='skeletonMageIce' end 
+            if unlocked.skeletonMageElectric then skellies[3]='skeletonMageElectric' end 
+            for i=1,3 do Player:summon(rndElement(skellies),1) end
+        end
     end
 end
 

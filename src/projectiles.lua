@@ -322,8 +322,32 @@ local projectileOnHitFunctions=function()
         --damages targets, destroys upon hitting solids
         ['base']=function(self,target,touch)
             if target.collisionClass=='solid' 
-            or target.collisionClass=='exit' 
             then return false end
+
+            if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
+            or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
+            then 
+                target:takeDamage({
+                    damage=self.attack.damage,
+                    knockback=self.attack.knockback,
+                    angle=getAngle(self.center,target.center),
+                }) 
+                return false
+            end 
+        end,
+        
+        ['bone']=function(self,target,touch)
+            if target.collisionClass=='solid' then 
+                if Player.upgrades.bounceBone then                     
+                    local angle=getAngle(touch,self)
+                    self.vx=cos(angle)*self.moveSpeed 
+                    self.vy=sin(angle)*self.moveSpeed
+                    self.angle=angle
+                    return
+                else 
+                    return false 
+                end
+            end
 
             if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
             or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
@@ -339,7 +363,6 @@ local projectileOnHitFunctions=function()
 
         ['arrow']=function(self,target,touch)
             if target.collisionClass=='solid' 
-            or target.collisionClass=='exit' 
             then 
                 if Player.upgrades.bounceArrow then                     
                     local angle=getAngle(touch,self)
@@ -363,7 +386,7 @@ local projectileOnHitFunctions=function()
                         target.status:burn(self.attack.damage*0.5,3) --apply 3sec burn                        
                     end
                     if Player.upgrades.archerIce then 
-                        target.status:freeze(target,1,0.5) --slow to half speed for 1s
+                        target.status:freeze(target,2,0.5) --slow to half speed for 1s
                     end
                 end
                 if Player.upgrades.archerElectric then 
@@ -397,7 +420,6 @@ local projectileOnHitFunctions=function()
         --damages and sets targets on fire, destroys upon hitting solids
         ['flame']=function(self,target,touch)
             if target.collisionClass=='solid' 
-            or target.collisionClass=='exit' 
             then return false end
 
             if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
@@ -419,7 +441,6 @@ local projectileOnHitFunctions=function()
         --damages and freezes targets, destroys upon hitting solids
         ['icicle']=function(self,target,touch)
             if target.collisionClass=='solid' 
-            or target.collisionClass=='exit' 
             then return false end
                
             if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
@@ -432,7 +453,7 @@ local projectileOnHitFunctions=function()
                     textColor='blue'
                 })
                 if target.state~='dead' then 
-                    target.status:freeze(target,1,0.5) --slow to half speed for 1s
+                    target.status:freeze(target,2,0.5) --slow to half speed for 2s
                 end
                 return false
             end 
@@ -441,7 +462,6 @@ local projectileOnHitFunctions=function()
         --damages targets, bounces off solids
         ['spark']=function(self,target,touch)     
             if target.collisionClass=='solid' 
-            or target.collisionClass=='exit' 
             then 
                 local angle=getAngle(touch,self)
                 self.vx=cos(angle)*self.moveSpeed 
@@ -468,7 +488,6 @@ local projectileOnHitFunctions=function()
             if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
             or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
             or target.collisionClass=='solid'
-            or target.collisionClass=='exit'
             then 
                 local queryData={
                     x=self.x-self.explosionRadius*0.5,
@@ -491,7 +510,7 @@ local projectileOnHitFunctions=function()
                         textColor='red',
                     })
                     if target.state~='dead' then 
-                        target.status:burn(self.attack.damage*0.5,5) --burn for 5s
+                        target.status:burn(self.attack.damage*0.25,5) --burn for 5s
                     end
                 end
                 self.particles:emit(self.center.x,self.center.y)
@@ -511,7 +530,6 @@ local projectileOnHitFunctions=function()
         --bounces off solids, slows each bounce
         ['blizzard']=function(self,target,touch)     
             if target.collisionClass=='solid' 
-            or target.collisionClass=='exit' 
             then 
                 self.moveSpeed=self.moveSpeed*0.9
                 local angle=getAngle(touch,self)
@@ -524,7 +542,6 @@ local projectileOnHitFunctions=function()
         --bounces off solids, speeds up each bounce
         ['orb']=function(self,target,touch)     
             if target.collisionClass=='solid' 
-            or target.collisionClass=='exit' 
             then 
                 self.moveSpeed=self.moveSpeed*1.2
                 self.moveSpeed=(min(self.moveSpeed,300))
@@ -538,7 +555,6 @@ local projectileOnHitFunctions=function()
         --damages and freezes targets, bounces off solids
         ['laser']=function(self,target,touch)     
             if target.collisionClass=='solid' 
-            or target.collisionClass=='exit' 
             then 
                 local angle=getAngle(touch,self)
                 self.vx=cos(angle)*self.moveSpeed 
@@ -557,7 +573,7 @@ local projectileOnHitFunctions=function()
                     textColor='blue'
                 })
                 if target.state~='dead' then 
-                    target.status:freeze(target,1,0.5) --slow to half speed for 1s
+                    target.status:freeze(target,2,0.5) --slow to half speed for 1s
                 end
                 return false
             end 
@@ -812,7 +828,7 @@ local projectileUpdateFunctions=function()
                                 textColor='red',
                             })
                             if target.state~='dead' then 
-                                target.status:burn(self.attack.damage*0.5,5) --burn for 5s
+                                target.status:burn(self.attack.damage*0.25,5) --burn for 5s
                             end
                         end
                         self.particles:emit(self.center.x,self.center.y)

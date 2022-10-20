@@ -1,9 +1,9 @@
 return {
     ['test']={
-        map='dungeonBoss',
+        map='swamp3',
         waves={
             {
-                tombstone=1,
+                obsidianGolem=1,
             },
             -- {
             --     spider=10,            
@@ -16,11 +16,10 @@ return {
             -- },
         },
         maxEnemies=100, --used to limit summoner enemies' minion spawns
-        chest={name='chestSmall'},
         exit={name='swampWallHole',pos={x=245,y=26+31}}, --small swamp
         -- exit={name='swampWallHole',pos={x=288,y=26+31}}, --swamp boss
         -- exit={name='ladderUp'},
-        nextLevel='caveBoss',
+        nextLevel='test',
     },
     ['swampL1']={
         map='swamp3',
@@ -37,7 +36,6 @@ return {
             },
         },
         maxEnemies=10,
-        chest={name='chestSmall'},
         exit={name='swampWallHole',pos={x=245,y=26+31}},
         nextLevel='swampL2',
     },
@@ -58,7 +56,6 @@ return {
             },
         },
         maxEnemies=10,
-        chest={name='chestSmall'},
         exit={name='swampWallHole',pos={x=373,y=26+31}},
         nextLevel='swampL3',
     },
@@ -77,7 +74,6 @@ return {
             },
         },
         maxEnemies=20,
-        chest={name='chestSmall'},
         exit={name='swampWallHole',pos={x=373,y=26+31}},
         nextLevel='swampL4',
     },
@@ -100,7 +96,6 @@ return {
             },
         },
         maxEnemies=20,
-        chest={name='chestSmall'},
         exit={name='swampWallHole',pos={x=373,y=26+31}},
         nextLevel='swampL5',
     },
@@ -121,7 +116,6 @@ return {
             },
         },
         maxEnemies=20,
-        chest={name='chestSmall'},
         exit={name='swampWallHole',pos={x=373,y=26+31}},
         nextLevel='swampL6',
     },
@@ -139,7 +133,6 @@ return {
             },
         },
         maxEnemies=20,
-        chest={name='chestSmall'},
         exit={name='swampWallHole',pos={x=373,y=26+31}},
         nextLevel='swampL7',
     },
@@ -157,7 +150,6 @@ return {
             },
         },
         maxEnemies=20,
-        chest={name='chestSmall'},
         exit={name='swampWallHole',pos={x=373,y=26+31}},
         nextLevel='swampL8',
     },
@@ -175,12 +167,12 @@ return {
             {
                 pumpkin=10,
                 zombie=10,
+                ghost=10,
                 frankenstein=1,
                 headlessHorseman=1
             },
         },
         maxEnemies=20,
-        chest={name='chestSmall'},
         exit={name='swampWallHole',pos={x=373,y=26+31}},
         nextLevel='swampBoss',
     },
@@ -198,7 +190,6 @@ return {
             },
         },
         maxEnemies=50,
-        chest={name='chestLarge'},
         exit={name='swampWallHole',pos={x=288,y=26+31}}, --swamp boss
         nextLevel='caveL1',
     },
@@ -217,7 +208,6 @@ return {
             },
         },
         maxEnemies=50,
-        chest={name='chestSmall'},
         exit={name='caveWallHole',pos={x=380,y=32+26}},
         nextLevel='caveL2',
     },
@@ -234,21 +224,19 @@ return {
             },
         },
         maxEnemies=30,
-        chest={name='chestSmall'},
-        exit={name='ladderDown'},
+        exit={name='caveWallHole',pos={x=380,y=32+26}},
         nextLevel='caveL3',
     },
     ['caveL3']={
         map='cave2',
         waves={
             {
-                spiderEgg=30,
-                ghost=10,
+                spiderEgg=40,
+                ghost=20,
             },
         },
         maxEnemies=30,
-        chest={name='chestSmall'},
-        exit={name='ladderDown'},
+        exit={name='caveWallHole',pos={x=380,y=32+26}},
         nextLevel='caveL4',
     },
     ['caveL4']={
@@ -258,11 +246,10 @@ return {
                 bat=30,
             },
             {
-                vampire=10,
+                vampire=12,
             },
         },
         maxEnemies=40,
-        chest={name='chestSmall'},
         exit={name='ladderDown'},
         nextLevel='caveL5',
     },
@@ -278,7 +265,6 @@ return {
             },
         },
         maxEnemies=40,
-        chest={name='chestSmall'},
         exit={name='ladderDown'},
         nextLevel='caveL6',
     },
@@ -299,7 +285,6 @@ return {
             },
         },
         maxEnemies=40,
-        chest={name='chestSmall'},
         exit={name='ladderDown'},
         nextLevel='caveBoss',
     },
@@ -317,7 +302,6 @@ return {
             },
         },
         maxEnemies=50,
-        chest={name='chestLarge'},
         exit={name='ladderUp'},
         nextLevel='dungeonL1',
     },
@@ -325,34 +309,165 @@ return {
         map='dungeon1',
         waves={
             {
-                pumpkin=1,
+                poltergeist=20,
+            },
+            {
+                floatingEyeball=20,
+            },
+            {
+                possessedArcher=20,
             },
         },
-        maxEnemies=10,
-        chest={name='chestSmall'},
+        maxEnemies=50,
         exit={name='dungeonStairs'},
         nextLevel='dungeonL2',
     },
     ['dungeonL2']={
+        map='dungeon2',
+        waves={
+            {
+                imp=40,
+            },
+            {
+                gnasherDemon=20,
+            },
+            {
+                possessedKnight=20,
+            },
+        },
+        maxEnemies=100,
+        exit={name='dungeonStairs'},
+        nextLevel='dungeonL3',
+    },
+    ['dungeonL3']={
+        map='dungeon3',
+        waves={
+            {
+                possessedKnight=15,
+                vampire=15,
+            },
+            {
+                possessedArcher=15,
+                imp=15,
+            },
+        },
+        maxEnemies=100,
+        exit={name='dungeonStairs'},
+        nextLevel='dungeonL4',
+    },
+    ['dungeonL4']={
+        map='dungeon4',
+        waves={
+            {
+                ghost=20,
+                poltergeist=10,
+            },
+            {
+                floatingEyeball=10,
+                gnasherDemon=20,
+            },
+            {
+                possessedArcher=20,
+                possessedKnight=20,
+            },
+        },
+        maxEnemies=100,
+        exit={name='dungeonStairs'},
+        nextLevel='dungeonL5',
+    },
+    ['dungeonL5']={
         map='dungeon6',
         waves={
             {
-                pumpkin=1,
+                headlessHorseman=10,
+            },
+            {
+                imp=20,
+                gnasherDemon=10,
+                floatingEyeball=5,
+            },
+            {
+                gnasherDemon=10,
+                imp=10,
+                pyreFiend=3,
             },
         },
-        maxEnemies=10,
-        chest={name='chestSmall'},
+        maxEnemies=100,
+        exit={name='dungeonStairs'},
+        nextLevel='dungeonL6',
+    },
+    ['dungeonL6']={
+        map='dungeon5',
+        waves={
+            {
+                frankenstein=10,
+            },
+            {
+                imp=20,
+                gnasherDemon=10,
+                possessedArcher=5,
+                possessedKnight=5,             
+            },
+            {
+                gnasherDemon=10,
+                imp=10,
+                beholder=3,
+            },
+        },
+        maxEnemies=100,
         exit={name='dungeonStairs'},
         nextLevel='dungeonBoss',
     },
     ['dungeonBoss']={
         map='dungeonBoss',
+        bossData={
+            wave=11, name='witch',
+            spawnPos={x=400,y=64},
+            spawnAnimDuration=1,
+            deathAnimDuration=3,
+        },
         waves={
             {
-                pumpkin=1,
+                pumpkin=50,
+            },
+            {
+                spider=100,
+            },
+            {
+                ghost=70,
+                poltergeist=30,
+            },
+            {
+                zombie=70,
+                undeadMiner=30,
+            },
+            {
+                werewolf=80,
+                werebear=10,
+            },
+            {
+                slime=70,
+                slimeMatron=30,
+            },
+            {
+                bat=30,
+                vampire=70,
+            },
+            {
+                possessedKnight=50,
+                possessedArcher=50,
+            },
+            {
+                frankenstein=25,
+            },
+            {
+                headlessHorseman=25,
+            },
+            {
+                witch=1,
             },
         },
-        maxEnemies=10,
+        maxEnemies=200,
         exit={name='dungeonStairs'},
         nextLevel='test',
     },

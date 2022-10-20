@@ -32,10 +32,11 @@ local generateDrawData=function(cardDef)
     return cardSprite,cardPoof,animations 
 end
 local sprite,poof,animations=generateDrawData(definitions.cardPoof)
+local pressedButtonSprite=love.graphics.newImage('assets/hud/pressedButton.png')
 
-local presentCards=function(self,count)
+local presentCards=function(self,count,isBossChest)
     self.center.x,self.center.y=Camera.x,Camera.y 
-    local upgrades=Upgrades:pickUpgrades(count)
+    local upgrades=Upgrades:pickUpgrades(count,isBossChest)
 
     local cardOffsets={-166,0,166,-83,83}
     local cardHeightSixTenths=self.cardHeight*0.6
@@ -92,8 +93,105 @@ local despawnCards=function(self)
     end
 end
 
+--card methods-------------------------------------------------------------------------------------
+local cardUpdate=function(self,x,y)
+    self.x,self.y=x+self.xOffset,y+self.yOffset 
+    local onLoop=self.animations.current:update(dt)
+    return self.stateMachine[self.state](self,onLoop)
+end
+
+local cardDraw=function(self)
+    if self.isCardVisible then 
+        love.graphics.draw(self.sprite,self.x,self.y) 
+        love.graphics.setFont(self.titleFont)
+        love.graphics.printf(self.title,self.x+10,self.y+self.titleOffset+13,98,'center')
+        love.graphics.setFont(self.textFont)
+        love.graphics.printf(self.desc,self.x+10,self.y+40,98,'center')
+        if self.isButtonPressed then 
+            love.graphics.draw(self.pressedButtonSprite,self.x,self.y)
+        end
+    end
+    self.animations.current:draw(self.poof,self.x,self.y)
+end
+
+local cardStateMachine={
+    spawn=function(self,onLoop) --spawn poof animation
+        self.isCardVisible=(self.animations.current.position>=7)
+        if onLoop then 
+            self.state='idle'
+            self.isCardVisible=true
+            self.animations.current:pauseAtEnd()
+        end
+    end,
+    idle=function(self) --wait for player to press button
+        if acceptInput then 
+            if Controls.pressed.mouse
+            and self:selectedMe(Controls.getMousePosition())
+            then
+                self.state='pressed'
+                self.isButtonPressed=true
+            end
+        end
+    end,
+    pressed=function(self) --'press' button, activate upgrade
+        self.pressedTimer=self.pressedTimer-dt 
+        if self.pressedTimer<0 then 
+            self.isButtonPressed=false 
+            Upgrades:unlock(self.name)
+            return true 
+        end
+    end,
+    despawn=function(self,onLoop) --despawn animation
+        self.isCardVisible=(self.animations.current.position<=6)
+        if onLoop then return false end 
+    end,
+}
+
+local selectedMe=function(self,mouseX,mouseY)
+    local button={x=self.x+20,y=self.y+86,w=80,h=14}
+    return not (mouseX<button.x or mouseX>button.x+button.w
+        or mouseY<button.y or mouseY>button.y+button.h)
+end
+
+local newCard=function(self,name,x,y,xOffset,yOffset) --card constructor
+    local def=Upgrades.definitions[name]
+    local title=def.name
+    local titleOffset=0
+    if #title<=14 then titleOffset=8
+    elseif #title<=23 then titleOffset=4 
+    end
+    local anims={}
+    for name,anim in pairs(self.cardAnimations) do anims[name]=anim:clone() end
+    anims.current=anims.spawn
+    local card={
+        name=name,
+        sprite=self.cardSprite,
+        pressedButtonSprite=self.cardPressedButtonSprite,
+        poof=self.cardPoof,
+        x=x, y=y,
+        xOffset=xOffset, yOffset=yOffset,
+        animations=anims,
+        title=title,      
+        desc=def.desc,
+        titleOffset=titleOffset,
+        titleFont=self.fonts.title,
+        textFont=self.fonts.text,
+        state='spawn',
+        isCardVisible=false,
+        isButtonPressed=false,
+        pressedTimer=0.15,
+        update=self.cardUpdate,
+        draw=self.cardDraw,
+        stateMachine=self.cardStateMachine,
+        selectedMe=self.selectedMe,
+    }
+    table.insert(self.cards,card)
+    return card 
+end
+
 return { --The Module
     cardSprite=sprite,
+    cardPressedButtonSprite=pressedButtonSprite,
     cardPoof=poof,
     cardAnimations=animations,
     cardWidth=definitions.cardPoof.frameWidth,
@@ -109,82 +207,9 @@ return { --The Module
     despawnCards=despawnCards,
     update=selectionUpdate,
     draw=selectionDraw,
-    cardUpdate=function(self,x,y)
-        self.x,self.y=x+self.xOffset,y+self.yOffset 
-        local onLoop=self.animations.current:update(dt)
-
-        if self.state=='spawn' then 
-            self.isCardVisible=(self.animations.current.position>=7)
-            if onLoop then 
-                self.state='idle'
-                self.isCardVisible=true
-                self.animations.current:pauseAtEnd()
-            end 
-            return 
-        end
-
-        if self.state=='idle' then 
-            if acceptInput then 
-                if Controls.pressed.mouse
-                and self:selectedMe(Controls.getMousePosition())
-                then
-                    self:activateUpgrade()                        
-                    return true
-                end
-            end
-            return 
-        end
-
-        if self.state=='despawn' then 
-            self.isCardVisible=(self.animations.current.position<=6)
-            if onLoop then return false end 
-            return 
-        end
-    end,
-    cardDraw=function(self)
-        if self.isCardVisible then 
-            love.graphics.draw(self.sprite,self.x,self.y) 
-            love.graphics.setFont(self.titleFont)
-            love.graphics.printf(self.title,self.x+10,self.y+self.titleOffset+13,98,'center')
-            love.graphics.setFont(self.textFont)
-            love.graphics.printf(self.desc,self.x+10,self.y+40,98,'center')
-        end
-        self.animations.current:draw(self.poof,self.x,self.y)
-    end,
-    selectedMe=function(self,mouseX,mouseY)
-        local button={x=self.x+20,y=self.y+86,w=80,h=14}
-        return not (mouseX<button.x or mouseX>button.x+button.w
-            or mouseY<button.y or mouseY>button.y+button.h)
-    end,
-    newCard=function(self,name,x,y,xOffset,yOffset) --card constructor
-        local def=Upgrades.definitions[name]
-        local title=def.name
-        local titleOffset=0
-        if #title<=14 then titleOffset=8
-        elseif #title<=23 then titleOffset=4 
-        end
-        local anims={}
-        for name,anim in pairs(self.cardAnimations) do anims[name]=anim:clone() end
-        anims.current=anims.spawn
-        local card={
-            sprite=self.cardSprite,
-            poof=self.cardPoof,
-            x=x, y=y,
-            xOffset=xOffset, yOffset=yOffset,
-            animations=anims,
-            title=title,      
-            desc=def.desc,
-            titleOffset=titleOffset,
-            titleFont=self.fonts.title,
-            textFont=self.fonts.text,
-            state='spawn',
-            isCardVisible=false,
-            selectedMe=self.selectedMe,
-            update=self.cardUpdate,
-            draw=self.cardDraw,
-            activateUpgrade=Upgrades.activationFunctions[name],
-        }
-        table.insert(self.cards,card)
-        return card 
-    end,
+    cardStateMachine=cardStateMachine,
+    cardUpdate=cardUpdate,
+    cardDraw=cardDraw,
+    selectedMe=selectedMe,
+    newCard=newCard,
 }

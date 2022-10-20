@@ -382,6 +382,23 @@ behaviors.states.common={
             if not onLoop then return end 
         end
 
+        if Player.upgrades.corpseExplosion then
+            if self.collisionClass=='enemy'
+            and self.name~='spiderEgg' --spiderEggs are the exception
+            then
+                local angles=Player.boneShieldAngles
+                local playerAttack=Player.attack 
+                local damage=self.health.max/8
+                for i=1,#angles do  
+                    Projectiles:new({ 
+                        x=self.center.x,y=self.center.y,name=playerAttack.projectile.name,
+                        damage=damage,knockback=playerAttack.knockback,
+                        angle=angles[i],yOffset=-10,
+                    })
+                end
+            end
+        end
+
         --destroy enemy, emit particle explosion, shake camera
         self.particles:emit(self.center.x,self.center.y)
         LevelManager:decreaseEntityCount(self.collisionClass,self.name)
@@ -625,9 +642,10 @@ behaviors.states.ally={
                         damage=self.attack.damage,
                         knockback=self.attack.knockback,
                         angle=getAngle(self.center,other.center),
+                        textColor=Player.upgrades.warriorIce and 'blue' or 'gray',
                     })
                     if other.state~='dead' and Player.upgrades.warriorIce then 
-                        other.status:freeze(other,1,0.5) --slow to half speed for 1s
+                        other.status:freeze(other,2,0.5) --slow to half speed for 2s
                     end 
                     table.insert(self.targetsAlreadyAttacked,other)
                 end
@@ -689,7 +707,7 @@ behaviors.states.ally={
             })
         end
         
-        local explosionRadius=50 --same explosion radius as fireball
+        local explosionRadius=100 --twice the radius of fireball
         local explosionDamage=self.health.max --damage equal to max health
         local queryData={
             x=self.x-explosionRadius*0.5,
@@ -725,7 +743,7 @@ behaviors.states.enemy={
         self.status:update(self)
         local onLoop=self:updateAnimation()
         if onLoop then self:changeState('idle') end
-        Camera:shake({magnitude=20*dt,stopThreshold=0}) --shake camera during spawn
+        Camera:shakeBypass({magnitude=20*dt,stopThreshold=0}) --shake camera during spawn
     end,
 
     spawnObsidianGolem=function(self)
@@ -733,7 +751,7 @@ behaviors.states.enemy={
         self.status:update(self)
         local onLoop=self:updateAnimation()
         if self.animations.current.position==15 then 
-            Camera:shake({magnitude=80*dt,damping=2}) --shake camera upon landing
+            Camera:shakeBypass({magnitude=80*dt,damping=2}) --shake camera upon landing
         end
         if onLoop then 
             self:changeState('idle') 
@@ -1302,6 +1320,30 @@ behaviors.states.enemy={
             self:changeState(rndElement({'teleport','idle'}))
         end
     end,
+
+    deadBoss=function(self) 
+        --if there's a death animation, wait for it to finish
+        if self.animations.dead then
+            self.animSpeed=self.animSpeedMax
+            local onLoop=self:updateAnimation()
+            if not onLoop then return end 
+        end
+
+        --destroy enemy, emit particle explosion, shake camera
+        --bosses' death shake bypasses camera's overshake prevention
+        self.particles:emit(self.center.x,self.center.y)
+        LevelManager:decreaseEntityCount(self.collisionClass,self.name)
+        if self.deathShake then 
+            local shake=self.deathShake 
+            Camera:shakeBypass({
+                magnitude=shake.magnitude,
+                period=shake.period,
+                damping=shake.damping,
+                stopThreshold=shake.stopThreshold,
+            })
+        end
+        return false
+    end,
 }
 
 behaviors.AI={ --AI--------------------------------------------------------------------------------
@@ -1395,7 +1437,7 @@ behaviors.AI={ --AI-------------------------------------------------------------
         spawn=behaviors.states.enemy.spawnGiantTombstone,
         idle=behaviors.states.enemy.idleStationary,
         attack=behaviors.states.enemy.spawnMinion,
-        dead=behaviors.states.common.dead,
+        dead=behaviors.states.enemy.deadBoss,
     },
     ['obsidianGolem']={
         spawn=behaviors.states.enemy.spawnObsidianGolem,
@@ -1405,7 +1447,7 @@ behaviors.AI={ --AI-------------------------------------------------------------
         attack=behaviors.states.enemy.obsidianGolemChooseAttack,
         fireball=behaviors.states.common.shoot,
         groundslam=behaviors.states.enemy.obsidianGolemGroundslam,
-        dead=behaviors.states.common.dead,
+        dead=behaviors.states.enemy.deadBoss,
     },
     ['witch']={
         spawn=behaviors.states.common.spawn,
@@ -1418,7 +1460,7 @@ behaviors.AI={ --AI-------------------------------------------------------------
         summonDemons=behaviors.states.enemy.witchSummonDemons,
         clone=behaviors.states.enemy.witchClone,
         teleport=behaviors.states.enemy.teleport,
-        dead=behaviors.states.common.dead,
+        dead=behaviors.states.enemy.deadBoss,
     },
     ['witchClone']={
         spawn=behaviors.states.common.spawn,

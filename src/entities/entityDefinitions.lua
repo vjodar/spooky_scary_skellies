@@ -2,7 +2,7 @@ return {
     ['skeletonWarrior']={
         name='skeletonWarrior',
         moveSpeed=15*60,
-        health=60,
+        health=100,
         attack={
             range=40,
             period=2,
@@ -60,7 +60,7 @@ return {
     ['skeletonArcher']={
         name='skeletonArcher',
         moveSpeed=14*60,
-        health=30,
+        health=50,
         attack={
             range=200,  
             period=1, 
@@ -120,7 +120,7 @@ return {
     ['skeletonMageFire']={
         name='skeletonMageFire',
         moveSpeed=13*60,  
-        health=30,
+        health=50,
         attack={
             range=150,  
             period=1.5,   
@@ -180,7 +180,7 @@ return {
     ['skeletonMageIce']={
         name='skeletonMageIce',
         moveSpeed=13*60,
-        health=30,
+        health=80,
         attack={
             range=150,  
             period=1.5,   
@@ -240,13 +240,13 @@ return {
     ['skeletonMageElectric']={
         name='skeletonMageElectric',
         moveSpeed=13*60,    
-        health=30,
+        health=50,
         attack={
             range=100,
             period=1,
             damage=5,
             knockback=50,
-            projectile={name='spark',xOffset=6,yOffset=-7,count=2,spread=0.5},
+            projectile={name='spark',xOffset=6,yOffset=-7,count=3,spread=0.5},
         },
         collider={
             w=10,
@@ -702,7 +702,7 @@ return {
         attack={
             range=40,        
             period=1.5,
-            damage=10,
+            damage=25,
             knockback=500,
             lungeForce=700,
         },
@@ -1609,13 +1609,13 @@ return {
     },
     ['pyreFiend']={
         name='pyreFiend',
-        health=500,
+        health=3000,
         moveSpeed=12*60,
         kbResistance=50,
         attack={
             range=80,  
             period=3, 
-            damage=10,
+            damage=20,
             knockback=100,
             projectile={name='pyre',xOffset=0,yOffset=-10,count=3,spread=0.5},
         },
@@ -1668,7 +1668,7 @@ return {
     },
     ['beholder']={
         name='beholder',
-        health=500,
+        health=3000,
         moveSpeed=10*60,
         kbResistance=50,
         attack={
@@ -1676,7 +1676,7 @@ return {
             period=2, 
             damage=50,
             knockback=100,
-            projectile={name='orb',xOffset=0,yOffset=-16,count=3,spread=1},
+            projectile={name='orb',xOffset=0,yOffset=-16,count=2,spread=1},
         },
         collider={
             w=19,
@@ -1880,13 +1880,13 @@ return {
         attack={
             range=140,  
             period=2,
-            damage=400, knockback=100, --specific to chainLightning
+            damage=100, knockback=100, --specific to chainLightning
             projectile={
                 fireball={
                     name='fireballWitch',
                     xOffset=0,yOffset=-16,
                     spread=0,
-                    damage=300,
+                    damage=100,
                     knockback=300,
                 },                
                 icicle={
@@ -1902,8 +1902,8 @@ return {
             demons={
                 {name='pyreFiend',spawnPoint='level',count=1},
                 {name='beholder',spawnPoint='level',count=1},
-                {name='gnasherDemon',spawnPoint='level',count=2},
-                {name='imp',spawnPoint='level',count=4},
+                {name='gnasherDemon',spawnPoint='level',count=8},
+                {name='imp',spawnPoint='level',count=16},
             },            
         },
         collider={
@@ -1979,11 +1979,11 @@ return {
     ['witchClone']={
         name='witchClone',
         moveSpeed=10*60,
-        health=1000,
+        health=2000,
         attack={
             range=140,  
             period=2,
-            damage=200, knockback=100, --specific to chainLightning
+            damage=50, knockback=100, --specific to chainLightning
             projectile={
                 fireball={
                     name='fireballWitch',
@@ -2002,8 +2002,8 @@ return {
                 },
             },
             demons={
-                {name='gnasherDemon',spawnPoint='level',count=2},
-                {name='imp',spawnPoint='level',count=4},
+                {name='gnasherDemon',spawnPoint='level',count=8},
+                {name='imp',spawnPoint='level',count=16},
             },            
         },
         collider={

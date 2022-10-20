@@ -40,15 +40,9 @@ end
 --testing-------------------
 function love.keyreleased(k) 
     if k=='escape' then love.event.quit() end 
-    if k=='o' then 
-        LevelManager:destroyLevel()
-        LevelManager:buildLevel(
-            LevelManager.currentLevel.name,LevelManager.currentLevel.allyCount
-        )
-    end
     if k=='p' then 
-        -- Upgrades:unlock('increaseKnockback')
-        UpgradeSelectionState:presentCards(5)
+        Upgrades.chests:new('chestSmall',Controls.getMousePosition())
+        -- UpgradeSelectionState:presentCards(5)
         -- FadeState:fadeBoth({fadeTime=2,afterFn=function() print('done') end, holdTime=1})
         -- local particles=ParticleSystem:generateEmitter({
         --     count=200,

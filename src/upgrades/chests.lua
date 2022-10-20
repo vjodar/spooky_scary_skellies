@@ -80,21 +80,20 @@ local chestIdle=function() end
 local chestOpen=function(self)
     local onLoop=self.animations.current:update(dt)
     if onLoop then 
-        self.animations.current:pauseAtEnd()
-        
-        --Start upgrade selection state with 3 cards for normal levels,
-        --5 cards for boss levels
-        local level=LevelManager.currentLevel.name 
-        local largeChest=(level=='swampBoss' or level=='caveBoss')
-        local cardCount=largeChest and 5 or 3
-        UpgradeSelectionState:presentCards(cardCount)
+        self.animations.current:pauseAtEnd() 
+        self.state='idle'
     end
 end
 
 local activateChest=function(self)
     self.animations.current:resume()
     self.state='open'
-    self.name='activatedChest'
+    self.name='activatedChest'    
+    
+    --Large (boss) chests get 5 cards, otherwise 3 cards
+    local isBossChest=self.size=='large'
+    local cardCount=isBossChest and 5 or 3
+    UpgradeSelectionState:presentCards(cardCount,isBossChest)
 end
 
 return { --The Module
@@ -116,8 +115,9 @@ return { --The Module
             animations[animName]=anim:clone() 
         end
         animations.current=animations.spawn
+        local size=name=='chestLarge' and 'large' or 'small'
         local chest={
-            name='chest', state='spawn',
+            name='chest', size=size, state='spawn',
             x=x, y=y, w=def.w, h=def.h,
             xOffset=def.xOffset, 
             yOffset=def.yOffset,

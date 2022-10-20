@@ -76,7 +76,7 @@ local pSystem={ --The Module
         if Player.state=='dead' then return false end 
         local target={x=Player.center.x, y=Player.center.y-8}
         if getDistance(self,target)<10 then 
-            Player:updateHealth(0.1) --heal the player
+            Player:updateHealth(Player.healthPerParticle) --heal the player
             return false 
         end 
         local angle=getAngle(self,target)

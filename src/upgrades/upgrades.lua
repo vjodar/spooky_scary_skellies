@@ -1,24 +1,58 @@
  local definitions={
     --General------------------------------------------------------------------
-    ['increaseMinionCapacity']={
-        name="Undead Army +3",
-        desc="Command up to 3 additional skeletons",
+    ['increaseMinionCapacity5']={
+        name="Undead Army +5",
+        desc="Command up to 5 additional skeletons",
         count=100,
+    },
+    ['increaseMinionCapacity15']={
+        name="Undead Army  +15",
+        desc="Command up to 15 additional skeletons",
+        level="swampBoss",
+    },
+    ['increaseMinionCapacity30']={
+        name="Undead Army  +30",
+        desc="Command up to 30 additional skeletons",
+        level="caveBoss",
     },
     ['increaseMinionsPerSummon']={
         name="Multi-Summon",
-        desc="Raise an additional skeleton each summon",
-        req={'increaseMinionCapacity'},
-        count=5,
+        desc="Raise an additional 2 skeletons each summon",
+        req={'increaseMinionCapacity5'},
+        count=3,
     },
     ['decreaseSummonCooldown']={
         name='Necromantic Agility',
         desc="Decrease cooldown of summoning",
-        count=5,
+        count=3,
     },
     ['boneShield']={
         name="Bone Sheild",
         desc="Fire a ring of bone upon taking damage",
+    },
+    ['corpseExplosion']={
+        name="Corpse Explosion",
+        desc="Slain enemies explode into a ring of bone",
+        level="caveBoss",
+    },
+    ['bounceBone']={
+        name="Bouncey Bone",
+        desc="Bones bounce off solid objects",
+        level="swampBoss",    
+    },
+    ['fastBone']={
+        name="Fast Bone",
+        desc="Bones travel more quickly",
+    },
+    ['panicSummon']={
+        name="Panic Summon",
+        desc="Summon 3 skeletons upon taking heavy damage",
+        level="swampBoss",
+    },
+    ['vampiricEnergy']={
+        name="Vampiric  Energy",
+        desc="Slain enemies restore more of your health",
+        level="swampBoss",
     },
     --Warrior------------------------------------------------------------------
     ['increaseHealth']={
@@ -29,7 +63,6 @@
     ['increaseKnockback']={
         name="Undead Strength",
         desc="Increase knockback of all allies",
-        count=3,
     },
     ['increaseDamage']={
         name="Undead Power",
@@ -39,12 +72,12 @@
     ['increaseAttackSpeed']={
         name="Undead Vigor",
         desc="Increase attack speed of all allies",
-        count=5,
+        count=2,
     },
     ['increaseMovespeed']={
         name="Undead Speed",
         desc="Increase movespeed of all allies",
-        count=10,
+        count=3,
     },
     ['warriorFire']={
         name="Kamakaze",
@@ -53,7 +86,7 @@
     },
     ['warriorIce']={
         name="Ice Kick",
-        desc="Skeleton warriors freeze enemies",
+        desc="Skeleton warriors are more resilient and freeze enemies",
         req={"skeletonMageIce"},
     },
     ['warriorElectric']={
@@ -74,11 +107,11 @@
     },
     ['spreadShot']={
         name="Spread Shot",
-        desc="Skeleton archers shoot 3 arrow volleys",
+        desc="Skeleton archers shoot 2 arrow volleys",
         req={"skeletonArcher"},
     },
     ['bounceArrow']={
-        name="Bounce Arrow",
+        name="Ricochet",
         desc="Skeleton archers arrows ricochet off solid objects",
         req={"skeletonArcher"},
     },
@@ -132,18 +165,45 @@
 
 local activationFunctions={
     --General
-    ['increaseMinionCapacity']=function()        
-        Player.maxMinions=Player.maxMinions+3
+    ['increaseMinionCapacity5']=function()        
+        Player.maxMinions=Player.maxMinions+5
+    end,
+    ['increaseMinionCapacity15']=function()        
+        Player.maxMinions=Player.maxMinions+15
+    end,
+    ['increaseMinionCapacity30']=function()        
+        Player.maxMinions=Player.maxMinions+30
     end,
     ['increaseMinionsPerSummon']=function()
-        Player.minionsPerSummon=Player.minionsPerSummon+1
+        Player.minionsPerSummon=Player.minionsPerSummon+2
     end,
     ['decreaseSummonCooldown']=function()
         local cd=Player.canSummon
-        cd.cooldownPeriod=max(1,cd.cooldownPeriod-1)
+        cd.cooldownPeriod=cd.cooldownPeriod-1.5
     end,
     ['boneShield']=function()
         Player.upgrades.boneShield=true 
+    end,
+    ['corpseExplosion']=function()
+        Player.upgrades.corpseExplosion=true
+    end,
+    ['bounceBone']=function()        
+        Player.upgrades.bounceBone=true
+        local bone=Projectiles.definitions.bone 
+        local travelTime=bone.travelTime or 4
+        bone.travelTime=travelTime+2
+    end,
+    ['fastBone']=function()
+        local bone=Projectiles.definitions.bone        
+        bone.moveSpeed=bone.moveSpeed+150
+        local travelTime=bone.travelTime or 4
+        bone.travelTime=travelTime+2
+    end,
+    ['panicSummon']=function()
+        Player.upgrades.panicSummon=true 
+    end,
+    ['vampiricEnergy']=function()
+        Player.healthPerParticle=0.5
     end,
     
     --Warrior
@@ -159,11 +219,11 @@ local activationFunctions={
             local def=Entities.definitions[name]
             def.health=def.health+val 
         end        
-        increaseHealth('skeletonWarrior',60)
-        increaseHealth('skeletonArcher',30)
-        increaseHealth('skeletonMageFire',30)
-        increaseHealth('skeletonMageIce',30)
-        increaseHealth('skeletonMageElectric',30)
+        increaseHealth('skeletonWarrior',100)
+        increaseHealth('skeletonArcher',50)
+        increaseHealth('skeletonMageFire',50)
+        increaseHealth('skeletonMageIce',80)
+        increaseHealth('skeletonMageElectric',50)
     end,
     ['increaseKnockback']=function() 
         --increase player and all allies' knockback by 3x base values
@@ -171,12 +231,12 @@ local activationFunctions={
             local atk=Entities.definitions[name].attack
             atk.knockback=atk.knockback+val 
         end
-        Player.attack.knockback=Player.attack.knockback+300
-        increaseKnockback('skeletonWarrior',300)
-        increaseKnockback('skeletonArcher',225)
-        increaseKnockback('skeletonMageFire',150)
-        increaseKnockback('skeletonMageIce',150)
-        increaseKnockback('skeletonMageElectric',150)
+        Player.attack.knockback=Player.attack.knockback+600
+        increaseKnockback('skeletonWarrior',600)
+        increaseKnockback('skeletonArcher',450)
+        increaseKnockback('skeletonMageFire',300)
+        increaseKnockback('skeletonMageIce',300)
+        increaseKnockback('skeletonMageElectric',300)
     end,
     ['increaseDamage']=function()
         --increase player and all allies' damage by their base values
@@ -194,16 +254,16 @@ local activationFunctions={
     ['increaseAttackSpeed']=function() 
         --decrease player and allies' attack period, enforce period limits.
         local playerAtk=Player.canAttack
-        playerAtk.cooldownPeriod=max(0.1,playerAtk.cooldownPeriod-0.1)
+        playerAtk.cooldownPeriod=playerAtk.cooldownPeriod-0.2
         local decreaseAttackPeriod=function(name,val)
             local atk=Entities.definitions[name].attack
-            atk.period=max(0.5,atk.period-val)
+            atk.period=atk.period-val
         end
-        decreaseAttackPeriod('skeletonWarrior',0.2)
-        decreaseAttackPeriod('skeletonArcher',0.2)
-        decreaseAttackPeriod('skeletonMageFire',0.1)
-        decreaseAttackPeriod('skeletonMageIce',0.1)
-        decreaseAttackPeriod('skeletonMageElectric',0.1)
+        decreaseAttackPeriod('skeletonWarrior',0.5)
+        decreaseAttackPeriod('skeletonArcher',0.4)
+        decreaseAttackPeriod('skeletonMageFire',0.2)
+        decreaseAttackPeriod('skeletonMageIce',0.2)
+        decreaseAttackPeriod('skeletonMageElectric',0.2)
 
         --decrease archer's firing animation frame duration
         local attackAnim=Entities.definitions.skeletonArcher.animations.attack
@@ -215,7 +275,7 @@ local activationFunctions={
             local def=Entities.definitions[name]
             def.moveSpeed=def.moveSpeed+val
         end
-        local moveBonus=2*60 --framerate sensitive
+        local moveBonus=4*60 --framerate sensitive
         Player.moveSpeedMax=Player.moveSpeedMax+moveBonus
         Player.moveSpeed=Player.moveSpeedMax
         increaseMovespeed('skeletonWarrior',moveBonus)
@@ -226,8 +286,9 @@ local activationFunctions={
     end,
     ['warriorFire']=function()
         pDef={
-            count=300,
+            count=1000,
             spread={x=4, y=8},
+            maxSpeed=15,
             yOffset=7,
             colors={[0xede4da]=1,[0xca5954]=2,}
         }
@@ -235,7 +296,11 @@ local activationFunctions={
         Entities.behaviors.AI.skeletonWarrior.dead=Entities.behaviors.states.ally.kamakaze 
     end,
     ['warriorIce']=function()
+        --enable upgrade, greatly increase warrior knockback resist and health
         Player.upgrades.warriorIce=true 
+        local warrior=Entities.definitions.skeletonWarrior 
+        warrior.kbResistance=90
+        warrior.health=warrior.health+240
     end,
     ['warriorElectric']=function()
         Player.upgrades.warriorElectric=true         
@@ -266,11 +331,14 @@ local activationFunctions={
         projectileDef=Entities.definitions.skeletonArcher.attack.projectile
         local count=projectileDef.count or 0
         local spread=projectileDef.spread or 0 
-        projectileDef.count=count+3
+        projectileDef.count=count+2
         projectileDef.spread=spread+0.2
     end,
     ['bounceArrow']=function()
         Player.upgrades.bounceArrow=true 
+        local arrow=Projectile.definitions.arrow 
+        local travelTime=arrow.travelTime or 2.66
+        arrow.travelTime=travelTime-1.5
     end,
     ['archerFire']=function()
         Player.upgrades.archerFire=true         
@@ -390,7 +458,7 @@ local getLevelSpecificUpgrades=function(self,level)
 end
 
 --selects count number of upgrades from pool to present as upgrade cards
-local pickUpgrades=function(self,count)
+local pickUpgrades=function(self,count,isBossChest)
     Upgrades:updatePool()
 
     local currentLevel=LevelManager.currentLevel.name
@@ -407,7 +475,7 @@ local pickUpgrades=function(self,count)
         local index=rnd(#self.pool)
         local removeTable=self.pool 
         --always select an available level specific upgrade
-        if #levelUpgrades>0 then 
+        if #levelUpgrades>0 and isBossChest then 
             index=rnd(#levelUpgrades)
             removeTable=levelUpgrades 
         end

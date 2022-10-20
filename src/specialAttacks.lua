@@ -65,6 +65,7 @@ local chainLightning=function(self,mage,targets,primary,secondary)
                 love.graphics.setLineWidth(self.width*0.5)
                 self.drawLine(p1,p2,self.yOffset)
                 love.graphics.setColor(1,1,1) --reset color
+                love.graphics.setLineWidth(self.width) --reset line width
             end
         end,
     }

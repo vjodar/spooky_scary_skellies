@@ -388,7 +388,7 @@ behaviors.states.common={
             then
                 local angles=Player.boneShieldAngles
                 local playerAttack=Player.attack 
-                local damage=self.health.max/8
+                local damage=self.health.max/16
                 for i=1,#angles do  
                     Projectiles:new({ 
                         x=self.center.x,y=self.center.y,name=playerAttack.projectile.name,

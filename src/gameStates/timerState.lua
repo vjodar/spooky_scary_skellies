@@ -1,8 +1,6 @@
 local timerState={}
 timerState.timers={}
 
-function timerState:clear() self.timers={} end
-
 function timerState:update()
     for i,timer in ipairs(self.timers) do --must use ipairs() 
         --Update each timer, remove any that return false

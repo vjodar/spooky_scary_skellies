@@ -1,7 +1,7 @@
 local panTo=function(self,panObjects)
     for i=1,#panObjects do table.insert(self.panObjects,panObjects[i]) end
     self.update=self.nextTargetUpdate
-    table.insert(gameStates,self)
+    GameStates:addState(self)
 end
 
 local nextTargetUpdate=function(self)

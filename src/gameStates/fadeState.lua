@@ -1,14 +1,11 @@
 local setupFade=function(self,mode,fadeTime,afterFn,holdTime)
-    --testing------------------------------------------------------
-    assert(gameStates[#gameStates]~=self,'already performing fade')
-    --testing------------------------------------------------------
     self.mode=mode
     self.inc=1/fadeTime 
     self.afterFn=afterFn
     self.holdTime=holdTime or 0
     if self.mode=='in' then self.inc=-self.inc end
     self.update=self.fadeUpdate 
-    table.insert(gameStates,self)
+    GameStates:addState(self)
 end
 
 local fadeOut=function(self,args) self:setupFade('out',args.fadeTime,args.afterFn,args.holdTime) end

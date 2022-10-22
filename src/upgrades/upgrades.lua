@@ -167,43 +167,54 @@ local activationFunctions={
     --General
     ['increaseMinionCapacity5']=function()        
         Player.maxMinions=Player.maxMinions+5
+        Player.dialog:say("My army grows!")
     end,
     ['increaseMinionCapacity15']=function()        
         Player.maxMinions=Player.maxMinions+15
+        Player.dialog:say("My army grows!")
     end,
     ['increaseMinionCapacity30']=function()        
         Player.maxMinions=Player.maxMinions+30
+        Player.dialog:say("My army grows!")
     end,
     ['increaseMinionsPerSummon']=function()
         Player.minionsPerSummon=Player.minionsPerSummon+2
+        Player.dialog:say("Multi-Summon!")
     end,
     ['decreaseSummonCooldown']=function()
         local cd=Player.canSummon
         cd.cooldownPeriod=cd.cooldownPeriod-1.5
+        Player.dialog:say("Necromanic Agility!")
     end,
     ['boneShield']=function()
         Player.upgrades.boneShield=true 
+        Player.dialog:say("Bone Shield!")
     end,
     ['corpseExplosion']=function()
         Player.upgrades.corpseExplosion=true
+        Player.dialog:say("Corpse Explosion!")
     end,
     ['bounceBone']=function()        
         Player.upgrades.bounceBone=true
         local bone=Projectiles.definitions.bone 
         local travelTime=bone.travelTime or 4
         bone.travelTime=travelTime+2
+        Player.dialog:say("Bouncey Bones!")
     end,
     ['fastBone']=function()
         local bone=Projectiles.definitions.bone        
         bone.moveSpeed=bone.moveSpeed+150
         local travelTime=bone.travelTime or 4
         bone.travelTime=travelTime+2
+        Player.dialog:say("Fast Bones!")
     end,
     ['panicSummon']=function()
         Player.upgrades.panicSummon=true 
+        Player.dialog:say("Panic Summon!")
     end,
     ['vampiricEnergy']=function()
         Player.healthPerParticle=0.5
+        Player.dialog:say("Vampiric Energy!")
     end,
     
     --Warrior
@@ -224,6 +235,8 @@ local activationFunctions={
         increaseHealth('skeletonMageFire',50)
         increaseHealth('skeletonMageIce',80)
         increaseHealth('skeletonMageElectric',50)
+        
+        Player.dialog:say("Undead Vitality!")
     end,
     ['increaseKnockback']=function() 
         --increase player and all allies' knockback by 3x base values
@@ -237,6 +250,8 @@ local activationFunctions={
         increaseKnockback('skeletonMageFire',300)
         increaseKnockback('skeletonMageIce',300)
         increaseKnockback('skeletonMageElectric',300)
+        
+        Player.dialog:say("Undead Strength!")
     end,
     ['increaseDamage']=function()
         --increase player and all allies' damage by their base values
@@ -250,6 +265,8 @@ local activationFunctions={
         increaseDamage('skeletonMageFire',5)
         increaseDamage('skeletonMageIce',5)
         increaseDamage('skeletonMageElectric',5)
+        
+        Player.dialog:say("Undead Power!")
     end,
     ['increaseAttackSpeed']=function() 
         --decrease player and allies' attack period, enforce period limits.
@@ -268,6 +285,8 @@ local activationFunctions={
         --decrease archer's firing animation frame duration
         local attackAnim=Entities.definitions.skeletonArcher.animations.attack
         attackAnim.duration[3]=max(0.1,attackAnim.duration[3]-0.05)
+        
+        Player.dialog:say("Undead Vigor!")
     end,
     ['increaseMovespeed']=function() 
         --increase player and allies' movespeed by 2 unit/s
@@ -283,6 +302,8 @@ local activationFunctions={
         increaseMovespeed('skeletonMageFire',moveBonus)
         increaseMovespeed('skeletonMageIce',moveBonus)
         increaseMovespeed('skeletonMageElectric',moveBonus)
+        
+        Player.dialog:say("Undead Speed!")
     end,
     ['warriorFire']=function()
         pDef={
@@ -294,21 +315,28 @@ local activationFunctions={
         }
         Entities.particleEmitters.skeletonWarrior=ParticleSystem:generateEmitter(pDef)
         Entities.behaviors.AI.skeletonWarrior.dead=Entities.behaviors.states.ally.kamakaze 
+        
+        Player.dialog:say("Kamakaze!")
     end,
     ['warriorIce']=function()
         --enable upgrade, greatly increase warrior knockback resist and health
         Player.upgrades.warriorIce=true 
-        local warrior=Entities.definitions.skeletonWarrior 
-        warrior.kbResistance=90
-        warrior.health=warrior.health+240
+        local warrior=Entities.definitions.skeletonWarrior
+        local kbResistance=warrior.kbResistance or 0
+        warrior.kbResistance=min(90,kbResistance+90)
+        warrior.health=warrior.health+400
+
+        Player.dialog:say("Ice Kick!")
     end,
     ['warriorElectric']=function()
-        Player.upgrades.warriorElectric=true         
+        Player.upgrades.warriorElectric=true 
+        Player.dialog:say("Discharge!")
     end,
     
     --Archer    
     ['skeletonArcher']=function()
-        Player.upgrades.skeletonArcher=true
+        Player.upgrades.skeletonArcher=true        
+        Player.dialog:say("Skeleton Archers!")
     end,
     ['increaseMinionRange']=function() 
         --Increases all allies' attack range by their base values
@@ -325,6 +353,8 @@ local activationFunctions={
         increaseRange('skeletonMageFire',150)
         increaseRange('skeletonMageIce',150)
         increaseRange('skeletonMageElectric',150) 
+        
+        Player.dialog:say("Sniper Skeletons!")
     end,
     ['spreadShot']=function() 
         --Increase projectile count by 3 and projectile spread by 0.2
@@ -333,27 +363,32 @@ local activationFunctions={
         local spread=projectileDef.spread or 0 
         projectileDef.count=count+2
         projectileDef.spread=spread+0.2
+        
+        Player.dialog:say("Spread Shot!")
     end,
     ['bounceArrow']=function()
-        Player.upgrades.bounceArrow=true 
-        local arrow=Projectile.definitions.arrow 
-        local travelTime=arrow.travelTime or 2.66
-        arrow.travelTime=travelTime-1.5
+        Player.upgrades.bounceArrow=true         
+        Player.dialog:say("Bounce Arrow!")
     end,
     ['archerFire']=function()
-        Player.upgrades.archerFire=true         
+        Player.upgrades.archerFire=true 
+        Player.dialog:say("Flame Arrow!")                
     end,
     ['archerIce']=function() 
-        Player.upgrades.archerIce=true         
+        Player.upgrades.archerIce=true 
+        Player.dialog:say("Frost Arrow!")        
     end,
     ['archerElectric']=function() 
-        Player.upgrades.archerElectric=true         
+        Player.upgrades.archerElectric=true
+        Player.dialog:say("Lightning Javelin!")
     end,
 
     --Mage    
     ['skeletonMageFire']=function()
         Player.upgrades.skeletonMageFire=true
         Player.selectedMage='Fire'
+        
+        Player.dialog:say("Skeleton Fire Mages!")
     end,
     ['mageFireUpgrade']=function()
         --Change projectile to 'fireball', increase knockback,range, and damage 
@@ -362,10 +397,14 @@ local activationFunctions={
         attackData.knockback=attackData.knockback+500
         attackData.range=attackData.range+50
         attackData.damage=attackData.damage+15
+        
+        Player.dialog:say("Fireball!")
     end,
     ['skeletonMageIce']=function()
         Player.upgrades.skeletonMageIce=true
         Player.selectedMage='Ice'
+        
+        Player.dialog:say("Skeleton Ice Mages!")
     end,
     ['mageIceUpgrade']=function()
         --Change projectile to 'blizzard', decrease attack speed, increase damage
@@ -376,10 +415,14 @@ local activationFunctions={
         attackData.range=attackData.range+50
         attackData.knockback=attackData.knockback+50
         attackData.damage=attackData.damage+5
+        
+        Player.dialog:say("Blizzard!")
     end,
     ['skeletonMageElectric']=function()
         Player.upgrades.skeletonMageElectric=true
         Player.selectedMage='Electric'
+        
+        Player.dialog:say("Skeleton Electric Mages!")
     end,
     ['mageElectricUpgrade']=function()
         --Change AI to have chainLightning attack, increase damage
@@ -389,6 +432,8 @@ local activationFunctions={
         attackData.knockback=attackData.knockback+50
         local behaviors=Entities.behaviors
         behaviors.AI.skeletonMageElectric.attack=behaviors.states.ally.chainLightning
+        
+        Player.dialog:say("Chain Lightning!")
     end,
 }
 
@@ -427,12 +472,12 @@ local updatePool=function(self)
 end
 
 --the tally is keep track of how many of each upgrade the player has obtained
-local generateTally=function(defs)
+local generateInitialTally=function(defs)
     local tally={}
     for name,_ in pairs(defs) do tally[name]=0 end 
     return tally 
 end
-local tally=generateTally(definitions)
+local tally=generateInitialTally(definitions)
 
 --current pool of available upgrades. Changes as the player unlocks more
 local generateInitialPool=function(defs)
@@ -445,6 +490,15 @@ local generateInitialPool=function(defs)
     return pool 
 end
 local pool=generateInitialPool(definitions)
+
+local resetTallyAndPool=function(self)
+    local defs=self.definitions 
+    for name,_ in pairs(defs) do self.tally[name]=0 end 
+    self.pool={}
+    for name,def in pairs(defs) do 
+        if not (def.req or def.level) then table.insert(self.pool,name) end
+    end
+end
 
 --returns a table of all level specific upgrades
 local getLevelSpecificUpgrades=function(self,level)
@@ -486,11 +540,12 @@ local pickUpgrades=function(self,count,isBossChest)
 end
 
 return { --The Module
-    chests=require 'src/upgrades/chests',
+    chests=require 'src.upgrades.chests',
     definitions=definitions,
     activationFunctions=activationFunctions,
     tally=tally,
     pool=pool,
+    resetTallyAndPool=resetTallyAndPool,
     getLevelSpecificUpgrades=getLevelSpecificUpgrades,
     pickUpgrades=pickUpgrades,
     unlock=unlock,

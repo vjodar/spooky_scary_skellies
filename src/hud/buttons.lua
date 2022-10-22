@@ -31,7 +31,7 @@ local update=function(self,x,y)
     
     self.warriorSpriteIndex,self.archerSpriteIndex,self.mageSpriteIndex=1,1,1
 
-    if acceptInput then 
+    if GameStates.acceptInput then 
         if Controls.down.btn1 then self.warriorSpriteIndex=2 end 
         if Controls.down.btn2 then self.archerSpriteIndex=2 end 
         if Controls.down.btn3 then self.mageSpriteIndex=2 end 

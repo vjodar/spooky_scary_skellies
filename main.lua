@@ -1,7 +1,5 @@
 function love.load()
     dt=0 --delta time global
-    acceptInput=false --flag to restrict inputs to one state at a time
-    gameStates={} --state stack
 
     love.graphics.setDefaultFilter('nearest','nearest') --set pixelated look
     love.graphics.setLineStyle('rough') --pixelated lines
@@ -10,37 +8,38 @@ function love.load()
     generateCommonMaths() --common math functions
     
     --Libraries
-    bump=require 'src/libraries/bump'
-    humpCam=require 'src/libraries/camera'
-    anim8=require 'src/libraries/anim8'
+    bump=require 'src.libraries.bump'
+    humpCam=require 'src.libraries.camera'
+    anim8=require 'src.libraries.anim8'
 
     --Game States
-    Controls=require 'src/gameStates/controlState'
-    Timer=require 'src/gameStates/timerState'
-    PlayState=require 'src/gameStates/playState'  
-    FadeState=require 'src/gameStates/fadeState'
-    PanState=require 'src/gameStates/panState'
-    UpgradeSelectionState=require 'src/gameStates/upgradeSelectionState'
+    GameStates=require 'src.gameStates.gameStates'
+    Controls=require 'src.gameStates.controlState'
+    Timer=require 'src.gameStates.timerState'
+    PlayState=require 'src.gameStates.playState'  
+    FadeState=require 'src.gameStates.fadeState'
+    PanState=require 'src.gameStates.panState'
+    UpgradeSelectionState=require 'src.gameStates.upgradeSelectionState'
 
     --Modules
-    UI=require 'src/userInterface'
-    Camera=require 'src/camera'
-    World=require 'src/world'
-    Objects=require 'src/objects'
-    Shadows=require 'src/shadows'
-    Statuses=require 'src/statuses'
-    ParticleSystem=require 'src/particleSystem'
-    Player=require 'src/player'
-    Hud=require 'src/hud/hud'
-    LevelManager=require 'src/levels/levelManager'
-    Entities=require 'src/entities/entityClass'
-    Projectiles=require 'src/projectiles' 
-    SpecialAttacks=require 'src/specialAttacks'
-    Upgrades=require 'src/upgrades/upgrades'
-    
-    table.insert(gameStates,Timer) --timer first
-    table.insert(gameStates,Controls) --controls second
-    table.insert(gameStates,PlayState) --initial game state
+    UI=require 'src.userInterface'
+    Camera=require 'src.camera'
+    World=require 'src.world'
+    Objects=require 'src.objects'
+    Shadows=require 'src.shadows'
+    Statuses=require 'src.statuses'
+    ParticleSystem=require 'src.particleSystem'
+    Player=require 'src.player'
+    Hud=require 'src.hud.hud'
+    LevelManager=require 'src.levels.levelManager'
+    Entities=require 'src.entities.entityClass'
+    Projectiles=require 'src.projectiles' 
+    SpecialAttacks=require 'src.specialAttacks'
+    Upgrades=require 'src.upgrades.upgrades'
+
+    GameStates:addState(Timer)
+    GameStates:addState(Controls)
+    GameStates:addState(PlayState)
     
     PlayState:startGame() --start the game
 end
@@ -50,20 +49,43 @@ function love.update(_dt)
     --testing-----------------------------------------------------------------------
     -- if not love.keyboard.isDown('space') then return end --step 1 frame at a time
     --testing-----------------------------------------------------------------------
-    for i=1, #gameStates do 
-        acceptInput=(i==#gameStates) --used to restrict inputs to top gameState
-        --run each state in gameStates, remove any that return false
-        if gameStates[i]:update()==false then table.remove(gameStates,i) end 
-    end
+    GameStates:update()
 end
 
 function love.draw()
     Camera:attach()
-    for i=1, #gameStates do 
-        if gameStates[i].draw then gameStates[i]:draw() end
-    end
+    GameStates:draw()
     Camera.curtain:draw()
     Camera:detach()
+end
+
+function resetGame()
+    --Clear tables
+    Objects:clearAll() --also destroys world items
+    GameStates.stack={}
+    UpgradeSelectionState.cards={}
+    PanState.panObjects={}
+    Timer.table={}
+    UI.dialogs={}
+    UI.damage.table={}
+    ParticleSystem.table={}
+    LevelManager.currentLevel={}
+    SpecialAttacks.table={}
+    Upgrades:resetTallyAndPool()
+
+    --Deload the files that need to be re-initialized to default values
+    local paths={        
+        'src.player',
+        'src.entities.entityClass',
+        'src.entities.entityDefinitions',
+        'src.entities.entityBehaviors',
+        'src.projectiles',
+        'src.hud.hud',
+        'src.hud.health',
+    }
+    for i=1,#paths do package.loaded[paths[i]]=nil end
+
+    love.load() --re-load the game
 end
 
 function generateFonts()

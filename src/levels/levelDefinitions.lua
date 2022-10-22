@@ -428,26 +428,26 @@ return {
         },
         waves={
             {
-                pumpkin=50,
+                pumpkin=100,
             },
             {
-                spider=100,
+                spider=200,
             },
             {
-                ghost=70,
-                poltergeist=30,
+                ghost=50,
+                poltergeist=50,
             },
             {
                 zombie=70,
-                undeadMiner=30,
+                undeadMiner=50,
             },
             {
                 werewolf=80,
                 werebear=10,
             },
             {
-                slime=70,
-                slimeMatron=30,
+                slime=30,
+                slimeMatron=70,
             },
             {
                 bat=30,

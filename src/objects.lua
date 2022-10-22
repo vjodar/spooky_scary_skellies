@@ -23,11 +23,17 @@ return {
             self.table[i]:draw() 
         end        
     end,
-    clear=function(self) 
+    clear=function(self) --destroys everthing except the Player
         local items,len=World:getItems()
         for i=1,len do World:remove(items[i]) end
         World:addItem(Player)
         self.table={Player} 
+        self.shortCircuit=true 
+    end,
+    clearAll=function(self) --destroys everything
+        local items,len=World:getItems()
+        for i=1,len do World:remove(items[i]) end 
+        self.table={}
         self.shortCircuit=true 
     end,
 }

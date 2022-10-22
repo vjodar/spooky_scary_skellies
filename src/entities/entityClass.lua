@@ -60,8 +60,8 @@ local generateParticleEmitters=function(defs)
 end
 
 local entityClass={}
-entityClass.definitions=require 'src/entities/entityDefinitions'
-entityClass.behaviors=require 'src/entities/entityBehaviors'
+entityClass.definitions=require 'src.entities.entityDefinitions'
+entityClass.behaviors=require 'src.entities.entityBehaviors'
 entityClass.spriteSheets,entityClass.grids=sheetsAndGrids(entityClass.definitions)
 entityClass.parseAnimations=parseAnimations 
 entityClass.chooseSpriteSheet=chooseSpriteSheet

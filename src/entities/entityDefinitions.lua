@@ -640,11 +640,11 @@ return {
     ['possessedArcher']={
         name='possessedArcher',
         moveSpeed=13*60,     
-        health=100,
+        health=200,
         attack={
             range=140,  
             period=2, 
-            damage=20,
+            damage=40,
             knockback=300,
             projectile={name='darkArrow',xOffset=12,yOffset=-10,spread=0.3},
         },
@@ -698,11 +698,11 @@ return {
     ['possessedKnight']={
         name='possessedKnight',
         moveSpeed=16*60,
-        health=120,
+        health=400,
         attack={
             range=40,        
             period=1.5,
-            damage=25,
+            damage=30,
             knockback=500,
             lungeForce=700,
         },
@@ -1733,8 +1733,8 @@ return {
         moveSpeed=0,
         attack={
             range=600,  
-            period=7.5, 
-            minion={name='tombstone',spawnPoint='level',count=5},
+            period=5, 
+            minion={name='tombstone',spawnPoint='level',count=6},
         },
         kbResistance=100,
         collider={
@@ -1805,7 +1805,7 @@ return {
                 damage=100,
                 knockback=1000,
             },
-            minion={name='golem',spawnPoint='level',count=5},
+            minion={name='golem',spawnPoint='level',count=10},
         },
         collider={
             w=38,
@@ -1876,7 +1876,7 @@ return {
     ['witch']={
         name='witch',
         moveSpeed=14*60,
-        health=50000,
+        health=40000,
         attack={
             range=140,  
             period=2,
@@ -2057,7 +2057,7 @@ return {
             },
         },
         particles={
-            count=200,
+            count=600,
             spread={x=1, y=1},
             yOffset=18,
             colors={

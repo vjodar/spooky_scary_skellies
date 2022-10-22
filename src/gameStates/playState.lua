@@ -41,7 +41,8 @@ end
 function love.keyreleased(k) 
     if k=='escape' then love.event.quit() end 
     if k=='p' then 
-        Upgrades.chests:new('chestSmall',Controls.getMousePosition())
+        -- Upgrades.chests:new('chestSmall',Controls.getMousePosition())
+        for name,_ in pairs(Upgrades.definitions) do Upgrades:unlock(name) end
         -- UpgradeSelectionState:presentCards(5)
         -- FadeState:fadeBoth({fadeTime=2,afterFn=function() print('done') end, holdTime=1})
         -- local particles=ParticleSystem:generateEmitter({
@@ -57,6 +58,8 @@ function love.keyreleased(k)
         -- particles:emit(Player.center.x,Player.center.y)
     end
     if k=='l' then
+        resetGame()
+        -- Player.dialog:say('I can summon skeletons with [1/2/3] keys.')
         -- LevelManager:setEntityAggro(not LevelManager:getEntityAggro())
         -- for name,def in pairs(Entities.definitions) do             
         --     if def.collider.class=='enemy' then 
@@ -79,7 +82,7 @@ function love.keyreleased(k)
         -- World:update(Player,goalX,goalY)
         -- Player.canSummon.cooldownPeriod=0.1
         -- Player:updateHealth(-1)
-        Upgrades.chests:new('chestLarge',Controls.getMousePosition())
+        -- Upgrades.chests:new('chestLarge',Controls.getMousePosition())
     end
 end
 --testing-------------------

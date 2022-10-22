@@ -1,6 +1,6 @@
 return {
-    buttons=require 'src/hud/buttons',
-    health=require 'src/hud/health',
+    buttons=require 'src.hud.buttons',
+    health=require 'src.hud.health',
 
     x=0,y=0,
     skeletonTotal=0,

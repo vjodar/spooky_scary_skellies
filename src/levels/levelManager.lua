@@ -1,4 +1,4 @@
-local mapDefinitions=require 'src/levels/mapDefinitions'
+local mapDefinitions=require 'src.levels.mapDefinitions'
 
 local generateDrawData=function(defs)
     local sprites,anims,foregrounds={},{},{}
@@ -8,7 +8,7 @@ local generateDrawData=function(defs)
         sprites[name]=love.graphics.newImage(path)
 
         if def.animation then    
-            animDef=def.animation         
+            local animDef=def.animation         
             local grid=anim8.newGrid(
                 animDef.frameWidth,animDef.frameHeight,
                 animDef.sheetWidth,animDef.sheetHeight
@@ -298,7 +298,7 @@ end
 local wait=function(self)
     --if acceptInput is true, it means the playState is on top of the 
     --gameStates stack and that no other states are waiting to finish
-    if acceptInput then self.update=self.updateStandard end 
+    if GameStates.acceptInput then self.update=self.updateStandard end 
 end
 
 local updateStandard=function(self) 
@@ -434,11 +434,11 @@ local updateBoss=function(self)
 end
 
 return { --The Module
-    terrainClass=require 'src/levels/terrain',
-    gridClass=require 'src/levels/grid',
-    decorationsClass=require 'src/levels/decorations',
-    exitsClass=require 'src/levels/exits',
-    levelDefinitions=require 'src/levels/levelDefinitions',
+    terrainClass=require 'src.levels.terrain',
+    gridClass=require 'src.levels.grid',
+    decorationsClass=require 'src.levels.decorations',
+    exitsClass=require 'src.levels.exits',
+    levelDefinitions=require 'src.levels.levelDefinitions',
     mapDefinitions=mapDefinitions,
     sprites=sprites,
     animations=animations,

@@ -178,18 +178,24 @@ local definitions={
         w=30, h=29, class='pit',
         sprites={
             'tableSmall1',
+            'tableSmall2',
+            'tableSmall3',
         },
     },
     tableVertical={
         w=30, h=29, class='pit',        
         sprites={
             'tableVertical1',
+            'tableVertical2',
+            'tableVertical3',
         },
     },
     tableLarge={
         w=60, h=28, class='pit',
         sprites={
             'tableLarge1',
+            'tableLarge2',
+            'tableLarge3',
         },
     },
     crateLarge={

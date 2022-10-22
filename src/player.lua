@@ -81,6 +81,9 @@ player.shadow=Shadows:new('player',player.w,player.h)
 --Status system
 player.status=Statuses:new()
 
+--Dialog system
+player.dialog=UI:newDialog(player,30)
+
 --Cooldown flags, periods, and callback functions
 player.canTurn={flag=true,cooldownPeriod=0.2}
 player.canTurn.setOnCooldown=Timer:giveCooldownCallbacks(player.canTurn)
@@ -106,19 +109,17 @@ function player:update()
         self.nearbyEnemies=self:queryForEnemies()
     end
 
-    if acceptInput then 
+    if GameStates.acceptInput then 
         self:move()
         if Controls.down.mouse and self.canAttack.flag then 
             self:launchBone() 
             self.canAttack.setOnCooldown()
         end
-        if self.canSummon.flag then 
-            if Controls.pressed.btn1 then self:summonMinions('skeletonWarrior')
-            elseif Controls.pressed.btn2 then self:summonMinions('skeletonArcher')
-            elseif Controls.pressed.btn3 then 
-                self:summonMinions('skeletonMage'..self.selectedMage) 
-            end 
-        end
+        if Controls.pressed.btn1 then self:summonMinions('skeletonWarrior')
+        elseif Controls.pressed.btn2 then self:summonMinions('skeletonArcher')
+        elseif Controls.pressed.btn3 then 
+            self:summonMinions('skeletonMage'..self.selectedMage) 
+        end 
     else 
         self.animations.current=self.animations.idle 
     end
@@ -169,7 +170,7 @@ function player:updatePosition()
             other.vy=other.vy+sin(angle)*self.moveSpeed*2*dt
         end
 
-        if acceptInput then --wait for all other above states to close
+        if GameStates.acceptInput then --wait for all other above states to close
             if other.name=='exit' then other:activateExit() end 
             if other.name=='chest' then other:activateChest() end 
         end
@@ -317,19 +318,36 @@ end
 --Uses summon() to summon minions, amount is definied by minionsPerSummon
 --and limited by maxMinions and the canSummon cooldown
 function player:summonMinions(name)
-    if self.canSummon.flag==false then return end
+    if self.canSummon.flag==false then
+        local messages={
+            "I'm not ready yet.",
+            "I must recharge my power.",
+            "Not ready to summon again.",
+        }
+        self.dialog:say(rndElement(messages))
+        return 
+    end
 
     if not self.upgrades[name] then 
-        --TODO: say "Can't summon that yet" message 
-        print("can't summon",name)
+        local messages={
+            "Haven't unlocked that skeleton yet.",
+            "I don't know that ability.",
+            "Can't summon that.",
+        }
+        self.dialog:say(rndElement(messages))
         return
     end
 
     local currentMinionCount=LevelManager.currentLevel.allyTotal
     local availableMinionSlots=self.maxMinions-currentMinionCount
 
-    if availableMinionSlots<1 then 
-        --TODO: say "Max minions reached!" message
+    if availableMinionSlots<1 then
+        local messages={
+            "Can't summon any more.",
+            "I'm at max capacity.",
+            "My army has reached its limit.",
+        }
+        self.dialog:say(rndElement(messages))
         return 
     end
 

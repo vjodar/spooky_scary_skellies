@@ -46,7 +46,7 @@ local presentCards=function(self,count,isBossChest)
         self:newCard(upgrades[i],0,0,xOffset,yOffset) 
     end
     self.upgradeSelectionDone=false 
-    table.insert(gameStates,self)
+    GameStates:addState(self)
 end
 
 local selectionUpdate=function(self)
@@ -124,7 +124,7 @@ local cardStateMachine={
         end
     end,
     idle=function(self) --wait for player to press button
-        if acceptInput then 
+        if GameStates.acceptInput then 
             if Controls.pressed.mouse
             and self:selectedMe(Controls.getMousePosition())
             then

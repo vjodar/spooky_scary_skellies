@@ -56,12 +56,92 @@ local generateDamageSystem=function(fonts)
     }
 end
 
+local dialogMethods={
+    update=function(self)
+        if self.isDoneTalking then return end
+
+        local ownerPos=self.owner.center or self.owner 
+        self.x,self.y=ownerPos.x,ownerPos.y
+
+        --Done forming speech, start duration countdown
+        if self.isFormingSpeech==false then
+            self.timer=self.timer+dt 
+            if self.timer>self.duration then 
+                self.isDoneTalking=true 
+                self.speech.current=""
+                self.speech.finished=""
+            end
+            return 
+        end
+        
+        --Still forming speech
+        local speech=self.speech 
+        speech.timer=speech.timer+dt 
+        if speech.timer>speech.period then --add another letter to current speech
+            speech.timer=0
+            speech.current=speech.finished:sub(1,speech.index)
+            speech.index=speech.index+1
+
+            if speech.index>#speech.finished then --finished forming speech
+                self.isFormingSpeech=false
+                speech.index=1
+            end
+        end
+    end,
+    draw=function(self)
+        if self.isDoneTalking then return end 
+        love.graphics.printf(
+            self.speech.current,
+            self.x-375,self.y-self.yOffset,
+            750,'center'
+        )
+    end,
+    say=function(self,speech)
+        self.speech.finished=speech 
+        self.isDoneTalking=false 
+        self.isFormingSpeech=true 
+        self.timer=0
+        self.speech.index=1
+    end,
+}
+
+local newDialog=function(self,entity,yOffset) --dialog constructor
+    local dialog={
+        owner=entity,
+        x=0, y=0,
+        yOffset=yOffset or 0,
+        duration=3,
+        timer=0,
+        isDoneTalking=true,
+        isFormingSpeech=false,
+        speech={ --used to manage building of speech gradually
+            finished="",
+            current="",
+            index=1,
+            timer=0,
+            period=0.03,
+        },
+        font=self.fonts.white,
+        update=self.dialogMethods.update,
+        draw=self.dialogMethods.draw,
+        say=self.dialogMethods.say,
+    }
+    table.insert(self.dialogs,dialog)
+    return dialog
+end
+
 return { --The Module
+    fonts=Fonts,
     damage=generateDamageSystem(Fonts),
+    dialogs={}, --holds all dialogs
+    dialogMethods=dialogMethods,
+    newDialog=newDialog,
     update=function(self) 
         self.damage:update()
+        for i=1, #self.dialogs do self.dialogs[i]:update() end 
     end,
     draw=function(self)
         self.damage:draw()
+        for i=1, #self.dialogs do self.dialogs[i]:draw() end 
     end,
 }

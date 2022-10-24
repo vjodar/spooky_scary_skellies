@@ -6,7 +6,8 @@ return {
     skeletonTotal=0,
     minionLimitReached=false,
     white=Fonts.white,
-    red=Fonts.red,    
+    red=Fonts.red,
+    font=Fonts.white,
 
     update=function(self)
         self.x,self.y=Camera.x,Camera.y 

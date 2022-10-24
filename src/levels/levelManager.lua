@@ -185,6 +185,50 @@ local startNextLevel=function(self)
     FadeState:fadeBoth({fadeTime=0.4,afterFn=buildNextLevel,holdTime=0.4})
 end
 
+local restartLevel=function(self)
+    --fill skeleton capacity with an even distribution of skeletons
+    local allyCount={
+        skeletonWarrior=0,
+        skeletonArcher=0,
+        skeletonMageFire=0,
+        skeletonMageIce=0,
+        skeletonMageElectric=0,
+    }
+    --only add archers and mages if they've been unlocked
+    local skeletonPool={'skeletonWarrior'}
+    if Player.upgrades.skeletonArcher then 
+        table.insert(skeletonPool,'skeletonArcher') 
+    end 
+    if Player.upgrades.skeletonMageFire then 
+        table.insert(skeletonPool,'skeletonMageFire')
+    elseif Player.upgrades.skeletonMageIce then 
+        table.insert(skeletonPool,'skeletonMageIce') 
+    elseif Player.upgrades.skeletonMageElectric then 
+        table.insert(skeletonPool,'skeletonMageElectric') 
+    end 
+
+    --Fill in allyCount
+    local numPerType=floor(Player.maxMinions/#skeletonPool)
+    for i=1,#skeletonPool do 
+        local currentAllyCount=allyCount[skeletonPool[i]]
+        allyCount[skeletonPool[i]]=currentAllyCount+numPerType
+    end
+
+    --Fill in any remaining slots with skeletonWarriors    
+    local remainder=Player.maxMinions-(numPerType * #skeletonPool)
+    allyCount.skeletonWarrior=allyCount.skeletonWarrior+remainder
+
+    local rebuildCurrentLevel=function()
+        Objects:clear()
+        Player.health.current=Player.health.max 
+        Player.state='idle'
+        Hud.health:calculateHeartPieces()
+        LevelManager.update=LevelManager.updateStandard
+        self:buildLevel(self.currentLevel.name,allyCount)
+    end
+    FadeState:fadeBoth({fadeTime=0.4,afterFn=rebuildCurrentLevel,holdTime=0.4})
+end
+
 local buildLevel=function(self,lvl,skeletons)
     local levelDef=self.levelDefinitions[lvl]
     local map=self.mapDefinitions[levelDef.map]
@@ -456,6 +500,7 @@ return { --The Module
     drawForeground=drawForeground,
     startNextLevel=startNextLevel,
     buildLevel=buildLevel,
+    restartLevel=restartLevel,
     spawnExit=spawnExit,
     killEntities=killEntities,
     wait=wait,

@@ -41,8 +41,9 @@ end
 function love.keyreleased(k) 
     if k=='escape' then love.event.quit() end 
     if k=='p' then 
+        GameOverState:lose()
         -- Upgrades.chests:new('chestSmall',Controls.getMousePosition())
-        for name,_ in pairs(Upgrades.definitions) do Upgrades:unlock(name) end
+        -- for name,_ in pairs(Upgrades.definitions) do Upgrades:unlock(name) end
         -- UpgradeSelectionState:presentCards(5)
         -- FadeState:fadeBoth({fadeTime=2,afterFn=function() print('done') end, holdTime=1})
         -- local particles=ParticleSystem:generateEmitter({

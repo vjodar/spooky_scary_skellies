@@ -13,6 +13,7 @@ player.collisionClass='ally'
 player.collisionFilter=World.collisionFilters[player.collisionClass]
 
 --General Data
+player.state='idle'
 player.health={current=500,max=500}
 player.kbResistance=0
 player.attack={
@@ -282,7 +283,7 @@ function player:die()
     Timer:after(2,function()
         LevelManager:killEntities('ally')
     end)
-    --TODO: do a game over thing here
+    GameOverState:lose()
 end
 
 function player:launchBone()

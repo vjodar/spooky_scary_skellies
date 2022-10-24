@@ -26,8 +26,6 @@ local function defaultMouseMappings()
     }
 end
 
-love.mouse.setCursor(love.mouse.getSystemCursor('hand')) --set cursor
-
 --The Module
 return {
     down=defaultInputs(),

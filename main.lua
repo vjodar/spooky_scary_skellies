@@ -20,6 +20,7 @@ function love.load()
     FadeState=require 'src.gameStates.fadeState'
     PanState=require 'src.gameStates.panState'
     UpgradeSelectionState=require 'src.gameStates.upgradeSelectionState'
+    GameOverState=require 'src.gameStates.gameOverState'
 
     --Modules
     UI=require 'src.userInterface'

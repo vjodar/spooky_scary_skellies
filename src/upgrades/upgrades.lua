@@ -46,7 +46,7 @@
     },
     ['panicSummon']={
         name="Panic Summon",
-        desc="Summon 3 skeletons upon taking heavy damage",
+        desc="Summon 5 skeletons upon taking heavy damage",
         level="swampBoss",
     },
     ['vampiricEnergy']={

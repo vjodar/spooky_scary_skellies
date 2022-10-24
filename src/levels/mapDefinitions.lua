@@ -401,7 +401,7 @@ return {
             },
         },
         spawnArea={x=80,y=96,w=384,h=224},
-        playerStartPos={x=100,y=100},
+        playerStartPos={x=116,y=116},
         terrain={
             pitDungeonAcidSmall=3,
         },

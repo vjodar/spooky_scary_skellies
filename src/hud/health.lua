@@ -71,7 +71,7 @@ local calculateHeartPieces=function(self)
             if unlocked.skeletonMageFire then skellies[3]='skeletonMageFire' end 
             if unlocked.skeletonMageIce then skellies[3]='skeletonMageIce' end 
             if unlocked.skeletonMageElectric then skellies[3]='skeletonMageElectric' end 
-            for i=1,3 do Player:summon(rndElement(skellies),1) end
+            for i=1,5 do Player:summon(rndElement(skellies),1) end
         end
     end
 end

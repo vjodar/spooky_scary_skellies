@@ -360,7 +360,4 @@ end
 function player:isBurning() return #self.status.table.burn>0 end
 function player:isFrozen() return #self.status.table.freeze>0 end
 
-World:addItem(player)
-table.insert(Objects.table,player)
-
 return player

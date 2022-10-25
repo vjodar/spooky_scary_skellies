@@ -1,5 +1,5 @@
 --divides a map's spawnArea into a grid of tiles. Returns the grid
-local generate=function(self,spawnArea,startPos)
+local generate=function(self,spawnArea)
     self.spawnArea=spawnArea
     local grid={}
 
@@ -163,10 +163,7 @@ local generateTerrain=function(self,mapTerrain,terrainClass,grid)
                         grid,terrainTileSize,'terrain'
                     )
                 end
-            else 
-                print('no more tiles available to spawn '..name) 
-                break
-            end
+            else break end
         end
     end
 end
@@ -206,10 +203,7 @@ local generateDecorations=function(self,mapDecorations,decorationsClass,grid)
                         availableTiles=self:getAvailableTiles(grid,decorTileSize,'decoration')
                     end
                 end
-            else 
-                print('no more tiles available to spawn '..selectedDecor) 
-                break
-            end
+            else break end
         end
     end
 
@@ -241,7 +235,7 @@ local generateEnemies=function(self,enemyWave,entitiesClass,grid)
                 else --stagger all following enemy spawns
                     Timer:after(i*0.1,spawnEnemy)
                 end
-            else print('no available tiles for '..name) break end
+            else break end
         end
     end
 end

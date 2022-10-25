@@ -21,6 +21,7 @@ function love.load()
     PanState=require 'src.gameStates.panState'
     UpgradeSelectionState=require 'src.gameStates.upgradeSelectionState'
     GameOverState=require 'src.gameStates.gameOverState'
+    TitleScreenState=require 'src.gameStates.titleScreenState'
 
     --Modules
     UI=require 'src.userInterface'
@@ -42,7 +43,7 @@ function love.load()
     GameStates:addState(Controls)
     GameStates:addState(PlayState)
     
-    PlayState:startGame() --start the game
+    PlayState:startTitleScreen() --start the game
 end
 
 function love.update(_dt)
@@ -73,6 +74,9 @@ function resetGame()
     LevelManager.currentLevel={}
     SpecialAttacks.table={}
     Upgrades:resetTallyAndPool()
+
+    Camera.curtain.alpha=1 --back to black screen
+    PlayState.state='title' --return to title screen
 
     --Deload the files that need to be re-initialized to default values
     local paths={        

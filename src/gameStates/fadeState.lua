@@ -17,7 +17,7 @@ local fadeUpdate=function(self)
     if (self.mode=='out' and Camera.curtain.alpha>1)
     or (self.mode=='both' and Camera.curtain.alpha>1)
     or (self.mode=='in' and Camera.curtain.alpha<0) 
-    then
+    then 
         if self.afterFn then self.afterFn() end 
         self.update=self.holdUpdate 
     end

@@ -243,7 +243,7 @@ local buildLevel=function(self,lvl,skeletons)
     Camera:lookAt(startPos.x,startPos.y)
 
     --divide the map's spawnArea into a grid, reserving tiles for startPos
-    local grid=self.gridClass:generate(map.spawnArea,startPos) 
+    local grid=self.gridClass:generate(map.spawnArea) 
     local decorations={}
     
     --spawn randomly generated map terrain, using gridClass to ensure no overlap
@@ -477,6 +477,69 @@ local updateBoss=function(self)
     end
 end
 
+local buildTitleScreenLevel=function(self)
+    local levelDef=self.levelDefinitions['swampL1']
+    local map=self.mapDefinitions[rndElement({'swamp2','cave2'})]
+    local startPos={x=16,y=64}
+    love.graphics.setBackgroundColor(map.bgColor)
+    local grid=self.gridClass:generate(map.spawnArea) 
+    local decorations={}
+
+    Camera.target={x=800/4, y=672/4} --look at top left of level
+    
+    --spawn randomly generated map terrain, using gridClass to ensure no overlap
+    if map.terrain then 
+        self.gridClass:generateTerrain(map.terrain,self.terrainClass,grid)
+    end
+
+    --spawn randomly generate ground decorations, using gridClass to ensure no overlap
+    if map.decorations then 
+        local decor=self.gridClass:generateDecorations(
+            map.decorations,self.decorationsClass,grid
+        )
+        for i=1,#decor do table.insert(decorations,decor[i]) end
+    end
+
+    self.currentLevel={
+        name=lvl,
+        definition=levelDef,
+        sprite=self.sprites[map.name],
+        anim=self.animations[map.name] or nil,
+        foreground=self.foregrounds[map.name] or nil,
+        boundaries=self.generateLevelBoundaries(map.boundaries),
+        decorations=decorations,
+        grid=grid,
+        allyCount={
+            skeletonWarrior=0,
+            skeletonArcher=0,
+            skeletonMageFire=0,
+            skeletonMageIce=0,
+            skeletonMageElectric=0,
+        },
+        allyTotal=0,
+        enemyCount=0,
+        currentWave=0,
+        bossData=levelDef.bossData or nil,
+        entityAggro=true,
+        canCheckWaveCompletion=false,
+        complete=false,
+        exit=levelDef.exit,
+        nextLevel=levelDef.nextLevel,
+    }
+
+    --spawn all the enemies! (exept bosses)
+    local enemies={}
+    local notBoss=function(name)
+        return not (name=='witch' or name=='witchClone' or name=='giantTombstone' or name=='obsidianGolem')
+    end
+    for name,def in pairs(Entities.definitions) do 
+        if def.collider.class=='enemy' and notBoss(def.name) then enemies[name]=rnd(4) end 
+    end
+    self.gridClass:generateEnemies(enemies,Entities,self.currentLevel.grid)
+
+    self.update=self.wait --wait until game starts
+end
+
 return { --The Module
     terrainClass=require 'src.levels.terrain',
     gridClass=require 'src.levels.grid',
@@ -505,6 +568,7 @@ return { --The Module
     killEntities=killEntities,
     wait=wait,
     getChestSpawnPos=getChestSpawnPos,
+    buildTitleScreenLevel=buildTitleScreenLevel,
     updateStandard=updateStandard,
     updateBoss=updateBoss,
     update=updateStandard,
@@ -527,7 +591,7 @@ return { --The Module
         --         love.graphics.rectangle('line',tile.x,tile.y,16,16)
         --         if #tile.occupiedBy>0 then 
         --             local o=tile.occupiedBy[1]
-        --             if o=='object' then love.graphics.setColor(1,0,0)
+        --             if o=='player' then love.graphics.setColor(1,0,0)
         --             elseif o=='terrain' then love.graphics.setColor(0,1,0)
         --             elseif o=='border' then love.graphics.setColor(0,0,1)
         --             elseif o=='decoration' then love.graphics.setColor(0,1,1)

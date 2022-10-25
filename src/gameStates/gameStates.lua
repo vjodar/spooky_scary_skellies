@@ -12,10 +12,10 @@ return {
     end,
     update=function(self)
         local stackLength=#self.stack
-        for i=1,stackLength do 
+        for i,gameState in ipairs(self.stack) do 
             self.acceptInput=(i==stackLength) --used to restrict inputs to top gameState
             --run each state in the stack, remove any that return false
-            if self.stack[i]:update()==false then table.remove(self.stack,i) end
+            if gameState:update()==false then table.remove(self.stack,i) end
         end
     end,
     draw=function(self)

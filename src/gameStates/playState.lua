@@ -1,12 +1,15 @@
-local PlayState={}
-
-function PlayState:startGame()
+local startTitleScreen=function(self)
     GameScale=2
     Camera:zoomTo(GameScale)
     love.graphics.setPointSize(GameScale)
     love.graphics.setLineWidth(GameScale)
-    Camera.target=Player.center
 
+    LevelManager:buildTitleScreenLevel()
+    TitleScreenState:start()
+end
+
+local startGame=function(self)
+    --Start the first level with no skeletons
     local allyCount={
         skeletonWarrior=0,
         skeletonArcher=0,
@@ -14,28 +17,57 @@ function PlayState:startGame()
         skeletonMageIce=0,
         skeletonMageElectric=0,
     }
-    LevelManager:buildLevel('swampL1',allyCount)
+    local buildStartingLevel=function()
+        self.state='game'
+        World:addItem(Player)
+        table.insert(Objects.table,Player)
+        Camera.smoother=Camera.smooth.damped(10)
+        Camera.target=Player.center    
+        LevelManager.currentLevel.boundaries={}
+        Objects:clear()
+        LevelManager.update=LevelManager.updateStandard
+        LevelManager:buildLevel('swampL1',allyCount)
+    end
+    FadeState:fadeBoth({fadeTime=0.4,afterFn=buildStartingLevel,holdTime=0.4})
 end
 
-function PlayState:update()
-    Camera:update()
-    LevelManager:update()
-    Objects:update()
-    SpecialAttacks:update()
-    ParticleSystem:update()
-    UI:update()
-    Hud:update()
-end
+local updateFunctions={
+    title=function(self)
+        Camera:update()
+        LevelManager:update()
+        Objects:update()
+        SpecialAttacks:update()
+        ParticleSystem:update()
+    end,
+    game=function(self)
+        Camera:update()
+        LevelManager:update()
+        Objects:update()
+        SpecialAttacks:update()
+        ParticleSystem:update()
+        UI:update()
+        Hud:update()
+    end,
+}
 
-function PlayState:draw()
-    LevelManager:draw()
-    Objects:draw()
-    SpecialAttacks:draw()
-    LevelManager:drawForeground()
-    ParticleSystem:draw()
-    UI:draw()
-    Hud:draw()
-end
+local drawFunctions={
+    title=function(self)
+        LevelManager:draw()
+        Objects:draw()
+        SpecialAttacks:draw()
+        LevelManager:drawForeground()
+        ParticleSystem:draw()
+    end,
+    game=function(self)
+        LevelManager:draw()
+        Objects:draw()
+        SpecialAttacks:draw()
+        LevelManager:drawForeground()
+        ParticleSystem:draw()
+        UI:draw()
+        Hud:draw()
+    end,
+}
 
 --testing-------------------
 function love.keyreleased(k) 
@@ -59,7 +91,6 @@ function love.keyreleased(k)
         -- particles:emit(Player.center.x,Player.center.y)
     end
     if k=='l' then
-        resetGame()
         -- Player.dialog:say('I can summon skeletons with [1/2/3] keys.')
         -- LevelManager:setEntityAggro(not LevelManager:getEntityAggro())
         -- for name,def in pairs(Entities.definitions) do             
@@ -88,4 +119,18 @@ function love.keyreleased(k)
 end
 --testing-------------------
 
-return PlayState
+return { --The Module
+    state='title',
+    startTitleScreen=startTitleScreen,
+    startGame=startGame,
+    stateMachine={
+        update=updateFunctions,
+        draw=drawFunctions,
+    },
+    update=function(self)
+        self.stateMachine.update[self.state](self)
+    end,
+    draw=function(self)
+        self.stateMachine.draw[self.state](self)
+    end,
+}

@@ -3,7 +3,15 @@ local behaviors={}
 behaviors.methods={} --Methods---------------------------------------------------------------------
 behaviors.methods.common={
 
-    update=function(self) return self.AI[self.state](self) end,
+    update=function(self)
+        --testing-------------------------------------------
+        if self.AI[self.state]==nil then 
+            print(self.name.." doesn't have behavior for state: "..self.state)
+            return false 
+        end
+        --testing-------------------------------------------
+        return self.AI[self.state](self) 
+    end,
 
     draw=function(self)
         --during spawn animation, only draw shadow when sprite is visible
@@ -30,7 +38,9 @@ behaviors.methods.common={
         local associatedAnimation={
             spawn='spawn',
             idle='idle',
+            idleCutscene='idle',
             attack='attack',
+            despawn='despawn',
             dead='dead',
             moveToPlayer='move',
             moveToTarget='move',
@@ -144,6 +154,9 @@ behaviors.methods.common={
         self.status:clear()
         self.animSpeed=self.animSpeedMax
         self:changeState('dead')
+        if self.name=='witch' and self.dialog then 
+            self.dialog:say("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO!")
+        end
     end,
 
     clearMoveTarget=function(self)
@@ -1308,6 +1321,12 @@ behaviors.states.enemy={
             LevelManager.gridClass:generateEnemies(
                 demonsToSpawn,Entities,LevelManager.currentLevel.grid 
             )
+            local messages={
+                "Go forth, my minions!",
+                "Attack, my minions!",
+                "Minions, I summon thee!",
+            }
+            self.dialog:say(rndElement(messages))
         end        
     end,
 
@@ -1316,8 +1335,16 @@ behaviors.states.enemy={
         self.status:update(self)
         local onLoop=self:updateAnimation()
         if onLoop then --summon clone
-            Entities:new(self.attack.clone.name,self.x,self.y)
+            local clone=Entities:new(self.attack.clone.name,self.x,self.y)
+            clone.dialog=UI:newDialog(clone,45)
             self:changeState(rndElement({'teleport','idle'}))
+            local messages={
+                "AAAAAHAHAHAHAHA!",
+                "Seeing double?",
+                "Which witch is which?",
+            }
+            self.dialog:say(rndElement(messages))
+            clone.dialog:say(rndElement(messages))
         end
     end,
 
@@ -1342,7 +1369,24 @@ behaviors.states.enemy={
                 stopThreshold=shake.stopThreshold,
             })
         end
+        if self.dialog then self.dialog:destroy() end
         return false
+    end,
+}
+
+behaviors.states.cutscene={
+    idle=function(self)
+        self:updateAnimation()
+        self:updatePosition()
+    end,
+
+    despawn=function(self)
+        local onLoop=self:updateAnimation()
+        self:updatePosition()
+        if onLoop then 
+            LevelManager:decreaseEntityCount(self.collisionClass,self.name)
+            return false 
+        end
     end,
 }
 
@@ -1472,7 +1516,7 @@ behaviors.AI={ --AI-------------------------------------------------------------
         chainLightning=behaviors.states.enemy.witchChainLightning,
         summonDemons=behaviors.states.enemy.witchSummonDemons,
         teleport=behaviors.states.enemy.teleport,
-        dead=behaviors.states.common.dead,
+        dead=behaviors.states.enemy.deadBoss,
     },
 }
 --shared AI
@@ -1495,5 +1539,13 @@ behaviors.AI['werewolf']=behaviors.AI.slime
 behaviors.AI['floatingEyeball']=behaviors.AI.possessedArcher
 behaviors.AI['pyreFiend']=behaviors.AI.possessedArcher
 behaviors.AI['beholder']=behaviors.AI.possessedArcher
+
+--setting cutscene behaviors for cutscene actors
+behaviors.AI['witch'].idleCutscene=behaviors.states.cutscene.idle
+behaviors.AI['witch'].despawn=behaviors.states.cutscene.despawn
+behaviors.AI['imp'].despawn=behaviors.states.cutscene.despawn
+behaviors.AI['gnasherDemon'].despawn=behaviors.states.cutscene.despawn
+behaviors.AI['pyreFiend'].despawn=behaviors.states.cutscene.despawn
+behaviors.AI['beholder'].despawn=behaviors.states.cutscene.despawn
 
 return behaviors 

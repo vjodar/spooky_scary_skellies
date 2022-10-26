@@ -1180,6 +1180,11 @@ return {
                 duration=0.4,
                 damagingFrames={1,1}
             },
+            despawn={
+                frames='8-1',
+                row=1,
+                duration=0.1,
+            },
         },
         particles={
             count=60,
@@ -1235,6 +1240,11 @@ return {
                 row=4,
                 duration={0.2,0.1,0.3},
                 damagingFrames={2,3}
+            },
+            despawn={
+                frames='8-1',
+                row=1,
+                duration=0.1,
             },
         },
         particles={
@@ -1652,6 +1662,11 @@ return {
                 duration={[1]=0.2,['2-3']=0.1,[4]=0.4,['5-7']=0.1},
                 firingFrame=4,
             },
+            despawn={
+                frames='8-1',
+                row=1,
+                duration=0.1,
+            },
         },
         particles={
             count=200,
@@ -1712,6 +1727,11 @@ return {
                 row=2,
                 duration=0.4,
                 firingFrame=1,
+            },
+            despawn={
+                frames='9-1',
+                row=1,
+                duration=0.1,
             },
         },
         particles={
@@ -1944,6 +1964,11 @@ return {
                 firingFrame=1
             },
             teleport={
+                frames='1-7',
+                row=3,
+                duration=0.1,
+            },
+            despawn={
                 frames='1-7',
                 row=3,
                 duration=0.1,

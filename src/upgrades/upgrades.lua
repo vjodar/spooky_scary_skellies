@@ -184,7 +184,7 @@ local activationFunctions={
     ['decreaseSummonCooldown']=function()
         local cd=Player.canSummon
         cd.cooldownPeriod=cd.cooldownPeriod-1.5
-        Player.dialog:say("Necromanic Agility!")
+        Player.dialog:say("Necromantic Agility!")
     end,
     ['boneShield']=function()
         Player.upgrades.boneShield=true 
@@ -214,7 +214,7 @@ local activationFunctions={
     end,
     ['vampiricEnergy']=function()
         Player.healthPerParticle=0.5
-        Player.dialog:say("Vampiric Energy!")
+        Player.dialog:say("Today I chose violence!")
     end,
     
     --Warrior
@@ -367,8 +367,8 @@ local activationFunctions={
         Player.dialog:say("Spread Shot!")
     end,
     ['bounceArrow']=function()
-        Player.upgrades.bounceArrow=true         
-        Player.dialog:say("Bounce Arrow!")
+        Player.upgrades.bounceArrow=true
+        Player.dialog:say("Ricochet!")
     end,
     ['archerFire']=function()
         Player.upgrades.archerFire=true 

@@ -138,7 +138,7 @@ function player:draw()
     )
     love.graphics.setColor(1,1,1,1)
     -- --testing------------------------------------------
-    -- love.graphics.print(self.center.x,self.x-10,self.y-10)
+    -- love.graphics.print(#UI.dialogs,self.x-10,self.y-10)
     -- love.graphics.print(self.center.y,self.x-10,self.y)
     -- love.graphics.print('STATES: '..#gameStates,self.x-10,self.y-30)
     -- love.graphics.print('objects: '..#Objects.table,self.x-10,self.y-60)
@@ -331,9 +331,9 @@ function player:summonMinions(name)
 
     if not self.upgrades[name] then 
         local messages={
-            "Haven't unlocked that skeleton yet.",
+            "I haven't unlocked that skeleton yet.",
             "I don't know that ability.",
-            "Can't summon that.",
+            "I can't summon that.",
         }
         self.dialog:say(rndElement(messages))
         return
@@ -344,7 +344,7 @@ function player:summonMinions(name)
 
     if availableMinionSlots<1 then
         local messages={
-            "Can't summon any more.",
+            "I can't summon any more.",
             "I'm at max capacity.",
             "My army has reached its limit.",
         }

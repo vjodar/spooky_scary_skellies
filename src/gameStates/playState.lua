@@ -9,16 +9,7 @@ local startTitleScreen=function(self)
 end
 
 local startGame=function(self)
-    --Start the first level with no skeletons
-    local allyCount={
-        skeletonWarrior=0,
-        skeletonArcher=0,
-        skeletonMageFire=0,
-        skeletonMageIce=0,
-        skeletonMageElectric=0,
-    }
     local buildStartingLevel=function()
-        self.state='game'
         World:addItem(Player)
         table.insert(Objects.table,Player)
         Camera.smoother=Camera.smooth.damped(10)
@@ -26,54 +17,17 @@ local startGame=function(self)
         LevelManager.currentLevel.boundaries={}
         Objects:clear()
         LevelManager.update=LevelManager.updateStandard
-        LevelManager:buildLevel('swampL1',allyCount)
+        LevelManager:buildTutorialLevel()
+        CutsceneState:tutorialCutscene()
     end
     FadeState:fadeBoth({fadeTime=0.4,afterFn=buildStartingLevel,holdTime=0.4})
 end
-
-local updateFunctions={
-    title=function(self)
-        Camera:update()
-        LevelManager:update()
-        Objects:update()
-        SpecialAttacks:update()
-        ParticleSystem:update()
-    end,
-    game=function(self)
-        Camera:update()
-        LevelManager:update()
-        Objects:update()
-        SpecialAttacks:update()
-        ParticleSystem:update()
-        UI:update()
-        Hud:update()
-    end,
-}
-
-local drawFunctions={
-    title=function(self)
-        LevelManager:draw()
-        Objects:draw()
-        SpecialAttacks:draw()
-        LevelManager:drawForeground()
-        ParticleSystem:draw()
-    end,
-    game=function(self)
-        LevelManager:draw()
-        Objects:draw()
-        SpecialAttacks:draw()
-        LevelManager:drawForeground()
-        ParticleSystem:draw()
-        UI:draw()
-        Hud:draw()
-    end,
-}
 
 --testing-------------------
 function love.keyreleased(k) 
     if k=='escape' then love.event.quit() end 
     if k=='p' then 
-        GameOverState:lose()
+        GameOverState:win()
         -- Upgrades.chests:new('chestSmall',Controls.getMousePosition())
         -- for name,_ in pairs(Upgrades.definitions) do Upgrades:unlock(name) end
         -- UpgradeSelectionState:presentCards(5)
@@ -91,6 +45,7 @@ function love.keyreleased(k)
         -- particles:emit(Player.center.x,Player.center.y)
     end
     if k=='l' then
+        Entities:new('witchClone',Controls:getMousePosition())
         -- Player.dialog:say('I can summon skeletons with [1/2/3] keys.')
         -- LevelManager:setEntityAggro(not LevelManager:getEntityAggro())
         -- for name,def in pairs(Entities.definitions) do             
@@ -120,17 +75,24 @@ end
 --testing-------------------
 
 return { --The Module
-    state='title',
     startTitleScreen=startTitleScreen,
     startGame=startGame,
-    stateMachine={
-        update=updateFunctions,
-        draw=drawFunctions,
-    },
     update=function(self)
-        self.stateMachine.update[self.state](self)
+        Camera:update()
+        LevelManager:update()
+        Objects:update()
+        SpecialAttacks:update()
+        ParticleSystem:update()
+        UI:update()
+        Hud:update()
     end,
     draw=function(self)
-        self.stateMachine.draw[self.state](self)
+        LevelManager:draw()
+        Objects:draw()
+        SpecialAttacks:draw()
+        LevelManager:drawForeground()
+        ParticleSystem:draw()
+        UI:draw()
+        Hud:draw()
     end,
 }

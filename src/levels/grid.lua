@@ -1,5 +1,5 @@
 --divides a map's spawnArea into a grid of tiles. Returns the grid
-local generate=function(self,spawnArea)
+local generate=function(self,spawnArea,radius)
     self.spawnArea=spawnArea
     local grid={}
 
@@ -15,7 +15,8 @@ local generate=function(self,spawnArea)
         end
     end
 
-    self:markPlayerTiles(grid,1) --occupy tiles surrounding player
+    local occupyTileRadius=radius or 1
+    self:markPlayerTiles(grid,occupyTileRadius) --occupy tiles surrounding player
 
     return grid 
 end
@@ -233,7 +234,7 @@ local generateEnemies=function(self,enemyWave,entitiesClass,grid)
                 if i==1 then --spawn first enemy immediately
                     spawnEnemy() 
                 else --stagger all following enemy spawns
-                    Timer:after(i*0.1,spawnEnemy)
+                    Timer:after(i*0.05,spawnEnemy)
                 end
             else break end
         end

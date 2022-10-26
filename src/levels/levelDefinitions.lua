@@ -21,6 +21,13 @@ return {
         -- exit={name='ladderUp'},
         nextLevel='test',
     },
+    ['tutorial']={
+        map='swamp3',
+        waves={},
+        maxEnemies=1,
+        exit={name='swampWallHole',pos={x=245,y=26+31}},
+        nextLevel='swampL1',
+    },
     ['swampL1']={
         map='swamp3',
         waves={
@@ -422,7 +429,7 @@ return {
         map='dungeonBoss',
         bossData={
             wave=11, name='witch',
-            spawnPos={x=400,y=64},
+            spawnPos={x=400,y=72},
             spawnAnimDuration=1,
             deathAnimDuration=3,
         },

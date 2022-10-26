@@ -13,7 +13,11 @@ end
 local updateFunctions={
     fadeInLose=function(self) --fade in 'Sad Halloween'
         self.alpha=self.alpha+dt*0.5
-        if self.alpha>1 then self.state='waitForInputLose' end
+        if self.alpha>1 then 
+            self.state='waitForInputLose'
+            self.buttons.titleScreen:update(self.x,self.y,-60,20)
+            self.buttons.tryAgain:update(self.x,self.y,60,20)
+        end
     end,
     waitForInputLose=function(self)
         self.buttons.titleScreen:update(self.x,self.y,-60,20)
@@ -22,7 +26,10 @@ local updateFunctions={
 
     fadeInWin=function(self) --fade in 'Happy Halloween'
         self.alpha=self.alpha+dt*0.5
-        if self.alpha>1 then self.state='waitForInputWin' end 
+        if self.alpha>1 then 
+            self.state='waitForInputWin' 
+            self.buttons.titleScreen:update(self.x,self.y,0,40)
+        end 
     end,
     waitForInputWin=function(self)
         self.buttons.titleScreen:update(self.x,self.y,0,40)
@@ -99,7 +106,10 @@ local buttons={
             local userPressedMe=self:updateButton()
             if userPressedMe==true then 
                 self.state='up'
-                resetGame()
+                FadeState:fadeOut({
+                    fadeTime=0.5,
+                    afterFn=resetGame,
+                })
                 return false
             end
         end,

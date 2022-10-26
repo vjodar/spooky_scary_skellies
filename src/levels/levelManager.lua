@@ -221,6 +221,7 @@ local restartLevel=function(self)
     local rebuildCurrentLevel=function()
         Objects:clear()
         Player.health.current=Player.health.max 
+        Player.status:clear()
         Player.state='idle'
         Hud.health:calculateHeartPieces()
         LevelManager.update=LevelManager.updateStandard
@@ -291,6 +292,8 @@ local buildLevel=function(self,lvl,skeletons)
         local summonSkeletons=function() Player:summon(name,count) end
         Timer:after(0.5,summonSkeletons)
     end
+
+    if lvl=='dungeonBoss' then CutsceneState:bossCutscene() end  
 
     self.update=self.wait --wait until any fading/camera panning is done
 end
@@ -383,9 +386,11 @@ local updateStandard=function(self)
                 { --watch boss spawn
                     target=spawnCenter,
                     afterFn=function()
-                        LevelManager.currentLevel.boss=Entities:new(
+                        local boss=Entities:new(
                             bossDef.name,spawnPos.x,spawnPos.y
                         )
+                        boss.dialog=UI:newDialog(boss,45)
+                        LevelManager.currentLevel.boss=boss
                     end,
                     holdTime=level.bossData.spawnAnimDuration,
                 }, 
@@ -419,8 +424,7 @@ local updateBoss=function(self)
         level.complete=true
         self:killEntities('enemy') --destroy any other enemies
         if level.name=='dungeonBoss' then 
-            print("Happy Halloween!!!")
-            --TODO: pan to witch to watch death, end the game
+            self:endTheGame()
             return 
         end
 
@@ -477,6 +481,23 @@ local updateBoss=function(self)
     end
 end
 
+local endTheGame=function(self)
+    local level=self.currentLevel
+    local panObjects={
+        { --watch boss die
+            target=level.boss.center,
+            holdTime=level.bossData.deathAnimDuration,
+        }, 
+        { --back to player
+            target=Player.center,
+            afterFn=function()
+                GameOverState:win()
+            end,
+        },
+    }
+    PanState:panTo(panObjects)
+end
+
 local buildTitleScreenLevel=function(self)
     local levelDef=self.levelDefinitions['swampL1']
     local map=self.mapDefinitions[rndElement({'swamp2','cave2'})]
@@ -485,7 +506,7 @@ local buildTitleScreenLevel=function(self)
     local grid=self.gridClass:generate(map.spawnArea) 
     local decorations={}
 
-    Camera.target={x=800/4, y=672/4} --look at top left of level
+    Camera.target={x=800/6, y=672/6} --look at top left of level
     
     --spawn randomly generated map terrain, using gridClass to ensure no overlap
     if map.terrain then 
@@ -540,6 +561,69 @@ local buildTitleScreenLevel=function(self)
     self.update=self.wait --wait until game starts
 end
 
+local buildTutorialLevel=function(self)
+    local levelDef=self.levelDefinitions['tutorial']
+    local map=self.mapDefinitions[levelDef.map]
+    local startPos=map.playerStartPos
+
+    love.graphics.setBackgroundColor(map.bgColor)
+
+    --move player to start position
+    Player.status:clear()
+    Player.x,Player.y=startPos.x,startPos.y+24
+    World:update(Player,Player.x,Player.y)
+    Camera:lookAt(startPos.x,startPos.y)
+
+    --divide the map's spawnArea into a grid, reserving tiles for startPos
+    local grid=self.gridClass:generate(map.spawnArea,3) 
+    local decorations={}
+    
+    --spawn randomly generated map terrain, using gridClass to ensure no overlap
+    if map.terrain then 
+        self.gridClass:generateTerrain(map.terrain,self.terrainClass,grid)
+    end
+
+    --spawn randomly generate ground decorations, using gridClass to ensure no overlap
+    if map.decorations then 
+        local decor=self.gridClass:generateDecorations(
+            map.decorations,self.decorationsClass,grid
+        )
+        for i=1,#decor do table.insert(decorations,decor[i]) end
+    end
+
+    self.currentLevel={
+        name=lvl,
+        definition=levelDef,
+        sprite=self.sprites[map.name],
+        anim=self.animations[map.name] or nil,
+        foreground=self.foregrounds[map.name] or nil,
+        boundaries=self.generateLevelBoundaries(map.boundaries),
+        decorations=decorations,
+        grid=grid,
+        allyCount={
+            skeletonWarrior=0,
+            skeletonArcher=0,
+            skeletonMageFire=0,
+            skeletonMageIce=0,
+            skeletonMageElectric=0,
+        },
+        allyTotal=0,
+        enemyCount=0,
+        currentWave=0,
+        bossData=levelDef.bossData or nil,
+        entityAggro=false, --disable aggro for opening cutscene
+        canCheckWaveCompletion=true,
+        complete=false,
+        exit=levelDef.exit,
+        nextLevel=levelDef.nextLevel,
+    }
+
+    --Spawn exit immediately
+    local exit=self.currentLevel.exit 
+    self.exitsClass:new(exit.name,exit.pos.x,exit.pos.y)
+    self.update=function() end --just wait till player exits level
+end
+
 return { --The Module
     terrainClass=require 'src.levels.terrain',
     gridClass=require 'src.levels.grid',
@@ -569,9 +653,11 @@ return { --The Module
     wait=wait,
     getChestSpawnPos=getChestSpawnPos,
     buildTitleScreenLevel=buildTitleScreenLevel,
+    buildTutorialLevel=buildTutorialLevel,
     updateStandard=updateStandard,
     updateBoss=updateBoss,
     update=updateStandard,
+    endTheGame=endTheGame,
 
     draw=function(self) 
         local level=self.currentLevel
@@ -592,9 +678,9 @@ return { --The Module
         --         if #tile.occupiedBy>0 then 
         --             local o=tile.occupiedBy[1]
         --             if o=='player' then love.graphics.setColor(1,0,0)
-        --             elseif o=='terrain' then love.graphics.setColor(0,1,0)
-        --             elseif o=='border' then love.graphics.setColor(0,0,1)
-        --             elseif o=='decoration' then love.graphics.setColor(0,1,1)
+        --             -- elseif o=='terrain' then love.graphics.setColor(0,1,0)
+        --             -- elseif o=='border' then love.graphics.setColor(0,0,1)
+        --             -- elseif o=='decoration' then love.graphics.setColor(0,1,1)
         --             end
         --             love.graphics.rectangle('line',tile.x,tile.y,16,16)
         --             love.graphics.setColor(1,1,1)

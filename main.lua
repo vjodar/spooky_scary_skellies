@@ -22,6 +22,7 @@ function love.load()
     UpgradeSelectionState=require 'src.gameStates.upgradeSelectionState'
     GameOverState=require 'src.gameStates.gameOverState'
     TitleScreenState=require 'src.gameStates.titleScreenState'
+    CutsceneState=require 'src.gameStates.cutsceneState'
 
     --Modules
     UI=require 'src.userInterface'
@@ -76,7 +77,7 @@ function resetGame()
     Upgrades:resetTallyAndPool()
 
     Camera.curtain.alpha=1 --back to black screen
-    PlayState.state='title' --return to title screen
+    Hud:hide() --hide HUD for title screen
 
     --Deload the files that need to be re-initialized to default values
     local paths={        
@@ -99,7 +100,7 @@ function generateFonts()
     local glyphs=(
         " abcdefghijklmnopqrstuvwxyz"..
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"..
-        "1234567890.:!,'+-/()[]"
+        "1234567890.:!?,'+-/()[]"
     )
 
     local colors={'white','yellow','gray','blue','red','green','big'}

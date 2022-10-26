@@ -58,6 +58,7 @@ end
 
 local dialogMethods={
     update=function(self)
+        if self.isDestroyed==true then return false end
         if self.isDoneTalking then return end
 
         local ownerPos=self.owner.center or self.owner 
@@ -103,6 +104,7 @@ local dialogMethods={
         self.timer=0
         self.speech.index=1
     end,
+    destroy=function(self) self.isDestroyed=true end,
 }
 
 local newDialog=function(self,entity,yOffset) --dialog constructor
@@ -114,6 +116,7 @@ local newDialog=function(self,entity,yOffset) --dialog constructor
         timer=0,
         isDoneTalking=true,
         isFormingSpeech=false,
+        isDestroyed=false,
         speech={ --used to manage building of speech gradually
             finished="",
             current="",
@@ -125,6 +128,7 @@ local newDialog=function(self,entity,yOffset) --dialog constructor
         update=self.dialogMethods.update,
         draw=self.dialogMethods.draw,
         say=self.dialogMethods.say,
+        destroy=self.dialogMethods.destroy,
     }
     table.insert(self.dialogs,dialog)
     return dialog
@@ -138,7 +142,9 @@ return { --The Module
     newDialog=newDialog,
     update=function(self) 
         self.damage:update()
-        for i=1, #self.dialogs do self.dialogs[i]:update() end 
+        for i,d in ipairs(self.dialogs) do 
+            if d:update()==false then table.remove(self.dialogs,i) end
+        end
     end,
     draw=function(self)
         self.damage:draw()

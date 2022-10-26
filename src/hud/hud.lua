@@ -3,6 +3,7 @@ return {
     health=require 'src.hud.health',
 
     x=0,y=0,
+    isHidden=true, --start off hidden for title screen
     skeletonTotal=0,
     minionLimitReached=false,
     white=Fonts.white,
@@ -19,11 +20,15 @@ return {
     end,
 
     draw=function(self)
+        if self.isHidden then return end
         self.buttons:draw()
         self.health:draw()
         love.graphics.printf(
             "Skeletons: "..self.skeletonTotal.."/"..Player.maxMinions,
             self.font,self.x-250,self.y+138,500,'center'
         )
-    end
+    end,
+
+    hide=function(self) self.isHidden=true end, 
+    show=function(self) self.isHidden=false end, 
 }

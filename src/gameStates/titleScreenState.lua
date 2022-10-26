@@ -1,8 +1,11 @@
 local start=function(self)
     GameStates:addState(self)
-    Camera.smoother=Camera.smooth.damped(0.4)
+    Camera.smoother=Camera.smooth.damped(0.5)
     self.playButton.isActive=false --will wait for fade to finish
-    local activatePlayButton=function() self.playButton.isActive=true end 
+    local activatePlayButton=function() 
+        self.playButton:update(self.x,self.y)
+        self.playButton.isActive=true 
+    end 
     Timer:after(1,function() FadeState:fadeIn({fadeTime=2,afterFn=activatePlayButton}) end)
 end 
 
@@ -42,14 +45,16 @@ local playButton={
     },
     state='up',
     isActive=false, --wait for fade in to complete
-    update=function(self,x,y,xOffset,yOffset)
-        self.x,self.y=x-(self.w*0.5)+xOffset,y-(self.h*0.5)+yOffset
+    update=function(self,x,y)
+        self.x,self.y=x-(self.w*0.5),y-(self.h*0.5)
 
-        local userPressedMe=self:updateButton()
-        if userPressedMe==true then 
-            self.state='up'
-            PlayState:startGame()
-            return false
+        if GameStates.acceptInput then 
+            local userPressedMe=self:updateButton()
+            if userPressedMe==true then 
+                self.state='up'
+                PlayState:startGame()
+                return false
+            end
         end
     end,
     draw=function(self)
@@ -62,7 +67,7 @@ local playButton={
 return {
     x=0, y=0,
     enemyFocus={ --used to pan camera to an enemy periodically
-        period=5,
+        period=3.5,
         timer=0,
     },
     text={
@@ -75,7 +80,6 @@ return {
         local focus=self.enemyFocus
         focus.timer=focus.timer+dt 
         if focus.timer>focus.period then 
-            focus.period=rnd(4,8)
             focus.timer=0
             local enemies={}
             for i=1,#Objects.table do
@@ -85,12 +89,15 @@ return {
                 and o.name~='tombstone'
                 then table.insert(enemies,o) end 
             end
-            Camera.target=rndElement(enemies).center
+            local newTarget=rndElement(enemies).center
+            Camera.target=newTarget
+            --choose a new target to focus after ~0.5s after pan
+            focus.period=0.5+getDistance(Camera,newTarget)*0.01
         end
 
         self.x,self.y=Camera:position()
-        if GameStates.acceptInput and self.playButton.isActive then             
-            return self.playButton:update(self.x,self.y,0,0) 
+        if self.playButton.isActive then             
+            return self.playButton:update(self.x,self.y) 
         end
     end,
     draw=function(self)

@@ -100,6 +100,9 @@ entityClass.new=function(self,entity,x,y,startState) --constructor
     e.idleTime=rnd()*3
     e.maxIdleTime=3 --3s of idle until entity wanders around
 
+    --Sound Data
+    e.sfx=def.sfx
+
     --Draw data
     e.spriteSheet=self.spriteSheets[self.chooseSpriteSheet(def)]
     e.xOffset=e.w*0.5

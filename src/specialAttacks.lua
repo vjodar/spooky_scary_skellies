@@ -47,29 +47,13 @@ local chainLightning=function(self,mage,targets,primary,secondary)
         secondaryColor=self.colors[secondary] or self.colors.white,
         width=GameScale,
         yOffset=-7,
-        update=function(self)
-            self.duration=self.duration-dt 
-            if self.duration<0 then return false end 
-        end,
-        drawLine=function(p1,p2,yOffset)
-            love.graphics.line(p1.x,p1.y+yOffset,p2.x,p2.y+yOffset)
-        end,
-        draw=function(self)
-            for i=1,#self.points-1 do 
-                local p1=self.points[i]
-                local p2=self.points[i+1]
-                love.graphics.setColor(self.primaryColor) --draw border
-                love.graphics.setLineWidth(self.width)
-                self.drawLine(p1,p2,self.yOffset)
-                love.graphics.setColor(self.secondaryColor) --draw inner line
-                love.graphics.setLineWidth(self.width*0.5)
-                self.drawLine(p1,p2,self.yOffset)
-                love.graphics.setColor(1,1,1) --reset color
-                love.graphics.setLineWidth(self.width) --reset line width
-            end
-        end,
+        update=self.methods.chainLightning.update,
+        drawLine=self.methods.chainLightning.drawLine,
+        draw=self.methods.chainLightning.draw,
     }
     table.insert(self.table,cl)
+
+    Audio:playSfx('chainLightning')
 end
 
 local spawnPyreTrail=function(self,args) --args={x,y,damage,knockback,yOffset}
@@ -101,32 +85,8 @@ local spawnPyreTrail=function(self,args) --args={x,y,damage,knockback,yOffset}
     pt.shadow=Shadows:new(def.name,pt.w,pt.h)
 
     --Methods
-    pt.update=function(self)
-        self.animation:update(dt)
-        self.duration=self.duration-dt 
-        if self.duration<0 then return false end 
-        self.timer=self.timer+dt 
-        if self.timer>self.attack.period then 
-            self.timer=0
-            local targets=World:queryRect(self.x,self.y,self.w,self.h,self.queryFilter)
-            for i=1,#targets do 
-                local target=targets[i]
-                target:takeDamage({
-                    damage=self.attack.damage,
-                    knockback=self.attack.knockback,
-                    angle=getAngle(self.center,target.center),
-                    textColor='red'
-                })
-            end
-        end
-    end
-    pt.draw=function(self)
-        self.shadow:draw(self.x,self.y)
-        self.animation:draw(
-            self.sprite,self.x+self.xOffset,self.y+self.yOffset,
-            nil,1,1,self.xOrigin,self.yOrigin
-        )
-    end
+    pt.update=self.methods.pyreTrail.update
+    pt.draw=self.methods.pyreTrail.draw
 
     World:addItem(pt)
     table.insert(Objects.table,pt) --pyreTrail is a physical object
@@ -140,6 +100,61 @@ return {
 
     chainLightning=chainLightning,
     spawnPyreTrail=spawnPyreTrail,
+
+    methods={
+        chainLightning={
+            update=function(self)
+                self.duration=self.duration-dt 
+                if self.duration<0 then return false end 
+            end,
+            drawLine=function(p1,p2,yOffset)
+                love.graphics.line(p1.x,p1.y+yOffset,p2.x,p2.y+yOffset)
+            end,
+            draw=function(self)
+                for i=1,#self.points-1 do 
+                    local p1=self.points[i]
+                    local p2=self.points[i+1]
+                    love.graphics.setColor(self.primaryColor) --draw border
+                    love.graphics.setLineWidth(self.width)
+                    self.drawLine(p1,p2,self.yOffset)
+                    love.graphics.setColor(self.secondaryColor) --draw inner line
+                    love.graphics.setLineWidth(self.width*0.5)
+                    self.drawLine(p1,p2,self.yOffset)
+                    love.graphics.setColor(1,1,1) --reset color
+                    love.graphics.setLineWidth(self.width) --reset line width
+                end
+            end,
+        },
+
+        pyreTrail={
+            update=function(self)
+                self.animation:update(dt)
+                self.duration=self.duration-dt 
+                if self.duration<0 then return false end 
+                self.timer=self.timer+dt 
+                if self.timer>self.attack.period then 
+                    self.timer=0
+                    local targets=World:queryRect(self.x,self.y,self.w,self.h,self.queryFilter)
+                    for i=1,#targets do 
+                        local target=targets[i]
+                        target:takeDamage({
+                            damage=self.attack.damage,
+                            knockback=self.attack.knockback,
+                            angle=getAngle(self.center,target.center),
+                            textColor='red'
+                        })
+                    end
+                end
+            end,
+            draw=function(self)
+                self.shadow:draw(self.x,self.y)
+                self.animation:draw(
+                    self.sprite,self.x+self.xOffset,self.y+self.yOffset,
+                    nil,1,1,self.xOrigin,self.yOrigin
+                )
+            end,
+        },
+    },
 
     colors={  
         yellow={227/255,194/255,91/255},

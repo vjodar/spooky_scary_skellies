@@ -25,6 +25,7 @@ function love.load()
     CutsceneState=require 'src.gameStates.cutsceneState'
 
     --Modules
+    Audio=require 'src.audio'
     UI=require 'src.userInterface'
     Camera=require 'src.camera'
     World=require 'src.world'

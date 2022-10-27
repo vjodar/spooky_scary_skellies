@@ -6,6 +6,10 @@ local projectileDefinitions={
             w=6,
             h=6,
             class='allyProjectile',
+        },
+        sfx={
+            launch='launchBone',
+            bounce='bounceBone',
         }
     },
     ['arrow']={
@@ -16,6 +20,10 @@ local projectileDefinitions={
             h=3,
             class='allyProjectile',
         },
+        sfx={
+            launch='launchDefault',
+            bounce='bounceDefault',
+        },
     },
     ['flame']={
         name='flame',
@@ -24,6 +32,9 @@ local projectileDefinitions={
             w=3,
             h=3,
             class='allyProjectile',
+        },
+        sfx={
+            launch='launchFlame',
         },
     },
     ['icicle']={
@@ -34,6 +45,9 @@ local projectileDefinitions={
             h=3,
             class='allyProjectile',
         },
+        sfx={
+            launch='launchIcicle',
+        },
     },
     ['spark']={
         name='spark',
@@ -42,6 +56,10 @@ local projectileDefinitions={
             w=3,
             h=3,
             class='allyProjectile',
+        },
+        sfx={
+            launch='launchSpark',
+            bounce='bounceSpark',
         },
     },
     ['darkArrow']={
@@ -52,6 +70,9 @@ local projectileDefinitions={
             h=3,
             class='enemyProjectile',
         },
+        sfx={
+            launch='launchDefault',
+        },
     },
     ['pickaxe']={
         name='pickaxe',
@@ -61,6 +82,9 @@ local projectileDefinitions={
             h=3,
             class='enemyProjectile',
         },
+        sfx={
+            launch='launchBone',
+        },
     },
     ['apple']={
         name='apple',
@@ -69,6 +93,9 @@ local projectileDefinitions={
             w=3,
             h=3,
             class='enemyProjectile',
+        },
+        sfx={
+            launch='launchDefault',
         },
     },
     ['jack-o-lantern']={
@@ -92,6 +119,10 @@ local projectileDefinitions={
             }
         },
         shake={magnitude=5},
+        sfx={
+            launch='launchJack',
+            explode='explodeDefault',
+        },
     },
     ['blueSpark']={
         name='blueSpark',
@@ -101,18 +132,31 @@ local projectileDefinitions={
             h=3,
             class='enemyProjectile',
         },
+        sfx={
+            launch='launchSpark',
+            bounce='bounceSpark',
+        },
     },
     ['mug']={
         name='mug', moveSpeed=130,
-        collider={w=3, h=3, class='enemyProjectile'}
+        collider={w=3, h=3, class='enemyProjectile'},
+        sfx={
+            launch='launchBone',
+        },
     },
     ['bottle']={
         name='bottle', moveSpeed=130,
-        collider={w=3, h=3, class='enemyProjectile'}
+        collider={w=3, h=3, class='enemyProjectile'},
+        sfx={
+            launch='launchBone',
+        },
     },
     ['candle']={
         name='candle', moveSpeed=130,
-        collider={w=3, h=3, class='enemyProjectile'}
+        collider={w=3, h=3, class='enemyProjectile'},
+        sfx={
+            launch='launchBone',
+        },
     },
     ['fireball']={
         name='fireball',
@@ -141,6 +185,10 @@ local projectileDefinitions={
             }
         },
         shake={magnitude=2},
+        sfx={
+            launch='launchFlame',
+            explode='explodeDefault',
+        },
     },
     ['blizzard']={
         name='blizzard',
@@ -167,7 +215,10 @@ local projectileDefinitions={
                 [0x668da9]=1,
                 [0x5c699f]=1,
             }
-        }
+        },
+        sfx={
+            explode='explodeBlizzard',
+        },
     },
     ['laser']={
         name='laser',
@@ -176,6 +227,10 @@ local projectileDefinitions={
             w=3,
             h=3,
             class='enemyProjectile',
+        },
+        sfx={
+            launch='launchLaser',
+            bounce='bounceLaser',
         },
     },
     ['pyre']={
@@ -192,6 +247,9 @@ local projectileDefinitions={
             frameHeight=12,
             frames='1-4',
             durations=0.1,
+        },
+        sfx={
+            launch='launchPyre',
         },
     },
     ['orb']={
@@ -216,6 +274,11 @@ local projectileDefinitions={
             }
         },
         shake={magnitude=5},
+        sfx={
+            launch='launchOrb',
+            bounce='bounceOrb',
+            explode='explodeOrb',
+        },
     },
     ['fireballObsidian']={
         name='fireballObsidian',
@@ -245,6 +308,10 @@ local projectileDefinitions={
             }
         },
         shake={magnitude=5},
+        sfx={
+            launch='launchFlame',
+            explode='explodeDefault',
+        },
     },    
     ['icicleWitch']={
         name='icicleWitch',
@@ -253,6 +320,9 @@ local projectileDefinitions={
             w=3,
             h=3,
             class='enemyProjectile',
+        },
+        sfx={
+            launch='launchIcicle',
         },
     },
     ['fireballWitch']={
@@ -282,6 +352,10 @@ local projectileDefinitions={
             }
         },
         shake={magnitude=2},
+        sfx={
+            launch='launchFlame',
+            explode='explodeDefault',
+        },
     },
 }
 
@@ -322,7 +396,10 @@ local projectileOnHitFunctions=function()
         --damages targets, destroys upon hitting solids
         ['base']=function(self,target,touch)
             if target.collisionClass=='solid' 
-            then return false end
+            then 
+                Audio:playSfx(self.sfx.hit)
+                return false 
+            end
 
             if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
             or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
@@ -343,8 +420,10 @@ local projectileOnHitFunctions=function()
                     self.vx=cos(angle)*self.moveSpeed 
                     self.vy=sin(angle)*self.moveSpeed
                     self.angle=angle
+                    Audio:playSfx(self.sfx.bounce)
                     return
                 else 
+                    Audio:playSfx(self.sfx.hit)
                     return false 
                 end
             end
@@ -369,8 +448,12 @@ local projectileOnHitFunctions=function()
                     self.vx=cos(angle)*self.moveSpeed 
                     self.vy=sin(angle)*self.moveSpeed
                     self.angle=angle
+                    Audio:playSfx(self.sfx.bounce)
                     return
-                else return false end 
+                else 
+                    Audio:playSfx(self.sfx.hit)
+                    return false 
+                end 
             end
 
             if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
@@ -420,7 +503,10 @@ local projectileOnHitFunctions=function()
         --damages and sets targets on fire, destroys upon hitting solids
         ['flame']=function(self,target,touch)
             if target.collisionClass=='solid' 
-            then return false end
+            then 
+                Audio:playSfx(self.sfx.hit)
+                return false 
+            end
 
             if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
             or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
@@ -441,7 +527,10 @@ local projectileOnHitFunctions=function()
         --damages and freezes targets, destroys upon hitting solids
         ['icicle']=function(self,target,touch)
             if target.collisionClass=='solid' 
-            then return false end
+            then
+                Audio:playSfx(self.sfx.hit)
+                return false 
+            end
                
             if (self.collisionClass=='allyProjectile' and target.collisionClass=='enemy')
             or (self.collisionClass=='enemyProjectile' and target.collisionClass=='ally')
@@ -467,6 +556,7 @@ local projectileOnHitFunctions=function()
                 self.vx=cos(angle)*self.moveSpeed 
                 self.vy=sin(angle)*self.moveSpeed
                 self.angle=angle
+                Audio:playSfx(self.sfx.bounce)
                 return
             end
                
@@ -523,6 +613,7 @@ local projectileOnHitFunctions=function()
                         stopThreshold=shake.stopThreshold,
                     })
                 end
+                Audio:playSfx(self.sfx.explode) 
                 return false
             end 
         end,
@@ -536,6 +627,7 @@ local projectileOnHitFunctions=function()
                 self.vx=cos(angle)*self.moveSpeed 
                 self.vy=sin(angle)*self.moveSpeed
                 self.angle=angle
+                Audio:playSfx(self.sfx.bounce)
             end
         end,    
 
@@ -549,6 +641,7 @@ local projectileOnHitFunctions=function()
                 self.vx=cos(angle)*self.moveSpeed 
                 self.vy=sin(angle)*self.moveSpeed
                 self.angle=angle
+                Audio:playSfx(self.sfx.bounce)
             end
         end,    
 
@@ -560,6 +653,7 @@ local projectileOnHitFunctions=function()
                 self.vx=cos(angle)*self.moveSpeed 
                 self.vy=sin(angle)*self.moveSpeed
                 self.angle=angle
+                Audio:playSfx(self.sfx.bounce) 
                 return
             end
                
@@ -706,6 +800,7 @@ local projectileUpdateFunctions=function()
                         end
                     end
                     self.particles:emit(self.center.x,self.center.y)
+                    Audio:playSfx(self.sfx.explode)
                 end
             end
 
@@ -794,9 +889,7 @@ local projectileUpdateFunctions=function()
             self.remainingTravelTime=self.remainingTravelTime-dt 
             if self.remainingTravelTime<0
             or getDistance(self.center,Camera.target)>600 
-            then 
-                return false
-            end
+            then return false end
 
             if self.animation then self.animation:update(dt) end 
 
@@ -841,6 +934,7 @@ local projectileUpdateFunctions=function()
                                 stopThreshold=shake.stopThreshold,
                             })
                         end
+                        Audio:playSfx(self.sfx.explode)
                         return false
                     end
                 end
@@ -982,6 +1076,9 @@ return {
         } 
         p.explosionRadius=def.explosionRadius or nil
         p.remainingTravelTime=def.travelTime or (200/def.moveSpeed)*4 --2sec per 100units/sec
+
+        --Audio
+        p.sfx=def.sfx
     
         --Draw data
         p.sprite=self.sprites[def.name]
@@ -1007,6 +1104,9 @@ return {
         
         World:addItem(p)
         table.insert(Objects.table,p)
+
+        Audio:playSfx(p.sfx.launch)
+
         return p
     end,
 }

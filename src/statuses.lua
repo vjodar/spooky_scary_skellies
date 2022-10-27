@@ -16,7 +16,8 @@ return {
                             damage=self.damage,
                             knockback=self.knockback,
                             angle=rnd()*pi*2,
-                            textColor='red'
+                            textColor='red',
+                            sfx='burn',
                         })
                         self.cycles=self.cycles-1
                         self.timer=0

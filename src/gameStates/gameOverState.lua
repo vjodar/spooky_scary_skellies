@@ -1,13 +1,14 @@
 local lose=function(self)
+    GameStates:addState(self)
     self.alpha=0
     self.state='fadeInLose'
-    GameStates:addState(self)
 end
 
 local win=function(self)
+    GameStates:addState(self)
     self.alpha=0
     self.state='fadeInWin'
-    GameStates:addState(self)
+    Hud:hide()
 end
 
 local updateFunctions={

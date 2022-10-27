@@ -118,7 +118,7 @@ behaviors.methods.common={
         return self.animations.current:update(dt*self.animSpeed)
     end,
 
-    takeDamage=function(self,args) --args={damage,knockback,angle,textColor}
+    takeDamage=function(self,args) --args={damage,knockback,angle,textColor,sfx}
         if self.state=='dead' then return end 
 
         local damage=max(args.damage,1)
@@ -146,6 +146,9 @@ behaviors.methods.common={
                 })
             end
         end
+
+        local sfx=args.sfx or 'hitDefault'
+        Audio:playSfx(sfx)
 
         if self.health.current==0 then self:die() end
     end,
@@ -630,6 +633,7 @@ behaviors.states.ally={
                 local fy=sin(self.angle)*self.attack.lungeForce
                 self.vx=self.vx+fx
                 self.vy=self.vy+fy  
+                Audio:playSfx(self.sfx.lunge)
             end
     
             --handle collisions
@@ -942,7 +946,8 @@ behaviors.states.enemy={
                 local fx=cos(self.angle)*self.attack.lungeForce
                 local fy=sin(self.angle)*self.attack.lungeForce
                 self.vx=self.vx+fx
-                self.vy=self.vy+fy        
+                self.vy=self.vy+fy    
+                Audio:playSfx(self.sfx.lunge)    
             end 
     
             --handle collisions

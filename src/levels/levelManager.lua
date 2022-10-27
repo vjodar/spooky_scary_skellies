@@ -289,8 +289,10 @@ local buildLevel=function(self,lvl,skeletons)
 
     --spawn in the skeleton minions
     for name,count in pairs(skeletons) do 
-        local summonSkeletons=function() Player:summon(name,count) end
-        Timer:after(0.5,summonSkeletons)
+        if count>0 then 
+            local summonSkeletons=function() Player:summon(name,count) end
+            Timer:after(0.5,summonSkeletons)
+        end 
     end
 
     if lvl=='dungeonBoss' then CutsceneState:bossCutscene() end  

@@ -56,6 +56,9 @@ return {
                 [0xede4da]=1,
             }
         },
+        sfx={
+            lunge='lungeDefault',
+        },
     },
     ['skeletonArcher']={
         name='skeletonArcher',
@@ -115,6 +118,9 @@ return {
                 [0xede4da]=3,
                 [0x8b9150]=1,
             }
+        },
+        sfx={
+
         },
     },
     ['skeletonMageFire']={
@@ -176,6 +182,9 @@ return {
                 [0xe56f4b]=1,
             }
         },
+        sfx={
+
+        },
     },
     ['skeletonMageIce']={
         name='skeletonMageIce',
@@ -235,6 +244,9 @@ return {
                 [0xede4da]=3,
                 [0x769fa6]=1,
             }
+        },
+        sfx={
+
         },
     },
     ['skeletonMageElectric']={
@@ -296,6 +308,9 @@ return {
                 [0xe3c25b]=1,
             }
         },
+        sfx={
+
+        },
     },
     ['slime']={
         name='slime',
@@ -352,6 +367,9 @@ return {
             },
             willHealPlayer=true,
         },
+        sfx={
+            lunge='lungeDefault',
+        },
     },
     ['pumpkin']={
         name='pumpkin',
@@ -407,6 +425,9 @@ return {
                 [0x557d55]=1,
             },
             willHealPlayer=true,
+        },
+        sfx={
+            lunge='lungeDefault',
         },
     },
     ['golem']={
@@ -465,6 +486,9 @@ return {
             },
             willHealPlayer=true,
         },
+        sfx={
+
+        },
     },
     ['spider']={
         name='spider',
@@ -520,6 +544,9 @@ return {
                 [0xca5954]=1,
             },
             willHealPlayer=true,
+        },
+        sfx={
+            lunge='lungeSpider',
         },
     },
     ['bat']={
@@ -579,6 +606,9 @@ return {
             },
             willHealPlayer=true,
         },
+        sfx={
+            lunge='lungeSpider',
+        },
     },
     ['zombie']={
         name='zombie',
@@ -635,6 +665,9 @@ return {
                 [0x737b42]=1,
             },
             willHealPlayer=true,
+        },
+        sfx={
+
         },
     },
     ['possessedArcher']={
@@ -694,6 +727,9 @@ return {
             },
             willHealPlayer=true,
         },
+        sfx={
+
+        },
     },
     ['possessedKnight']={
         name='possessedKnight',
@@ -751,6 +787,9 @@ return {
             },
             willHealPlayer=true,
         },
+        sfx={
+
+        },
     },
     ['undeadMiner']={
         name='undeadMiner',
@@ -807,6 +846,9 @@ return {
                 [0x575a88]=1,
             },
             willHealPlayer=true,
+        },
+        sfx={
+
         },
     },    
     ['ent']={
@@ -866,6 +908,9 @@ return {
             },
             willHealPlayer=true,
         },
+        sfx={
+
+        },
     },
     ['headlessHorseman']={
         name='headlessHorseman',
@@ -924,6 +969,9 @@ return {
             willHealPlayer=true,
         },
         deathShake={magnitude=10},
+        sfx={
+
+        },
     },
     ['slimeMatron']={
         name='slimeMatron',
@@ -977,6 +1025,9 @@ return {
                 [0x8b9150]=1,
             },
             willHealPlayer=true,
+        },
+        sfx={
+
         },
     },
     ['vampire']={
@@ -1035,6 +1086,9 @@ return {
             },
             willHealPlayer=true,
         },
+        sfx={
+
+        },
     },
     ['tombstone']={
         name='tombstone',
@@ -1087,6 +1141,9 @@ return {
                 [0x4c4b54]=1,
             }
         },
+        sfx={
+
+        },
     },
     ['spiderEgg']={
         name='spiderEgg',
@@ -1135,6 +1192,9 @@ return {
                 [0xbfb8b4]=1,
                 [0x4c4b54]=1,
             }
+        },
+        sfx={
+
         },
     },
     ['imp']={
@@ -1195,6 +1255,9 @@ return {
                 [0x5d483c]=1,
             },
             willHealPlayer=true,
+        },
+        sfx={
+
         },
     },
     ['gnasherDemon']={
@@ -1257,6 +1320,9 @@ return {
             },
             willHealPlayer=true,
         },
+        sfx={
+
+        },
     },
     ['frankenstein']={
         name='frankenstein',
@@ -1316,6 +1382,9 @@ return {
             willHealPlayer=true,
         },
         deathShake={magnitude=10},
+        sfx={
+
+        },
     },
     ['werebear']={
         name='werebear',
@@ -1373,6 +1442,9 @@ return {
             willHealPlayer=true,
         },
         deathShake={magnitude=10},
+        sfx={
+
+        },
     },
     ['werewolf']={
         name='werewolf',
@@ -1427,6 +1499,9 @@ return {
                 [0x5d483c]=1,
             },
             willHealPlayer=true,
+        },
+        sfx={
+
         },
     },
     ['ghost']={
@@ -1492,6 +1567,9 @@ return {
             },
             willHealPlayer=true,
         },
+        sfx={
+
+        },
     },
     ['poltergeist']={
         name='poltergeist',
@@ -1556,6 +1634,9 @@ return {
             },
             willHealPlayer=true,
         },
+        sfx={
+
+        },
     },
     ['floatingEyeball']={
         name='floatingEyeball',
@@ -1615,6 +1696,9 @@ return {
                 [0x668da9]=1,
             },
             willHealPlayer=true,
+        },
+        sfx={
+
         },
     },
     ['pyreFiend']={
@@ -1680,6 +1764,9 @@ return {
             willHealPlayer=true,
         },
         deathShake={magnitude=10},
+        sfx={
+
+        },
     },
     ['beholder']={
         name='beholder',
@@ -1746,6 +1833,9 @@ return {
             willHealPlayer=true,
         },
         deathShake={magnitude=10},
+        sfx={
+
+        },
     },
     ['giantTombstone']={
         name='giantTombstone',
@@ -1807,6 +1897,9 @@ return {
         deathShake={
             magnitude=25,
             damping=3,
+        },
+        sfx={
+
         },
     },
     ['obsidianGolem']={
@@ -1891,6 +1984,9 @@ return {
         deathShake={
             magnitude=25,
             damping=3,
+        },
+        sfx={
+
         },
     },
     ['witch']={
@@ -2000,6 +2096,9 @@ return {
             magnitude=25,
             damping=2,
         },
+        sfx={
+
+        },
     },
     ['witchClone']={
         name='witchClone',
@@ -2096,6 +2195,9 @@ return {
                 [0x5a5888]=1, [0x7c6da2]=1, [0x947a9d]=1, [0xbc87a5]=1, [0xd9a6a6]=1,
             },
             willHealPlayer=true,
+        },
+        sfx={
+
         },
     },
 }

@@ -56,6 +56,11 @@ local calculateBoneShieldAngles=function()
 end
 player.boneShieldAngles=calculateBoneShieldAngles()
 
+--Sound Data
+player.sfx={
+    summon='summonSkeleton',
+}
+
 --Draw data
 player.spriteSheet=love.graphics.newImage('assets/entities/player.png')
 player.frameWidth=20
@@ -251,6 +256,9 @@ function player:takeDamage(args)
     local damageTextColor=args.textColor or 'gray'
     UI.damage:new(self.center.x,self.center.y,floor(damage),damageTextColor)
 
+    local sfx=args.sfx or 'hitDefault'
+    Audio:playSfx(sfx)
+
     self:updateHealth(-damage)
 
     if self.upgrades.boneShield then
@@ -313,7 +321,9 @@ function player:summon(name,count)
         local goalY=self.y+sin(angle)*distance
         local realX,realY=World:move(skelly,goalX,goalY,skelly.collisionFilter)
         skelly.x,skelly.y=realX,realY
-    end
+
+    end    
+    Audio:playSfx(self.sfx.summon)
 end
 
 --Uses summon() to summon minions, amount is definied by minionsPerSummon

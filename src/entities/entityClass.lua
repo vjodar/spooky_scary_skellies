@@ -139,6 +139,7 @@ entityClass.new=function(self,entity,x,y,startState) --constructor
 
     local state=startState or 'spawn'
     e:changeState(state)
+    if state=='spawn' then Audio:playSfx(e.sfx.spawn) end
 
     World:addItem(e)
     table.insert(Objects.table,e)

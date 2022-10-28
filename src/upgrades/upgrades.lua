@@ -440,6 +440,7 @@ local activationFunctions={
 local unlock=function(self,name) 
     self.tally[name]=self.tally[name]+1
     self.activationFunctions[name]()
+    Audio:playSfx('upgrade')
 end 
 
 --Go through upgrade definitions, check pre reqs and count limits

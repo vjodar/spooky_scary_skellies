@@ -6,7 +6,7 @@ local start=function(self)
         self.playButton:update(self.x,self.y)
         self.playButton.isActive=true 
     end 
-    Timer:after(1,function() FadeState:fadeIn({fadeTime=2,afterFn=activatePlayButton}) end)
+    Timer:after(0.5,function() FadeState:fadeIn({fadeTime=2,afterFn=activatePlayButton}) end)
 end 
 
 local newImage=love.graphics.newImage
@@ -52,6 +52,7 @@ local playButton={
             local userPressedMe=self:updateButton()
             if userPressedMe==true then 
                 self.state='up'
+                Audio:playSfx('accept')
                 PlayState:startGame()
                 return false
             end

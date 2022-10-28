@@ -8,7 +8,7 @@ local tutorialCutscene=function(self)
     --Use timers to facilitate dialog and actions
     local setupWitchActor=function()
         self.witch=Entities:new('witch',rnd(Player.x-48,Player.x+48),Player.y-32)
-        local dialog=UI:newDialog(self.witch,45)
+        local dialog=UI:newDialog(self.witch,45,'dialogWitch')
         dialog.speech.period=0.05 --dialog is slower than normal
         self.witch.dialog=dialog
     end
@@ -90,7 +90,7 @@ local bossCutscene=function(self)
     local bossSpawnPos=LevelManager.currentLevel.bossData.spawnPos
     local setupWitchActor=function()
         self.witch=Entities:new('witch',bossSpawnPos.x,bossSpawnPos.y)        
-        local dialog=UI:newDialog(self.witch,45)
+        local dialog=UI:newDialog(self.witch,45,'dialogWitch')
         dialog.speech.period=0.05 --dialog is slower than normal
         self.witch.dialog=dialog
         

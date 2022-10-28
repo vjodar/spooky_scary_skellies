@@ -82,6 +82,7 @@ local dialogMethods={
             speech.timer=0
             speech.current=speech.finished:sub(1,speech.index)
             speech.index=speech.index+1
+            Audio:playSfx(self.sfx)
 
             if speech.index>#speech.finished then --finished forming speech
                 self.isFormingSpeech=false
@@ -107,13 +108,14 @@ local dialogMethods={
     destroy=function(self) self.isDestroyed=true end,
 }
 
-local newDialog=function(self,entity,yOffset) --dialog constructor
+local newDialog=function(self,entity,yOffset,sfx) --dialog constructor
     local dialog={
         owner=entity,
         x=0, y=0,
         yOffset=yOffset or 0,
         duration=3,
         timer=0,
+        sfx=sfx,
         isDoneTalking=true,
         isFormingSpeech=false,
         isDestroyed=false,

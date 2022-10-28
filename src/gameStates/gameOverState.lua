@@ -2,6 +2,7 @@ local lose=function(self)
     GameStates:addState(self)
     self.alpha=0
     self.state='fadeInLose'
+    Audio:playSfx('gameOver')
 end
 
 local win=function(self)
@@ -107,6 +108,7 @@ local buttons={
             local userPressedMe=self:updateButton()
             if userPressedMe==true then 
                 self.state='up'
+                Audio:playSfx('accept')
                 FadeState:fadeOut({
                     fadeTime=0.5,
                     afterFn=resetGame,
@@ -133,6 +135,7 @@ local buttons={
             local userPressedMe=self:updateButton()
             if userPressedMe==true then 
                 self.state='up'
+                Audio:playSfx('accept')
                 LevelManager:restartLevel()
                 return false
             end

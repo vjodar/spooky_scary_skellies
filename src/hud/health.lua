@@ -60,6 +60,8 @@ local calculateHeartPieces=function(self)
     local previousCount=self.heartPieces 
     self.heartPieces=ceil(Player.health.current/25) --1 piece for every 1-25hp
 
+    if self.heartPieces>previousCount then Audio:playSfx('heartPieceRestore') end
+
     --lost a heart piece, emit particles
     if self.heartPieces<previousCount then 
         self.particles:emit(Player.center.x,Player.center.y)
@@ -73,6 +75,7 @@ local calculateHeartPieces=function(self)
             if unlocked.skeletonMageElectric then skellies[3]='skeletonMageElectric' end 
             for i=1,5 do Player:summon(rndElement(skellies),1) end
         end
+        Audio:playSfx('heartPieceLose')
     end
 end
 

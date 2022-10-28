@@ -14,7 +14,7 @@ player.collisionFilter=World.collisionFilters[player.collisionClass]
 
 --General Data
 player.state='idle'
-player.health={current=500,max=500}
+player.health={current=300,max=500} --Less than max to show health restore feature
 player.kbResistance=0
 player.attack={
     damage=10,
@@ -58,7 +58,8 @@ player.boneShieldAngles=calculateBoneShieldAngles()
 
 --Sound Data
 player.sfx={
-    summon='summonSkeleton',
+    dialog='dialogPlayer',
+    reject='reject',
 }
 
 --Draw data
@@ -88,7 +89,7 @@ player.shadow=Shadows:new('player',player.w,player.h)
 player.status=Statuses:new()
 
 --Dialog system
-player.dialog=UI:newDialog(player,30)
+player.dialog=UI:newDialog(player,30,player.sfx.dialog)
 
 --Cooldown flags, periods, and callback functions
 player.canTurn={flag=true,cooldownPeriod=0.2}
@@ -143,7 +144,7 @@ function player:draw()
     )
     love.graphics.setColor(1,1,1,1)
     -- --testing------------------------------------------
-    -- love.graphics.print(#UI.dialogs,self.x-10,self.y-10)
+    -- love.graphics.print(self.moveSpeed,self.x-10,self.y-10)
     -- love.graphics.print(self.center.y,self.x-10,self.y)
     -- love.graphics.print('STATES: '..#gameStates,self.x-10,self.y-30)
     -- love.graphics.print('objects: '..#Objects.table,self.x-10,self.y-60)
@@ -284,7 +285,7 @@ end
 
 function player:die()
     self.state='dead'
-    self.status:clear()
+    self.status:clear(self)
     self.animSpeed=self.animSpeedMax
     Camera:shake({magnitude=20,damping=2})    
     LevelManager:setEntityAggro(false)
@@ -316,14 +317,12 @@ function player:summon(name,count)
         
         --move skeleton using world collision to a point around player
         local angle=rnd()*2*pi 
-        local distance=rnd()*(50+self.maxMinions)
+        local distance=rnd()*(50+count)
         local goalX=self.x+cos(angle)*distance
         local goalY=self.y+sin(angle)*distance
         local realX,realY=World:move(skelly,goalX,goalY,skelly.collisionFilter)
         skelly.x,skelly.y=realX,realY
-
-    end    
-    Audio:playSfx(self.sfx.summon)
+    end
 end
 
 --Uses summon() to summon minions, amount is definied by minionsPerSummon
@@ -336,6 +335,7 @@ function player:summonMinions(name)
             "Not ready to summon again.",
         }
         self.dialog:say(rndElement(messages))
+        Audio:playSfx(self.sfx.reject)
         return 
     end
 
@@ -346,6 +346,7 @@ function player:summonMinions(name)
             "I can't summon that.",
         }
         self.dialog:say(rndElement(messages))
+        Audio:playSfx(self.sfx.reject)
         return
     end
 
@@ -359,6 +360,7 @@ function player:summonMinions(name)
             "My army has reached its limit.",
         }
         self.dialog:say(rndElement(messages))
+        Audio:playSfx(self.sfx.reject)
         return 
     end
 

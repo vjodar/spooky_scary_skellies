@@ -221,7 +221,7 @@ local restartLevel=function(self)
     local rebuildCurrentLevel=function()
         Objects:clear()
         Player.health.current=Player.health.max 
-        Player.status:clear()
+        Player.status:clear(Player)
         Player.state='idle'
         Hud.health:calculateHeartPieces()
         LevelManager.update=LevelManager.updateStandard
@@ -238,7 +238,7 @@ local buildLevel=function(self,lvl,skeletons)
     love.graphics.setBackgroundColor(map.bgColor)
 
     --move player to start position
-    Player.status:clear()
+    Player.status:clear(Player)
     Player.x,Player.y=startPos.x,startPos.y 
     World:update(Player,Player.x,Player.y)
     Camera:lookAt(startPos.x,startPos.y)
@@ -391,7 +391,7 @@ local updateStandard=function(self)
                         local boss=Entities:new(
                             bossDef.name,spawnPos.x,spawnPos.y
                         )
-                        boss.dialog=UI:newDialog(boss,45)
+                        boss.dialog=UI:newDialog(boss,45,'dialogWitch')
                         LevelManager.currentLevel.boss=boss
                     end,
                     holdTime=level.bossData.spawnAnimDuration,
@@ -411,7 +411,7 @@ local updateStandard=function(self)
         level.canCheckWaveCompletion=false 
         local enemyCount=self.getWaveEnemyCount(nextWaveDef)
         local enableCheck=function() level.canCheckWaveCompletion=true end 
-        Timer:after(0.1*enemyCount,enableCheck)
+        Timer:after(0.05*enemyCount,enableCheck)
     end
 end
 
@@ -558,7 +558,7 @@ local buildTitleScreenLevel=function(self)
     for name,def in pairs(Entities.definitions) do 
         if def.collider.class=='enemy' and notBoss(def.name) then enemies[name]=rnd(4) end 
     end
-    self.gridClass:generateEnemies(enemies,Entities,self.currentLevel.grid)
+    self.gridClass:generateEnemies(enemies,Entities,self.currentLevel.grid,'idle')
 
     self.update=self.wait --wait until game starts
 end
@@ -571,7 +571,7 @@ local buildTutorialLevel=function(self)
     love.graphics.setBackgroundColor(map.bgColor)
 
     --move player to start position
-    Player.status:clear()
+    Player.status:clear(Player)
     Player.x,Player.y=startPos.x,startPos.y+24
     World:update(Player,Player.x,Player.y)
     Camera:lookAt(startPos.x,startPos.y)
@@ -622,7 +622,9 @@ local buildTutorialLevel=function(self)
 
     --Spawn exit immediately
     local exit=self.currentLevel.exit 
+    Audio:mute() --mute the exit spawning in
     self.exitsClass:new(exit.name,exit.pos.x,exit.pos.y)
+    Audio:unmute()
     self.update=function() end --just wait till player exits level
 end
 

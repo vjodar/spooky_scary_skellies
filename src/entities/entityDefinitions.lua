@@ -57,7 +57,9 @@ return {
             }
         },
         sfx={
+            spawn='summonSkeleton',
             lunge='lungeDefault',
+            death='deathSkeleton',
         },
     },
     ['skeletonArcher']={
@@ -120,7 +122,8 @@ return {
             }
         },
         sfx={
-
+            spawn='summonSkeleton',
+            death='deathSkeleton',
         },
     },
     ['skeletonMageFire']={
@@ -183,7 +186,8 @@ return {
             }
         },
         sfx={
-
+            spawn='summonSkeleton',
+            death='deathSkeleton',
         },
     },
     ['skeletonMageIce']={
@@ -246,7 +250,8 @@ return {
             }
         },
         sfx={
-
+            spawn='summonSkeleton',
+            death='deathSkeleton',
         },
     },
     ['skeletonMageElectric']={
@@ -309,7 +314,8 @@ return {
             }
         },
         sfx={
-
+            spawn='summonSkeleton',
+            death='deathSkeleton',
         },
     },
     ['slime']={
@@ -368,7 +374,9 @@ return {
             willHealPlayer=true,
         },
         sfx={
+            spawn='spawnSlime',
             lunge='lungeDefault',
+            death='deathMedium',
         },
     },
     ['pumpkin']={
@@ -427,7 +435,9 @@ return {
             willHealPlayer=true,
         },
         sfx={
+            spawn='spawnPoof',
             lunge='lungeDefault',
+            death='deathMedium',
         },
     },
     ['golem']={
@@ -487,7 +497,9 @@ return {
             willHealPlayer=true,
         },
         sfx={
-
+            spawn='spawnPoof',
+            lunge='lungeGolem',
+            death='deathMedium',
         },
     },
     ['spider']={
@@ -546,7 +558,9 @@ return {
             willHealPlayer=true,
         },
         sfx={
+            spawn='spawnPoof',
             lunge='lungeSpider',
+            death='deathLight',
         },
     },
     ['bat']={
@@ -607,7 +621,9 @@ return {
             willHealPlayer=true,
         },
         sfx={
+            spawn='spawnPoof',
             lunge='lungeSpider',
+            death='deathLight',
         },
     },
     ['zombie']={
@@ -667,7 +683,8 @@ return {
             willHealPlayer=true,
         },
         sfx={
-
+            spawn='spawnRaise',
+            death='deathMedium',
         },
     },
     ['possessedArcher']={
@@ -728,7 +745,8 @@ return {
             willHealPlayer=true,
         },
         sfx={
-
+            spawn='spawnPoof',
+            death='deathMedium',
         },
     },
     ['possessedKnight']={
@@ -788,7 +806,9 @@ return {
             willHealPlayer=true,
         },
         sfx={
-
+            spawn='spawnPoof',
+            lunge='lungeKnight',
+            death='deathMedium',
         },
     },
     ['undeadMiner']={
@@ -848,7 +868,8 @@ return {
             willHealPlayer=true,
         },
         sfx={
-
+            spawn='spawnRaise',
+            death='deathMedium',
         },
     },    
     ['ent']={
@@ -909,7 +930,8 @@ return {
             willHealPlayer=true,
         },
         sfx={
-
+            spawn='spawnPoof',
+            death='deathMedium',
         },
     },
     ['headlessHorseman']={
@@ -970,7 +992,8 @@ return {
         },
         deathShake={magnitude=10},
         sfx={
-
+            spawn='spawnPortal',
+            death='deathHeavy',
         },
     },
     ['slimeMatron']={
@@ -1027,7 +1050,8 @@ return {
             willHealPlayer=true,
         },
         sfx={
-
+            spawn='spawnSlime',
+            death='deathMedium',
         },
     },
     ['vampire']={
@@ -1087,7 +1111,9 @@ return {
             willHealPlayer=true,
         },
         sfx={
-
+            spawn='spawnPoof',
+            summon='launchBone',
+            death='deathMedium',
         },
     },
     ['tombstone']={
@@ -1142,7 +1168,8 @@ return {
             }
         },
         sfx={
-
+            spawn='spawnRaise',
+            death='deathMedium',
         },
     },
     ['spiderEgg']={
@@ -1194,7 +1221,8 @@ return {
             }
         },
         sfx={
-
+            spawn='spawnPoof',
+            death='deathLight',
         },
     },
     ['imp']={
@@ -1257,7 +1285,9 @@ return {
             willHealPlayer=true,
         },
         sfx={
-
+            spawn='spawnPortal',
+            lunge='lungeDefault',
+            death='deathMedium',
         },
     },
     ['gnasherDemon']={
@@ -1321,7 +1351,9 @@ return {
             willHealPlayer=true,
         },
         sfx={
-
+            spawn='spawnPortal',
+            lunge='lungeBite',
+            death='deathMedium',
         },
     },
     ['frankenstein']={
@@ -1383,7 +1415,8 @@ return {
         },
         deathShake={magnitude=10},
         sfx={
-
+            spawn='spawnPoof',
+            death='deathHeavy',
         },
     },
     ['werebear']={
@@ -1443,7 +1476,9 @@ return {
         },
         deathShake={magnitude=10},
         sfx={
-
+            spawn='spawnPoof',
+            lunge='lungeBite',
+            death='deathHeavy',
         },
     },
     ['werewolf']={
@@ -1501,7 +1536,9 @@ return {
             willHealPlayer=true,
         },
         sfx={
-
+            spawn='spawnPoof',
+            lunge='lungeBite',
+            death='deathMedium',
         },
     },
     ['ghost']={
@@ -1568,7 +1605,10 @@ return {
             willHealPlayer=true,
         },
         sfx={
-
+            spawn='spawnGhost',
+            lunge='lungeDefault',
+            teleport='teleportGhost',
+            death='deathMedium',
         },
     },
     ['poltergeist']={
@@ -1635,7 +1675,9 @@ return {
             willHealPlayer=true,
         },
         sfx={
-
+            spawn='spawnGhost',
+            teleport='teleportGhost',
+            death='deathMedium',
         },
     },
     ['floatingEyeball']={
@@ -1698,7 +1740,8 @@ return {
             willHealPlayer=true,
         },
         sfx={
-
+            spawn='spawnPoof',
+            death='deathMedium',
         },
     },
     ['pyreFiend']={
@@ -1765,7 +1808,8 @@ return {
         },
         deathShake={magnitude=10},
         sfx={
-
+            spawn='spawnPortal',
+            death='deathHeavy',
         },
     },
     ['beholder']={
@@ -1834,7 +1878,8 @@ return {
         },
         deathShake={magnitude=10},
         sfx={
-
+            spawn='spawnPortal',
+            death='deathHeavy',
         },
     },
     ['giantTombstone']={
@@ -1899,7 +1944,8 @@ return {
             damping=3,
         },
         sfx={
-
+            spawn='spawnGiantTombstone',
+            death='deathBoss',
         },
     },
     ['obsidianGolem']={
@@ -1986,7 +2032,8 @@ return {
             damping=3,
         },
         sfx={
-
+            spawn='spawnPoof',
+            death='deathBoss',
         },
     },
     ['witch']={
@@ -2097,7 +2144,9 @@ return {
             damping=2,
         },
         sfx={
-
+            spawn='spawnPoof',
+            teleport='spawnPoof',
+            death='deathBoss',
         },
     },
     ['witchClone']={
@@ -2197,7 +2246,8 @@ return {
             willHealPlayer=true,
         },
         sfx={
-
+            spawn='spawnPoof',
+            teleport='spawnPoof',
         },
     },
 }

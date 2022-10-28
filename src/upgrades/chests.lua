@@ -94,6 +94,7 @@ local activateChest=function(self)
     local isBossChest=self.size=='large'
     local cardCount=isBossChest and 5 or 3
     UpgradeSelectionState:presentCards(cardCount,isBossChest)
+    Audio:playSfx('spawnPoof')
 end
 
 return { --The Module
@@ -132,6 +133,7 @@ return { --The Module
         }
         table.insert(Objects.table,chest)
         World:addItem(chest)
+        Audio:playSfx('spawnPoof')
         return chest 
     end,
 }

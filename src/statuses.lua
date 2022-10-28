@@ -9,21 +9,7 @@ return {
                 period=period,
                 cycles=cycles,
                 timer=0,
-                update=function(self,entity)
-                    self.timer=self.timer+dt 
-                    if self.timer>self.period then 
-                        entity:takeDamage({
-                            damage=self.damage,
-                            knockback=self.knockback,
-                            angle=rnd()*pi*2,
-                            textColor='red',
-                            sfx='burn',
-                        })
-                        self.cycles=self.cycles-1
-                        self.timer=0
-                    end
-                    if self.cycles==0 then return false end
-                end 
+                update=self.statusMethods.burnUpdate,
             }
             table.insert(self.table.burn,b)
         end
@@ -32,14 +18,7 @@ return {
             local f={
                 duration=duration,
                 timer=0,
-                update=function(self,entity) 
-                    self.timer=self.timer+dt 
-                    if self.timer>self.duration then 
-                        entity.moveSpeed=entity.moveSpeedMax 
-                        entity.animSpeed=entity.animSpeedMax 
-                        return false 
-                    end  
-                end
+                update=self.statusMethods.freezeUpdate,
             }
             table.insert(self.table.freeze,f)
             entity.moveSpeed=entity.moveSpeedMax*slow 
@@ -53,6 +32,31 @@ return {
             },
             burn=burn, --burn instance constructor
             freeze=freeze, --freeze instance constructor
+            statusMethods={
+                burnUpdate=function(self,entity)
+                    self.timer=self.timer+dt 
+                    if self.timer>self.period then 
+                        entity:takeDamage({
+                            damage=self.damage,
+                            knockback=self.knockback,
+                            angle=rnd()*pi*2,
+                            textColor='red',
+                            sfx='burn',
+                        })
+                        self.cycles=self.cycles-1
+                        self.timer=0
+                    end
+                    if self.cycles==0 then return false end
+                end,
+                freezeUpdate=function(self,entity) 
+                    self.timer=self.timer+dt 
+                    if self.timer>self.duration then 
+                        entity.moveSpeed=entity.moveSpeedMax 
+                        entity.animSpeed=entity.animSpeedMax 
+                        return false 
+                    end  
+                end,
+            },
             update=function(self,entity) --updates all status instances
                 for statusType,_ in pairs(self.table) do 
                     for i,status in ipairs(self.table[statusType]) do 
@@ -62,9 +66,11 @@ return {
                     end
                 end
             end,
-            clear=function(self)
+            clear=function(self,entity)
                 self.table.burn={}
                 self.table.freeze={}
+                entity.moveSpeed=entity.moveSpeedMax 
+                entity.animSpeed=entity.animSpeedMax 
             end,
         }
     end

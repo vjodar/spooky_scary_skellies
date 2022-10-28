@@ -211,10 +211,12 @@ local generateDecorations=function(self,mapDecorations,decorationsClass,grid)
     return decorations
 end
 
-local generateEnemies=function(self,enemyWave,entitiesClass,grid)
+local generateEnemies=function(self,enemyWave,entitiesClass,grid,startState)
     --update grid with the tile currently occupied by player
     self.clearPlayerTiles(grid)
     self:markPlayerTiles(grid,4)
+
+    local state=startState or 'spawn'
 
     for name,count in pairs(enemyWave) do 
         local enemyColliderDef=entitiesClass.definitions[name].collider
@@ -230,7 +232,7 @@ local generateEnemies=function(self,enemyWave,entitiesClass,grid)
                     selectedTile.x,selectedTile.y,
                     enemyColliderDef.w,enemyColliderDef.h,enemyTileSize
                 )
-                local spawnEnemy=function() entitiesClass:new(name,spawnX,spawnY) end
+                local spawnEnemy=function() entitiesClass:new(name,spawnX,spawnY,state) end
                 if i==1 then --spawn first enemy immediately
                     spawnEnemy() 
                 else --stagger all following enemy spawns

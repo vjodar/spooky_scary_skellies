@@ -103,6 +103,7 @@ return { --The Module
         exit.center=getCenter(exit)
         table.insert(Objects.table,exit)
         World:addItem(exit)
+        Audio:playSfx('spawnPoof')
         return exit 
     end,
 }

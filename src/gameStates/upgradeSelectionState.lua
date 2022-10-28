@@ -8,7 +8,7 @@ local definitions={
             spawn={
                 frames='1-14',
                 row=1,
-                durations=0.08,
+                durations=0.07,
             },
         }
     }
@@ -116,12 +116,12 @@ end
 
 local cardStateMachine={
     spawn=function(self,onLoop) --spawn poof animation
-        self.isCardVisible=(self.animations.current.position>=7)
         if onLoop then 
             self.state='idle'
             self.isCardVisible=true
             self.animations.current:pauseAtEnd()
         end
+        self.isCardVisible=self.animations.current.position>=7
     end,
     idle=function(self) --wait for player to press button
         if GameStates.acceptInput then 
@@ -142,8 +142,8 @@ local cardStateMachine={
         end
     end,
     despawn=function(self,onLoop) --despawn animation
-        self.isCardVisible=(self.animations.current.position<=6)
         if onLoop then return false end 
+        self.isCardVisible=self.animations.current.position<=6
     end,
 }
 

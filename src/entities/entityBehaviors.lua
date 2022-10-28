@@ -154,7 +154,7 @@ behaviors.methods.common={
     end,
 
     die=function(self)
-        self.status:clear()
+        self.status:clear(self)
         self.animSpeed=self.animSpeedMax
         self:changeState('dead')
         if self.name=='witch' and self.dialog then 
@@ -318,6 +318,7 @@ behaviors.methods.enemy={
         local minionName=self.attack.minion.name
         local count=self.attack.minion.count or 1
         local startState=self.attack.minion.startState
+        Audio:playSfx(self.sfx.summon)
         
         --spawn minion in center of spawner (with small deviation for natural
         --spread when multiple minions spawn at once)
@@ -427,6 +428,8 @@ behaviors.states.common={
                 stopThreshold=shake.stopThreshold,
             })
         end
+
+        Audio:playSfx(self.sfx.death)
         return false
     end,
 
@@ -749,6 +752,7 @@ behaviors.states.ally={
         end
 
         Camera:shake({magnitude=10})
+        Audio:playSfx('explodeOrb')
 
         return false
     end,
@@ -759,7 +763,10 @@ behaviors.states.enemy={
         self:updatePosition()
         self.status:update(self)
         local onLoop=self:updateAnimation()
-        if onLoop then self:changeState('idle') end
+        if onLoop then 
+            self:changeState('idle') 
+            Audio:playSfx('obsidianGolemSlam')
+        end
         Camera:shakeBypass({magnitude=20*dt,stopThreshold=0}) --shake camera during spawn
     end,
 
@@ -769,6 +776,7 @@ behaviors.states.enemy={
         local onLoop=self:updateAnimation()
         if self.animations.current.position==15 then 
             Camera:shakeBypass({magnitude=80*dt,damping=2}) --shake camera upon landing
+            Audio:playSfx('obsidianGolemSlam')
         end
         if onLoop then 
             self:changeState('idle') 
@@ -995,7 +1003,8 @@ behaviors.states.enemy={
                 local fx=cos(self.angle)*self.attack.lungeForce
                 local fy=sin(self.angle)*self.attack.lungeForce
                 self.vx=self.vx+fx
-                self.vy=self.vy+fy        
+                self.vy=self.vy+fy
+                Audio:playSfx(self.sfx.lunge)   
             end 
     
             --handle collisions
@@ -1016,7 +1025,7 @@ behaviors.states.enemy={
                     })
                     table.insert(self.targetsAlreadyAttacked,other)
                 end
-            end  
+            end
         end
     end,
 
@@ -1058,7 +1067,8 @@ behaviors.states.enemy={
         local onLoop=self:updateAnimation()
         if onLoop then
             self.targetsAlreadyAttacked={}
-            local nextState=rnd(2)>1 and 'teleport' or 'idle' --50% chance            
+            local nextState=rnd(2)>1 and 'teleport' or 'idle' --50% chance    
+            if nextState=='teleport' then Audio:playSfx(self.sfx.teleport) end         
             self:changeState(nextState)
         end
 
@@ -1069,7 +1079,8 @@ behaviors.states.enemy={
                 local fx=cos(self.angle)*self.attack.lungeForce
                 local fy=sin(self.angle)*self.attack.lungeForce
                 self.vx=self.vx+fx
-                self.vy=self.vy+fy        
+                self.vy=self.vy+fy     
+                Audio:playSfx(self.sfx.lunge)   
             end 
     
             --handle collisions
@@ -1108,6 +1119,7 @@ behaviors.states.enemy={
         local onLoop=self:updateAnimation()
         if onLoop then 
             local nextState=rnd(4)>1 and 'teleport' or 'idle' --75% chance
+            if nextState=='teleport' then Audio:playSfx(self.sfx.teleport) end   
             self:changeState(nextState)
         end 
 
@@ -1151,6 +1163,7 @@ behaviors.states.enemy={
             self.center.x,self.center.y=c.x,c.y
 
             self:changeState('spawn') 
+            Audio:playSfx(self.sfx.spawn)
         end
     end,
 
@@ -1200,6 +1213,7 @@ behaviors.states.enemy={
                 table.insert(self.targetsAlreadyAttacked,target)
             end
             self:spawnMinions()
+            Audio:playSfx('obsidianGolemSlam')
         end
     end,
 
@@ -1341,7 +1355,7 @@ behaviors.states.enemy={
         local onLoop=self:updateAnimation()
         if onLoop then --summon clone
             local clone=Entities:new(self.attack.clone.name,self.x,self.y)
-            clone.dialog=UI:newDialog(clone,45)
+            clone.dialog=UI:newDialog(clone,45,'dialogWitch')
             self:changeState(rndElement({'teleport','idle'}))
             local messages={
                 "AAAAAHAHAHAHAHA!",
@@ -1375,6 +1389,7 @@ behaviors.states.enemy={
             })
         end
         if self.dialog then self.dialog:destroy() end
+        Audio:playSfx(self.sfx.death)
         return false
     end,
 }

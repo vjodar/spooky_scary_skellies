@@ -10,6 +10,7 @@ local projectileDefinitions={
         sfx={
             launch='launchBone',
             bounce='bounceBone',
+            destroy='projectileDestroy',
         }
     },
     ['arrow']={
@@ -23,6 +24,7 @@ local projectileDefinitions={
         sfx={
             launch='launchDefault',
             bounce='bounceDefault',
+            destroy='projectileDestroy',
         },
     },
     ['flame']={
@@ -35,6 +37,7 @@ local projectileDefinitions={
         },
         sfx={
             launch='launchFlame',
+            destroy='launchFlame',
         },
     },
     ['icicle']={
@@ -47,6 +50,7 @@ local projectileDefinitions={
         },
         sfx={
             launch='launchIcicle',
+            destroy='launchIcicle',
         },
     },
     ['spark']={
@@ -72,6 +76,7 @@ local projectileDefinitions={
         },
         sfx={
             launch='launchDefault',
+            destroy='projectileDestroy',
         },
     },
     ['pickaxe']={
@@ -84,6 +89,7 @@ local projectileDefinitions={
         },
         sfx={
             launch='launchBone',
+            destroy='projectileDestroy',
         },
     },
     ['apple']={
@@ -96,6 +102,7 @@ local projectileDefinitions={
         },
         sfx={
             launch='launchDefault',
+            destroy='projectileDestroy',
         },
     },
     ['jack-o-lantern']={
@@ -142,6 +149,7 @@ local projectileDefinitions={
         collider={w=3, h=3, class='enemyProjectile'},
         sfx={
             launch='launchBone',
+            destroy='projectileDestroy',
         },
     },
     ['bottle']={
@@ -149,6 +157,7 @@ local projectileDefinitions={
         collider={w=3, h=3, class='enemyProjectile'},
         sfx={
             launch='launchBone',
+            destroy='projectileDestroy',
         },
     },
     ['candle']={
@@ -156,6 +165,7 @@ local projectileDefinitions={
         collider={w=3, h=3, class='enemyProjectile'},
         sfx={
             launch='launchBone',
+            destroy='projectileDestroy',
         },
     },
     ['fireball']={
@@ -323,6 +333,7 @@ local projectileDefinitions={
         },
         sfx={
             launch='launchIcicle',
+            destroy='launchIcicle',
         },
     },
     ['fireballWitch']={
@@ -397,7 +408,7 @@ local projectileOnHitFunctions=function()
         ['base']=function(self,target,touch)
             if target.collisionClass=='solid' 
             then 
-                Audio:playSfx(self.sfx.hit)
+                Audio:playSfx(self.sfx.destroy)
                 return false 
             end
 
@@ -423,7 +434,7 @@ local projectileOnHitFunctions=function()
                     Audio:playSfx(self.sfx.bounce)
                     return
                 else 
-                    Audio:playSfx(self.sfx.hit)
+                    Audio:playSfx(self.sfx.destroy)
                     return false 
                 end
             end
@@ -451,7 +462,7 @@ local projectileOnHitFunctions=function()
                     Audio:playSfx(self.sfx.bounce)
                     return
                 else 
-                    Audio:playSfx(self.sfx.hit)
+                    Audio:playSfx(self.sfx.destroy)
                     return false 
                 end 
             end
@@ -504,7 +515,7 @@ local projectileOnHitFunctions=function()
         ['flame']=function(self,target,touch)
             if target.collisionClass=='solid' 
             then 
-                Audio:playSfx(self.sfx.hit)
+                Audio:playSfx(self.sfx.destroy)
                 return false 
             end
 
@@ -528,7 +539,7 @@ local projectileOnHitFunctions=function()
         ['icicle']=function(self,target,touch)
             if target.collisionClass=='solid' 
             then
-                Audio:playSfx(self.sfx.hit)
+                Audio:playSfx(self.sfx.destroy)
                 return false 
             end
                

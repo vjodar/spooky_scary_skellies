@@ -5,11 +5,7 @@ function love.conf(t)
     t.window.width=1000         --The window width (number)
     t.window.height=750         --The window height (number)
     t.window.resizable=true
-
-    --testing---------------
-    -- t.window.vsync=false 
-    --testing---------------
-
+    
     t.modules.physics=false
     t.modules.joystick=false 
     t.modules.thread=false 

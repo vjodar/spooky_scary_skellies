@@ -1,12 +1,15 @@
 local start=function(self)
     GameStates:addState(self)
-    Camera.smoother=Camera.smooth.damped(0.5)
+    Camera.smoother=Camera.smooth.damped(3)
     self.playButton.isActive=false --will wait for fade to finish
     local activatePlayButton=function() 
-        self.playButton:update(self.x,self.y)
+        self.playButton:update(self.x,self.y+32)
         self.playButton.isActive=true 
     end 
-    Timer:after(0.5,function() FadeState:fadeIn({fadeTime=2,afterFn=activatePlayButton}) end)
+    Timer:after(0.5,function() 
+        FadeState:fadeIn({fadeTime=2,afterFn=activatePlayButton}) 
+        Audio:playSong('title')
+    end)
 end 
 
 local newImage=love.graphics.newImage
@@ -53,6 +56,7 @@ local playButton={
             if userPressedMe==true then 
                 self.state='up'
                 Audio:playSfx('accept')
+                Audio:setVolume(1,0.2)
                 PlayState:startGame()
                 return false
             end
@@ -68,7 +72,7 @@ local playButton={
 return {
     x=0, y=0,
     enemyFocus={ --used to pan camera to an enemy periodically
-        period=3.5,
+        period=1.5,
         timer=0,
     },
     text={
@@ -93,17 +97,32 @@ return {
             local newTarget=rndElement(enemies).center
             Camera.target=newTarget
             --choose a new target to focus after ~0.5s after pan
-            focus.period=0.5+getDistance(Camera,newTarget)*0.01
+            focus.period=getDistance(Camera,newTarget)*0.005
         end
 
         self.x,self.y=Camera:position()
         if self.playButton.isActive then             
-            return self.playButton:update(self.x,self.y) 
+            return self.playButton:update(self.x,self.y+32) 
         end
     end,
     draw=function(self)
         love.graphics.draw(self.text.title,self.x-88,self.y-164)
         love.graphics.draw(self.text.author,self.x-50,self.y-68)
+        love.graphics.printf("Music By:",Fonts.big,
+            self.x-375,self.y+150,750,'center'
+        )
+        love.graphics.printf(
+            "FearOfDark, chuneboi, meanings, Ethlial",
+            self.x-375,self.y+160,750,'center'
+        )
+        love.graphics.printf(
+            "hanna, amelia, kfaraday, TristEndo",
+            self.x-375,self.y+170,750,'center'
+        )
+        love.graphics.printf(
+            "Jred, Laz, drexegar, VinsCool",
+            self.x-375,self.y+180,750,'center'
+        )
         if self.playButton.isActive then self.playButton:draw() end
     end,
     start=start,

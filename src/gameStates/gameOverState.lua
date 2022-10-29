@@ -7,9 +7,10 @@ end
 
 local win=function(self)
     GameStates:addState(self)
-    self.alpha=0
+    self.alpha=-0.2
     self.state='fadeInWin'
     Hud:hide()
+    Audio:playSong('win')
 end
 
 local updateFunctions={
@@ -109,6 +110,7 @@ local buttons={
             if userPressedMe==true then 
                 self.state='up'
                 Audio:playSfx('accept')
+                Audio:setVolume(1,0) --fade out music
                 FadeState:fadeOut({
                     fadeTime=0.5,
                     afterFn=resetGame,

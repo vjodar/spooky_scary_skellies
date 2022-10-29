@@ -143,14 +143,6 @@ function player:draw()
         nil,self.scaleX,1,self.xOrigin,self.yOrigin
     )
     love.graphics.setColor(1,1,1,1)
-    -- --testing------------------------------------------
-    -- love.graphics.print(self.moveSpeed,self.x-10,self.y-10)
-    -- love.graphics.print(self.center.y,self.x-10,self.y)
-    -- love.graphics.print('STATES: '..#gameStates,self.x-10,self.y-30)
-    -- love.graphics.print('objects: '..#Objects.table,self.x-10,self.y-60)
-    -- love.graphics.print('items: '..World:countItems(),self.x-10,self.y-90)
-    -- love.graphics.print('ENEMIES()[]: '..LevelManager.currentLevel.enemyCount,self.x-10,self.y-60)
-    -- --testing------------------------------------------
 end
 
 function player:updatePosition()

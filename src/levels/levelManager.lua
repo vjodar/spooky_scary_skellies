@@ -295,7 +295,15 @@ local buildLevel=function(self,lvl,skeletons)
         end 
     end
 
-    if lvl=='dungeonBoss' then CutsceneState:bossCutscene() end  
+    if lvl=='dungeonBoss' then 
+        CutsceneState:bossCutscene() 
+        Audio:playSong('dungeonBossWaves')
+    else 
+        if Audio.currentSong~=levelDef.song then 
+            Audio:playSong(levelDef.song)
+        end
+    end
+
 
     self.update=self.wait --wait until any fading/camera panning is done
 end
@@ -351,9 +359,6 @@ local wait=function(self)
 end
 
 local updateStandard=function(self) 
-    --testing-----------------------------
-    -- if love.timer.getAverageDelta()>0.1 then Objects:clear() end
-    --testing-----------------------------
     local level=self.currentLevel 
     if level.anim then level.anim:update(dt) end
     if level.complete then return end
@@ -383,6 +388,9 @@ local updateStandard=function(self)
             }
             self.update=self.updateBoss
             self:setEntityAggro(false) --disable entity aggro
+            if Audio.currentSong~=level.definition.song then 
+                Audio:playSong(level.definition.song) --play boss music
+            end
 
             local panObjects={
                 { --watch boss spawn
@@ -424,6 +432,7 @@ local updateBoss=function(self)
 
     if level.boss.state=='dead' then 
         level.complete=true
+        Audio:setVolume(1,0) --fade out music
         self:killEntities('enemy') --destroy any other enemies
         if level.name=='dungeonBoss' then 
             self:endTheGame()
@@ -674,27 +683,5 @@ return { --The Module
         for i=1,#self.currentLevel.decorations do --draw ground decorations
             self.currentLevel.decorations[i]:draw()
         end
-        --testing------------------------------------------------------
-        -- for i=1,#self.currentLevel.grid do 
-        --     for j=1,#self.currentLevel.grid[i] do
-        --         local tile=self.currentLevel.grid[i][j] 
-        --         love.graphics.rectangle('line',tile.x,tile.y,16,16)
-        --         if #tile.occupiedBy>0 then 
-        --             local o=tile.occupiedBy[1]
-        --             if o=='player' then love.graphics.setColor(1,0,0)
-        --             -- elseif o=='terrain' then love.graphics.setColor(0,1,0)
-        --             -- elseif o=='border' then love.graphics.setColor(0,0,1)
-        --             -- elseif o=='decoration' then love.graphics.setColor(0,1,1)
-        --             end
-        --             love.graphics.rectangle('line',tile.x,tile.y,16,16)
-        --             love.graphics.setColor(1,1,1)
-        --         end
-        --     end
-        -- end
-        -- for i=1,#level.boundaries do 
-        --     local b=level.boundaries[i]
-        --     love.graphics.rectangle('line',b.x,b.y,b.w,b.h)
-        -- end
-        --testing------------------------------------------------------
     end,
 }

@@ -4,12 +4,6 @@ behaviors.methods={} --Methods--------------------------------------------------
 behaviors.methods.common={
 
     update=function(self)
-        --testing-------------------------------------------
-        if self.AI[self.state]==nil then 
-            print(self.name.." doesn't have behavior for state: "..self.state)
-            return false 
-        end
-        --testing-------------------------------------------
         return self.AI[self.state](self) 
     end,
 
@@ -25,12 +19,6 @@ behaviors.methods.common={
             nil,self.scaleX,1,self.xOrigin,self.yOrigin
         )
         love.graphics.setColor(1,1,1,1)
-        --testing------------------------
-        -- love.graphics.circle('line',self.moveTarget.center.x,self.moveTarget.center.y,3)
-        -- love.graphics.rectangle(
-        --     'line',self.center.x-57,self.center.y-32,114,64
-        -- )
-        --testing------------------------
     end,
 
     changeState=function(self,newState)

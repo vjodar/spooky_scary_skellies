@@ -14,6 +14,7 @@ function love.load()
 
     --Game States
     GameStates=require 'src.gameStates.gameStates'
+    Audio=require 'src.gameStates.audioState'
     Controls=require 'src.gameStates.controlState'
     Timer=require 'src.gameStates.timerState'
     PlayState=require 'src.gameStates.playState'  
@@ -25,7 +26,6 @@ function love.load()
     CutsceneState=require 'src.gameStates.cutsceneState'
 
     --Modules
-    Audio=require 'src.audio'
     UI=require 'src.userInterface'
     Camera=require 'src.camera'
     World=require 'src.world'
@@ -41,6 +41,7 @@ function love.load()
     SpecialAttacks=require 'src.specialAttacks'
     Upgrades=require 'src.upgrades.upgrades'
 
+    GameStates:addState(Audio)
     GameStates:addState(Timer)
     GameStates:addState(Controls)
     GameStates:addState(PlayState)
@@ -50,9 +51,6 @@ end
 
 function love.update(_dt)
     dt=_dt --update delta time
-    --testing-----------------------------------------------------------------------
-    -- if not love.keyboard.isDown('space') then return end --step 1 frame at a time
-    --testing-----------------------------------------------------------------------
     GameStates:update()
 end
 

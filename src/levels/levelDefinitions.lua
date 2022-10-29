@@ -44,6 +44,7 @@ return {
         },
         maxEnemies=10,
         exit={name='swampWallHole',pos={x=245,y=26+31}},
+        song='swampLevel',
         nextLevel='swampL2',
     },
     ['swampL2']={
@@ -64,6 +65,7 @@ return {
         },
         maxEnemies=10,
         exit={name='swampWallHole',pos={x=373,y=26+31}},
+        song='swampLevel',
         nextLevel='swampL3',
     },
     ['swampL3']={
@@ -82,6 +84,7 @@ return {
         },
         maxEnemies=20,
         exit={name='swampWallHole',pos={x=373,y=26+31}},
+        song='swampLevel',
         nextLevel='swampL4',
     },
     ['swampL4']={
@@ -104,6 +107,7 @@ return {
         },
         maxEnemies=20,
         exit={name='swampWallHole',pos={x=373,y=26+31}},
+        song='swampLevel',
         nextLevel='swampL5',
     },
     ['swampL5']={
@@ -124,6 +128,7 @@ return {
         },
         maxEnemies=20,
         exit={name='swampWallHole',pos={x=373,y=26+31}},
+        song='swampLevel',
         nextLevel='swampL6',
     },
     ['swampL6']={
@@ -141,6 +146,7 @@ return {
         },
         maxEnemies=20,
         exit={name='swampWallHole',pos={x=373,y=26+31}},
+        song='swampLevel',
         nextLevel='swampL7',
     },
     ['swampL7']={
@@ -158,6 +164,7 @@ return {
         },
         maxEnemies=20,
         exit={name='swampWallHole',pos={x=373,y=26+31}},
+        song='swampLevel',
         nextLevel='swampL8',
     },
     ['swampL8']={
@@ -181,6 +188,7 @@ return {
         },
         maxEnemies=20,
         exit={name='swampWallHole',pos={x=373,y=26+31}},
+        song='swampLevel',
         nextLevel='swampBoss',
     },
     ['swampBoss']={
@@ -198,6 +206,7 @@ return {
         },
         maxEnemies=50,
         exit={name='swampWallHole',pos={x=288,y=26+31}}, --swamp boss
+        song='swampBoss',
         nextLevel='caveL1',
     },
     ['caveL1']={
@@ -216,6 +225,7 @@ return {
         },
         maxEnemies=50,
         exit={name='caveWallHole',pos={x=380,y=32+26}},
+        song='caveLevel',
         nextLevel='caveL2',
     },
     ['caveL2']={
@@ -232,6 +242,7 @@ return {
         },
         maxEnemies=30,
         exit={name='caveWallHole',pos={x=380,y=32+26}},
+        song='caveLevel',
         nextLevel='caveL3',
     },
     ['caveL3']={
@@ -244,6 +255,7 @@ return {
         },
         maxEnemies=30,
         exit={name='caveWallHole',pos={x=380,y=32+26}},
+        song='caveLevel',
         nextLevel='caveL4',
     },
     ['caveL4']={
@@ -258,6 +270,7 @@ return {
         },
         maxEnemies=40,
         exit={name='ladderDown'},
+        song='caveLevel',
         nextLevel='caveL5',
     },
     ['caveL5']={
@@ -273,6 +286,7 @@ return {
         },
         maxEnemies=40,
         exit={name='ladderDown'},
+        song='caveLevel',
         nextLevel='caveL6',
     },
     ['caveL6']={
@@ -293,6 +307,7 @@ return {
         },
         maxEnemies=40,
         exit={name='ladderDown'},
+        song='caveLevel',
         nextLevel='caveBoss',
     },
     ['caveBoss']={
@@ -310,6 +325,7 @@ return {
         },
         maxEnemies=50,
         exit={name='ladderUp'},
+        song='caveBoss',
         nextLevel='dungeonL1',
     },
     ['dungeonL1']={
@@ -327,6 +343,7 @@ return {
         },
         maxEnemies=50,
         exit={name='dungeonStairs'},
+        song='dungeonLevel',
         nextLevel='dungeonL2',
     },
     ['dungeonL2']={
@@ -344,6 +361,7 @@ return {
         },
         maxEnemies=100,
         exit={name='dungeonStairs'},
+        song='dungeonLevel',
         nextLevel='dungeonL3',
     },
     ['dungeonL3']={
@@ -360,6 +378,7 @@ return {
         },
         maxEnemies=100,
         exit={name='dungeonStairs'},
+        song='dungeonLevel',
         nextLevel='dungeonL4',
     },
     ['dungeonL4']={
@@ -380,6 +399,7 @@ return {
         },
         maxEnemies=100,
         exit={name='dungeonStairs'},
+        song='dungeonLevel',
         nextLevel='dungeonL5',
     },
     ['dungeonL5']={
@@ -401,6 +421,7 @@ return {
         },
         maxEnemies=100,
         exit={name='dungeonStairs'},
+        song='dungeonLevel',
         nextLevel='dungeonL6',
     },
     ['dungeonL6']={
@@ -423,6 +444,7 @@ return {
         },
         maxEnemies=100,
         exit={name='dungeonStairs'},
+        song='dungeonLevel',
         nextLevel='dungeonBoss',
     },
     ['dungeonBoss']={
@@ -476,6 +498,7 @@ return {
         },
         maxEnemies=200,
         exit={name='dungeonStairs'},
+        song='dungeonBoss',
         nextLevel='test',
     },
 }

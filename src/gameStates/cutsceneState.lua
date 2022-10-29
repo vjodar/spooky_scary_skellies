@@ -35,9 +35,15 @@ local tutorialCutscene=function(self)
             end
         end
         self.witch:changeState('despawn')
+        Audio:playSfx(Entities.definitions.witch.sfx.spawn)
         for i=1,#demons do 
-            Timer:after(0.1*i,function() demons[i]:changeState('despawn') end)
+            Timer:after(0.1*i,function() 
+                demons[i]:changeState('despawn') 
+                Audio:playSfx(Entities.definitions.imp.sfx.spawn)
+            end)
         end
+        local vol=Audio.musicVolume.default 
+        Audio:setVolume(1,vol) --restore full vol
     end
     local endTutorialCutscene=function()
         CutsceneState.cutsceneDone=true
@@ -86,6 +92,7 @@ local bossCutscene=function(self)
     self.cutsceneDone=false
     LevelManager:setEntityAggro(false)
     Hud:hide()
+    Audio:playSong('dungeonBossWaves')
     
     local bossSpawnPos=LevelManager.currentLevel.bossData.spawnPos
     local setupWitchActor=function()

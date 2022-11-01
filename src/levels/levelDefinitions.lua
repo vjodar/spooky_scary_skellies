@@ -1,26 +1,4 @@
 return {
-    ['test']={
-        map='swamp3',
-        waves={
-            {
-                obsidianGolem=1,
-            },
-            -- {
-            --     spider=10,            
-            --     spiderEgg=10,            
-            -- },
-            -- {
-            --     pumpkin=10,
-            --     ent=10,  
-            --     headlessHorseman=4,     
-            -- },
-        },
-        maxEnemies=100, --used to limit summoner enemies' minion spawns
-        exit={name='swampWallHole',pos={x=245,y=26+31}}, --small swamp
-        -- exit={name='swampWallHole',pos={x=288,y=26+31}}, --swamp boss
-        -- exit={name='ladderUp'},
-        nextLevel='test',
-    },
     ['tutorial']={
         map='swamp3',
         waves={},
@@ -249,7 +227,10 @@ return {
         map='cave2',
         waves={
             {
-                spiderEgg=40,
+                spiderEgg=20,
+            },
+            {
+                spiderEgg=20,
                 ghost=20,
             },
         },
@@ -335,7 +316,7 @@ return {
                 poltergeist=20,
             },
             {
-                floatingEyeball=20,
+                floatingEyeball=30,
             },
             {
                 possessedArcher=20,
@@ -372,8 +353,8 @@ return {
                 vampire=15,
             },
             {
-                possessedArcher=15,
-                imp=15,
+                possessedArcher=30,
+                imp=30,
             },
         },
         maxEnemies=100,
@@ -415,8 +396,8 @@ return {
             },
             {
                 gnasherDemon=10,
-                imp=10,
-                pyreFiend=3,
+                imp=20,
+                pyreFiend=4,
             },
         },
         maxEnemies=100,
@@ -437,9 +418,9 @@ return {
                 possessedKnight=5,             
             },
             {
-                gnasherDemon=10,
-                imp=10,
-                beholder=3,
+                gnasherDemon=20,
+                imp=20,
+                beholder=4,
             },
         },
         maxEnemies=100,
@@ -471,23 +452,23 @@ return {
                 undeadMiner=50,
             },
             {
-                werewolf=80,
-                werebear=10,
-            },
-            {
                 slime=30,
-                slimeMatron=70,
+                slimeMatron=30,
             },
             {
                 bat=30,
-                vampire=70,
+                vampire=50,
+            },
+            {
+                werewolf=80,
+                werebear=10,
             },
             {
                 possessedKnight=50,
                 possessedArcher=50,
             },
             {
-                frankenstein=25,
+                frankenstein=30,
             },
             {
                 headlessHorseman=25,
@@ -496,7 +477,7 @@ return {
                 witch=1,
             },
         },
-        maxEnemies=200,
+        maxEnemies=100,
         exit={name='dungeonStairs'},
         song='dungeonBoss',
         nextLevel='test',

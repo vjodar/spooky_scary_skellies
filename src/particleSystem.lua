@@ -64,7 +64,8 @@ local pSystem={ --The Module
         self.vy=self.vy-(self.vy*self.linearDamping*dt)
         self.duration=self.duration-dt 
         if self.duration<0 then 
-            if self.willHealPlayer then
+            local pHealth=Player.health
+            if self.willHealPlayer and pHealth.current~=pHealth.max then
                 self.speed=300
                 self.update=self.travelToPlayer 
                 return

@@ -230,6 +230,22 @@ local restartLevel=function(self)
     FadeState:fadeBoth({fadeTime=0.4,afterFn=rebuildCurrentLevel,holdTime=0.4})
 end
 
+--called when averageFPS>0.1 to prevent game hanging
+local restartAndReduceLoad=function(self)
+    if GameStates.acceptInput==false then return end
+
+    --prevent physics engine hanging by reducing all enemy counts and maximum
+    --number of enemies in the level and restarting.
+    local levelDef=self.currentLevel.definition 
+    for i=1,#levelDef.waves do 
+        for enemy,count in pairs(levelDef.waves[i]) do 
+            count=max(1,ceil(count*0.50)) 
+        end        
+    end
+    levelDef.maxEnemies=max(1,ceil(levelDef.maxEnemies*0.75))
+    self:restartLevel()
+end
+
 local buildLevel=function(self,lvl,skeletons)
     local levelDef=self.levelDefinitions[lvl]
     local map=self.mapDefinitions[levelDef.map]
@@ -304,7 +320,6 @@ local buildLevel=function(self,lvl,skeletons)
         end
     end
 
-
     self.update=self.wait --wait until any fading/camera panning is done
 end
 
@@ -359,6 +374,7 @@ local wait=function(self)
 end
 
 local updateStandard=function(self) 
+    if love.timer.getAverageDelta()>0.2 then self:restartAndReduceLoad() end
     local level=self.currentLevel 
     if level.anim then level.anim:update(dt) end
     if level.complete then return end
@@ -424,6 +440,7 @@ local updateStandard=function(self)
 end
 
 local updateBoss=function(self)
+    if love.timer.getAverageDelta()>0.2 then self:restartAndReduceLoad() end
     local level=self.currentLevel
     if level.anim then level.anim:update(dt) end 
     if level.complete then return end --waiting for player to exit level
@@ -661,6 +678,7 @@ return { --The Module
     startNextLevel=startNextLevel,
     buildLevel=buildLevel,
     restartLevel=restartLevel,
+    restartAndReduceLoad=restartAndReduceLoad,
     spawnExit=spawnExit,
     killEntities=killEntities,
     wait=wait,

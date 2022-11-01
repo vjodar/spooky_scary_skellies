@@ -125,30 +125,32 @@ local sfxDefinitions={
     'reject',
 }
 
-local createSources=function(defs,dir,channels)
+local createSources=function(defs,dir)
     local sources={}
-    for i=1,channels do table.insert(sources,{}) end
+    local averages={}
 
     local newSource=function(name) 
         return love.audio.newSource(dir..name..'.wav','static')
     end
 
-    for i=1,#defs do --create audio source in all channels
-        for j=1,channels do 
-            sources[j][defs[i]]=newSource(defs[i]) 
-        end
+    for i=1,#defs do --channel for all sfx sources
+        sources[defs[i]]=newSource(defs[i]) 
+        averages[defs[i]]=0 
     end 
 
-    return sources
+    return sources,averages
 end
+local sfx,sfxAverage=createSources(sfxDefinitions,'assets/sounds/')
 
-local playSfx=function(self,name)
-    if self.isMute==true then print("muted") return end 
+local playSfx=function(self,name)  
     if name==nil then return end 
-    local sfx=self.sfx[rnd(4)][name] --pick random channel
+    if self.isMute==true then return end 
+    if self.sfxAverage[name]>self.sfxAverageMax then return end --limit average sfx plays
+    local sfx=self.sfx[name]
     sfx:stop() --stop and rewind
     sfx:setPitch(1+rnd(-1,1)*0.1) --minor pitch variation
     sfx:play()
+    self.sfxAverage[name]=self.sfxAverage[name]+1
 end
 
 local defaultMusicVolume=0.5 --otherwise it's too loud
@@ -201,14 +203,15 @@ end
 local mute=function(self) self.isMute=true end
 local unmute=function(self) self.isMute=false end
 
-local sfxChannelCount=4 --amount of 'channels'
 return {
     isMute=false,
     mute=mute,
     unmute=unmute,
-    sfx=createSources(sfxDefinitions,'assets/sounds/',sfxChannelCount),
-    music=createSongs(),
+    sfx=sfx,
+    sfxAverage=sfxAverage, --keeps track of average sfx plays
+    sfxAverageMax=0.0000001, --used to limit average sfx plays
     playSfx=playSfx,
+    music=createSongs(),
     currentSong="",
     playSong=playSong,
     setVolume=setVolume,
@@ -218,7 +221,13 @@ return {
         target=defaultMusicVolume,
         delta=0,
     },
-    update=function(self) --smoothly changes volume of all music sources
+    update=function(self) 
+        for sfx,average in pairs(self.sfxAverage) do --update average sfx plays
+            self.sfxAverage[sfx]=average*dt
+        end
+        self:tweenVolume() --smoothly changes volume of all music sources
+    end,
+    tweenVolume=function(self)
         local vol=self.musicVolume     
         if vol.delta==0 then return end
 

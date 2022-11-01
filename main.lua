@@ -1,5 +1,6 @@
 function love.load()
     dt=0 --delta time global
+    hasFocus=true
 
     love.graphics.setDefaultFilter('nearest','nearest') --set pixelated look
     love.graphics.setLineStyle('rough') --pixelated lines
@@ -51,6 +52,7 @@ end
 
 function love.update(_dt)
     dt=_dt --update delta time
+    if hasFocus==false then return end
     GameStates:update()
 end
 
@@ -60,6 +62,8 @@ function love.draw()
     Camera.curtain:draw()
     Camera:detach()
 end
+
+function love.focus(f) hasFocus=f end
 
 function resetGame()
     --Clear tables
